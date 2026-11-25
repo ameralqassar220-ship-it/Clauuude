@@ -28,7 +28,13 @@ const stills = opt('--stills', null);
 
   const duration = await page.evaluate(() => window.DURATION);
   const total = Math.round(duration * fps);
-  const ff = spawn('ffmpeg', ['-y', '-v', 'error', '-f', 'image2pipe', '-framerate', String(fps), '-c:v', 'mjpeg', '-i', '-',
+  // Voiceover: audio/voiceover.mp3, delayed by the page's AUDIO_OFFSET, padded to the video length.
+  const voice = path.join(__dirname, 'audio', 'voiceover.mp3');
+  const offsetMs = Math.round(1000 * (await page.evaluate(() => window.AUDIO_OFFSET || 0)));
+  const audioArgs = require('fs').existsSync(voice)
+    ? ['-i', voice, '-filter_complex', `[1:a]adelay=${offsetMs}:all=1,apad[a]`, '-map', '0:v', '-map', '[a]', '-c:a', 'aac', '-b:a', '192k', '-shortest']
+    : [];
+  const ff = spawn('ffmpeg', ['-y', '-v', 'error', '-f', 'image2pipe', '-framerate', String(fps), '-c:v', 'mjpeg', '-i', '-', ...audioArgs,
     '-c:v', 'libx264', '-preset', 'medium', '-crf', '18', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', out], { stdio: ['pipe', 'inherit', 'inherit'] });
 
   for (let i = 0; i < total; i++) {

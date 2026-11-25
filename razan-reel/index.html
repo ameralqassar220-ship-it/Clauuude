@@ -131,32 +131,39 @@ const easeInOut = p => p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
 const easeBack = p => { const c = 1.6; return 1 + (c + 1) * Math.pow(p - 1, 3) + c * Math.pow(p - 1, 2); };
 const prog = (t, a, d) => clamp((t - a) / d);
 
+// Voiceover (audio/voiceover.mp3) starts at AUDIO_OFFSET; phrase times come from its pauses.
+const AUDIO_OFFSET = 0.3;
+const A = x => x + AUDIO_OFFSET;
 // Scene windows [start, end] in seconds
-const SC = { s1: [0, 3.6], s2: [3.6, 7.8], s3: [7.8, 12.2], s4: [12.2, 16.4], s5: [16.4, 20.6], s6: [20.6, 24.4], s7: [24.4, 30] };
-const DURATION = 30;
+const SC = { s1: [0, A(2.75)], s2: [A(2.75), A(5.7)], s3: [A(5.7), A(10.65)], s4: [A(10.65), A(13.6)], s5: [A(13.6), A(16.9)], s6: [A(16.9), A(18.9)], s7: [A(18.9), 25] };
+const DURATION = 25;
 
-// Captions: [start, end, "words", highlight-indexes {i: 'hl'|'hs'}]
+// Caption groups: spoken segments [start, end, "words"] (audio time) + highlighted word indexes.
 const CAPS = [
-  [0.25, 3.5,  "Building a closet or a kitchen in the UAE?", { 2: 'hs', 5: 'hs' }],
-  [3.75, 7.7,  "Aluminium profiles for all four sides.", { 3: 'hl', 4: 'hl', 5: 'hl' }],
-  [7.95, 12.1, "6mm glass, cut to your exact size.", { 5: 'hs', 6: 'hs' }],
-  [12.35, 16.3, "Delivered pre-cut, labelled, ready to install.", { 3: 'hl', 4: 'hl', 5: 'hl' }],
-  [16.55, 20.5, "Your quote in 2 hours. Cut in 48.", { 3: 'hs', 4: 'hs' }],
-  [20.75, 24.3, "Four steps. One supplier.", { 3: 'hl' }],
-  [24.55, 30,  "Get your quote today.", { 2: 'hs' }],
+  { hl: { 2: 'hs', 5: 'hs' }, segs: [[0.02, 2.58, "Building a closet or a kitchen in the UAE?"]] },
+  { hl: { 4: 'hl', 5: 'hl', 6: 'hl' }, segs: [[2.84, 5.54, "Get aluminium profiles for all four sides!"]] },
+  { hl: { 2: 'hs', 3: 'hs', 4: 'hs' }, segs: [[5.78, 7.06, "6mm glass:"], [7.22, 8.72, "fluted, mesh, tinted"]] },
+  { hl: { 3: 'hl', 4: 'hl' }, segs: [[8.97, 10.5, "cut to your exact size!"]] },
+  { hl: { 5: 'hs', 6: 'hs', 7: 'hs' }, segs: [[10.73, 11.63, "Delivered pre-cut,"], [11.79, 13.44, "labelled, and ready to install."]] },
+  { hl: { 4: 'hl', 5: 'hl' }, segs: [[13.67, 15.47, "Your quote in just 2 hours."], [15.69, 16.69, "Cut in 48!"]] },
+  { hl: { 3: 'hl' }, segs: [[17.0, 18.73, "Four steps. One supplier."]] },
+  { hl: { 1: 'hs', 5: 'hl' }, segs: [[18.96, 22.08, "Visit razanuae.com and get your quote today!"]] },
 ];
+// how long each word takes to say, relative (defaults to its letter count)
+const SPOKEN = { '6mm': 13, '48!': 10, '2': 3, 'razanuae.com': 17, 'UAE?': 6 };
 const capsEl = $('caps');
-const capData = CAPS.map(([a, b, text, hl]) => {
+const capData = CAPS.map((g, gi) => {
   const el = document.createElement('div'); el.className = 'cap';
-  const words = text.split(' ').map((w, i) => {
-    const s = document.createElement('span'); s.className = 'w' + (hl[i] ? ' ' + hl[i] : ''); s.textContent = w; el.appendChild(s); return s;
+  const words = [], times = [];
+  g.segs.forEach(([sa, sb, text]) => {
+    const ws = text.split(' '), wt = ws.map(w => (SPOKEN[w] || w.replace(/[^\w]/g, '').length) + 2);
+    const tot = wt.reduce((x, y) => x + y, 0); let acc = 0;
+    ws.forEach((w, i) => { times.push(A(sa + (sb - sa) * acc / tot) - .04); acc += wt[i]; words.push(w); });
   });
+  const spans = words.map((w, i) => { const s = document.createElement('span'); s.className = 'w' + (g.hl[i] ? ' ' + g.hl[i] : ''); s.textContent = w; el.appendChild(s); return s; });
   capsEl.appendChild(el);
-  // reveal words across the first ~60% of the window, weighted by length
-  const lens = words.map(w => w.textContent.length + 3), tot = lens.reduce((x, y) => x + y, 0);
-  const span = Math.min(2.4, (b - a) * 0.62); let acc = 0;
-  const times = lens.map(l => { const tt = a + span * acc / tot; acc += l; return tt; });
-  return { a, b, el, words, times };
+  const a = times[0], b = gi + 1 < CAPS.length ? A(CAPS[gi + 1].segs[0][0]) - .06 : DURATION + 1;
+  return { a, b, el, words: spans, times };
 });
 
 function set(el, { x = 0, y = 0, s = 1, r = 0, o = 1, tx = '' } = {}) {
@@ -217,8 +224,8 @@ window.render = function (t) {
 
   // S6 — steps light up in sequence
   ['s6a', 's6b', 's6c', 's6d'].forEach((id, i) => {
-    set($(id), pop(t, SC.s6, i * .18));
-    const on = prog(t, SC.s6[0] + .9 + i * .55, .3);
+    set($(id), pop(t, SC.s6, i * .12));
+    const on = prog(t, SC.s6[0] + .35 + i * .33, .25);
     const n = $(id).querySelector('.n');
     n.style.background = on > .5 ? 'var(--navy)' : 'var(--mist)';
     n.style.color = on > .5 ? '#fff' : 'var(--navy)';
@@ -244,7 +251,7 @@ window.render = function (t) {
     });
   });
 };
-window.DURATION = DURATION;
+window.DURATION = DURATION; window.AUDIO_OFFSET = AUDIO_OFFSET;
 window.render(new URLSearchParams(location.search).has('t') ? +new URLSearchParams(location.search).get('t') : 2.5);
 </script>
 </body>
