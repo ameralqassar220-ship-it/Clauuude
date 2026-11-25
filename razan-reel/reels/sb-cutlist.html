@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Razan — "Send your drawing" storyboard ad (9:16, ~15 s)</title>
+<!-- One-off storyboard ad. Timeline: 0–2 WhatsApp sketch · 2–8 sketch -> drawing -> exploded cut list (receipt) ·
+     8–11 bundles · 11–13 quote on WhatsApp · 13–end end card. window.SFX lists tick/whoosh times for the audio mix.
+     Brand rule: the Razan logo never rolls, spins, bounces or scales — fade only. -->
+<style>
+  :root { --navy:#00203f; --sand:#DBAB88; --blue:#1e6fd9; --wa:#008069; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; }
+  body { font-family: Inter, sans-serif; color: #111b21; }
+  #stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: #f4f6f9; }
+  .abs { position: absolute; will-change: transform, opacity; }
+  .hide { visibility: hidden; }
+  /* WhatsApp */
+  .chat { position: absolute; inset: 0; background: #efeae2; }
+  .chat:before { content: ''; position: absolute; inset: 0; opacity: .5;
+    background: radial-gradient(circle at 20px 20px, rgba(0,0,0,.035) 3px, transparent 4px) 0 0/60px 60px, radial-gradient(circle at 50px 45px, rgba(0,0,0,.03) 2px, transparent 3px) 0 0/60px 60px; }
+  .wahead { position: absolute; left: 0; right: 0; top: 0; height: 230px; background: var(--wa); color: #fff; display: flex; align-items: flex-end; padding: 0 40px 34px; gap: 26px; }
+  .wahead .av { width: 96px; height: 96px; border-radius: 50%; background: #dfe5e7; display: grid; place-items: center; font: 700 44px Inter; color: #54656f; }
+  .wahead .av.logo { background: #fff url(../assets/logo-mark.png) center/cover; }
+  .wahead b { display: block; font: 600 44px/1.1 Inter; } .wahead span { font: 400 30px Inter; opacity: .85; }
+  .bub { position: absolute; border-radius: 22px; padding: 16px; box-shadow: 0 2px 2px rgba(0,0,0,.12); font: 400 40px/1.35 Inter; }
+  .bub.in { left: 40px; background: #fff; border-top-left-radius: 0; }
+  .bub.out { right: 40px; background: #d9fdd3; border-top-right-radius: 0; }
+  .bub .tm { display: block; text-align: right; font: 400 26px Inter; color: #667781; margin-top: 6px; }
+  .bub .tm.blue:after { content: ' ✓✓'; color: #53bdeb; }
+  .photo { width: 640px; height: 800px; border-radius: 14px; overflow: hidden; position: relative; background: #e9e4d8; }
+  /* drawing stage */
+  #paper { position: absolute; inset: 0; background:
+      repeating-linear-gradient(0deg, rgba(30,111,217,.10) 0 1px, transparent 1px 40px), repeating-linear-gradient(90deg, rgba(30,111,217,.10) 0 1px, transparent 1px 40px), #f7f9fc; }
+  #drawing { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; transform-origin: 540px 0; }
+  .dimt { font: 700 34px "JetBrains Mono", monospace; fill: var(--blue); }
+  .hand { font: italic 700 46px Caladea, serif; fill: #3d3d3d; }
+  /* receipt */
+  #receipt { left: 90px; width: 900px; top: 760px; background: #fff; box-shadow: 0 20px 50px rgba(0,32,63,.18); overflow: hidden; }
+  #receipt .hd { padding: 26px 34px 18px; border-bottom: 3px dashed #c9d3df; font: 800 30px/1.3 "JetBrains Mono", monospace; color: var(--navy); }
+  #receipt .hd span { display: block; font: 500 24px "JetBrains Mono", monospace; color: #6b7a8a; }
+  .row { position: relative; height: 82px; border-bottom: 1px dashed #e1e7ee; }
+  .bar { position: absolute; left: 34px; top: 26px; height: 30px; border-radius: 3px; background: linear-gradient(180deg, #4a4f55, #22262b 55%, #3a3f45); }
+  .lbl { position: absolute; right: 34px; top: 22px; font: 700 32px/1.2 "JetBrains Mono", monospace; color: var(--navy); white-space: pre; }
+  .gl { position: absolute; top: 12px; width: 44px; height: 58px; border: 3px solid #22262b; background: repeating-linear-gradient(90deg, rgba(120,170,200,.35) 0 4px, rgba(200,225,240,.5) 4px 8px); }
+  .hw { position: absolute; top: 14px; width: 54px; height: 54px; border-radius: 12px; background: #eef3f8; display: grid; place-items: center; font-size: 34px; }
+  /* bundles */
+  .bundle { text-align: center; }
+  .tagline { left: 70px; right: 70px; font: 800 52px/1.2 "Inter Display", Inter; color: var(--navy); text-align: center; }
+  .tagline b { color: var(--blue); }
+  .sticker { width: 120px; height: 120px; border-radius: 50%; background: #fff url(../assets/logo-mark.png) center/86% no-repeat; box-shadow: 0 6px 16px rgba(0,0,0,.25); border: 5px solid #fff; }
+  /* quote pdf */
+  .pdf { width: 600px; background: #fff; border-radius: 12px; overflow: hidden; }
+  .pdf .pv { height: 300px; background: #f6f7f9; padding: 26px 30px; }
+  .pdf .pv i { display: block; height: 14px; border-radius: 7px; background: #dde3ea; margin-bottom: 16px; }
+  .pdf .meta { display: flex; align-items: center; gap: 20px; padding: 20px 24px; background: #f0f2f5; }
+  .pdf .ic { width: 64px; height: 76px; border-radius: 8px; background: #e2483d; color: #fff; display: grid; place-items: center; font: 800 22px Inter; }
+  .pdf .meta b { display: block; font: 600 32px Inter; } .pdf .meta span { font: 400 26px Inter; color: #667781; }
+  /* end card */
+  #end { inset: 0; background: radial-gradient(ellipse at 50% 30%, #0b3358 0%, var(--navy) 60%, #00142a 100%); color: #fff; }
+  #end .logo { position: absolute; left: 190px; top: 380px; width: 700px; height: 280px; border-radius: 34px; background: #fff url(../assets/logo.png) center/112% auto no-repeat; }
+  #end .l1 { position: absolute; left: 0; right: 0; top: 780px; text-align: center; font: 900 96px/1.05 "Inter Display", Inter; letter-spacing: -.02em; }
+  #end .l2 { position: absolute; left: 0; right: 0; top: 900px; text-align: center; font: 800 60px/1.2 "Inter Display", Inter; color: var(--sand); }
+  #end .btn { position: absolute; left: 50%; top: 1080px; padding: 34px 90px; border-radius: 999px; background: #25D366; font: 800 56px/1 Inter; white-space: nowrap; transform: translateX(-50%); }
+  #end .url { position: absolute; left: 0; right: 0; top: 1240px; text-align: center; font: 600 36px Inter; color: rgba(255,255,255,.8); letter-spacing: .06em; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <!-- DRAWING STAGE -->
+  <div id="paper" class="abs hide"></div>
+  <svg id="drawing" class="hide" viewBox="0 0 1080 1920">
+    <defs><filter id="rough" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="2" seed="7" result="n"/><feDisplacementMap id="disp" in="SourceGraphic" in2="n" scale="14"/></filter></defs>
+    <g id="art" filter="url(#rough)" fill="none" stroke-linecap="round" stroke-linejoin="round"></g>
+    <g id="dims"></g>
+  </svg>
+  <div id="receipt" class="abs hide"><div class="hd">CUT LIST · 3 SLIDING DOORS<span>OPENING 2400 × 2600 · SLIM 2×2 · ORDER S08047</span></div><div id="rows"></div></div>
+  <div id="bundles"></div>
+  <!-- CHAT -->
+  <div id="chat" class="chat">
+    <div class="wahead"><div class="av">J</div><div><b>Joinery Workshop</b><span>online</span></div></div>
+  </div>
+  <div id="end" class="abs hide">
+    <div class="logo" id="endlogo"></div>
+    <div class="l1">Send your drawing.</div>
+    <div class="l2">Cut-list &amp; price in 2 hours.</div>
+    <div class="btn">Get Quote</div>
+    <div class="url">razanuae.com · WhatsApp +971 50 201 9281</div>
+  </div>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, p) => a + (b - a) * p;
+const easeOut = p => 1 - Math.pow(1 - p, 3);
+const easeInOut = p => p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
+const easeBack = p => { const c = 1.5; return 1 + (c + 1) * Math.pow(p - 1, 3) + c * Math.pow(p - 1, 2); };
+const prog = (t, a, d) => clamp((t - a) / d);
+const NS = 'http://www.w3.org/2000/svg';
+const show = (e, o) => { e.style.opacity = o; e.classList.toggle('hide', o <= .001); };
+const SFX = [];                     // [{t, type}] for the audio mix
+const CFG = {
+  price: 'AED 7,450',               // PLACEHOLDER — replace with the real quote total before running the ad
+  voiceAt: 12.45,                    // Douglas: "Send your drawing. Cut-list and price in two hours."
+  duration: 16.0,
+};
+
+/* ---------- 0–2 s: WhatsApp bubble with a phone photo of a pencil sketch ---------- */
+const chat = $('chat');
+function bubble(cls, html, top) { const b = document.createElement('div'); b.className = 'bub ' + cls; b.style.top = top + 'px'; b.innerHTML = html; chat.appendChild(b); return b; }
+// the "phone photo": paper, slight lighting gradient, a pencil sketch (same art as the drawing stage, rendered rough)
+const sketchSVG = `<svg viewBox="200 300 680 850" width="640" height="800" style="position:absolute;inset:0;transform:rotate(-3deg) scale(1.06)">
+  <defs><filter id="r2"><feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="2" seed="7" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="14"/></filter></defs>
+  <g filter="url(#r2)" fill="none" stroke="#4a4a4a" stroke-width="5" stroke-linecap="round">ART</g></svg>`;
+const ART = (sw = 5) => `
+  <rect x="300" y="420" width="480" height="560"/>
+  <line x1="460" y1="420" x2="460" y2="980"/><line x1="620" y1="420" x2="620" y2="980"/>
+  ${[0, 1, 2].map(d => [1, 2, 3, 4, 5, 6].map(i => `<line x1="${300 + d * 160 + i * 22.8}" y1="440" x2="${300 + d * 160 + i * 22.8}" y2="960" stroke-width="${sw * .45}" opacity=".6"/>`).join('')).join('')}
+  <line x1="440" y1="700" x2="480" y2="700" stroke-width="${sw * .7}"/><line x1="600" y1="700" x2="640" y2="700" stroke-width="${sw * .7}"/>
+  <line x1="300" y1="380" x2="780" y2="380" stroke-width="${sw * .6}"/><line x1="830" y1="420" x2="830" y2="980" stroke-width="${sw * .6}"/>`;
+const HANDTXT = `<text x="540" y="360" text-anchor="middle" class="hand">2400</text><text x="880" y="700" class="hand" transform="rotate(90 880 700)" text-anchor="middle">2600</text>
+  <text x="540" y="1060" text-anchor="middle" class="hand" style="font-size:40px">3 sliding · fluted</text>`;
+const photo = `<div class="photo"><div style="position:absolute;inset:0;background:linear-gradient(135deg,#f3efe4,#ddd6c4)"></div>
+  ${sketchSVG.replace('ART', ART() + HANDTXT)}
+  <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 30% 20%,rgba(255,255,255,.35),rgba(0,0,0,.12))"></div></div>`;
+const b1 = bubble('in', photo + `<div style="padding:16px 8px 0;width:640px">2400 × 2600, 3 sliding doors, fluted glass</div><span class="tm">8:10</span>`, 290);
+const b2 = bubble('out', `<div class="pdf"><div class="pv"><b style="font:800 30px Inter;color:#00203f">RAZAN · QUOTATION</b><br><br><i style="width:80%"></i><i style="width:60%"></i><i style="width:90%"></i><i style="width:70%"></i><i style="width:85%"></i></div>
+  <div class="meta"><div class="ic">PDF</div><div><b>Quote_S08047.pdf</b><span>Cut list · 3 sliding doors · 2 pages</span></div></div></div>
+  <div style="padding:16px 8px 0;font:800 56px Inter;color:#00203f">${CFG.price}</div><div style="padding:0 8px;font:400 34px Inter;color:#3b4a54">Cut list attached — ready to produce.</div><span class="tm blue">9:40</span>`, 380);
+const b3 = bubble('in', `👍 sending the advance.<span class="tm">9:41</span>`, 1180);
+
+/* ---------- 2–8 s: sketch -> clean drawing -> dimensions -> exploded cut list ---------- */
+const art = $('art'); art.innerHTML = ART() + HANDTXT;
+const dims = $('dims');
+function dim(x1, y1, x2, y2, label, off) {
+  const g = document.createElementNS(NS, 'g'); g.setAttribute('stroke', '#1e6fd9'); g.setAttribute('stroke-width', '4'); dims.appendChild(g);
+  const v = x1 === x2, tk = 16, L = (a) => { const l = document.createElementNS(NS, 'line'); for (const k in a) l.setAttribute(k, a[k]); g.appendChild(l); };
+  L({ x1, y1, x2, y2 });
+  L(v ? { x1: x1 - tk, y1, x2: x1 + tk, y2: y1 } : { x1, y1: y1 - tk, x2: x1, y2: y1 + tk });
+  L(v ? { x1: x2 - tk, y1: y2, x2: x2 + tk, y2 } : { x1: x2, y1: y2 - tk, x2, y2: y2 + tk });
+  const tx = document.createElementNS(NS, 'text'); tx.setAttribute('class', 'dimt'); tx.setAttribute('text-anchor', 'middle'); tx.setAttribute('stroke', 'none');
+  const cx = (x1 + x2) / 2 + off[0], cy = (y1 + y2) / 2 + off[1]; tx.setAttribute('x', cx); tx.setAttribute('y', cy); if (v) tx.setAttribute('transform', `rotate(-90 ${cx} ${cy})`);
+  tx.textContent = label; dims.appendChild(tx); return [g, tx];
+}
+const DIMS = [dim(300, 370, 780, 370, '2400', [0, -18]), dim(840, 420, 840, 980, '2600', [-20, 0]),
+  dim(300, 1010, 460, 1010, '790', [0, 46]), dim(460, 1010, 620, 1010, '790', [0, 46]), dim(620, 1010, 780, 1010, '790', [0, 46])];
+const DIM_AT = [3.25, 3.4, 3.6, 3.7, 3.8];
+
+// receipt rows — profile lengths, glass, hardware (counts illustrative; edit to the real cut list)
+const ROWS = [
+  { k: 'bar', len: 2580, text: 'L1  2580 mm  ×3', at: 4.10 },
+  { k: 'bar', len: 790,  text: 'L2   790 mm  ×3', at: 4.45 },
+  { k: 'bar', len: 2580, text: 'L3  2580 mm  ×3', at: 4.80 },
+  { k: 'bar', len: 790,  text: 'L4   790 mm  ×3', at: 5.15 },
+  { k: 'bar', len: 2400, text: 'L5  2400 mm  ×1', at: 5.50 },
+  { k: 'bar', len: 2400, text: 'L6  2400 mm  ×1', at: 5.85 },
+  { k: 'glass', text: 'GLASS 746×2536 ×3', at: 6.30 },
+  { k: 'hw', text: 'ROLLERS ×6 · SOFT-CLOSE ×3', at: 7.00 },
+];
+const rowsEl = $('rows');
+const rowEls = ROWS.map((r, i) => {
+  const d = document.createElement('div'); d.className = 'row'; rowsEl.appendChild(d);
+  const parts = [];
+  if (r.k === 'bar') { const b = document.createElement('div'); b.className = 'bar'; b.style.width = Math.round(r.len / 2580 * 400) + 'px'; d.appendChild(b); parts.push(b); SFX.push({ t: r.at, type: 'whoosh' }); }
+  if (r.k === 'glass') [0, 1, 2].forEach(j => { const g = document.createElement('div'); g.className = 'gl'; g.style.left = 34 + j * 64 + 'px'; d.appendChild(g); parts.push(g); SFX.push({ t: r.at + j * .15, type: 'whoosh' }); });
+  if (r.k === 'hw') ['⚙️', '🛞', '🔩'].forEach((e, j) => { const g = document.createElement('div'); g.className = 'hw'; g.style.left = 34 + j * 70 + 'px'; g.textContent = e; d.appendChild(g); parts.push(g); SFX.push({ t: r.at + j * .2, type: 'whoosh' }); });
+  const l = document.createElement('div'); l.className = 'lbl'; d.appendChild(l);
+  const typeAt = r.at + (r.k === 'bar' ? .18 : .45), dur = .32;
+  for (let c = 0; c < r.text.length; c += 3) SFX.push({ t: typeAt + dur * c / r.text.length, type: 'tick' });
+  return { d, parts, l, r, typeAt, dur };
+});
+
+/* ---------- 8–11 s: bundles with a Razan sticker ---------- */
+const B = $('bundles');
+function mk(html) { const d = document.createElement('div'); d.innerHTML = html.trim(); const n = d.firstChild; B.appendChild(n); return n; }
+const bProf = mk(`<div class="abs bundle" style="left:90px;top:520px;width:900px">
+  <svg width="900" height="300" viewBox="0 0 900 300">${[0,1,2,3,4,5,6,7].map(i => `<rect x="${60 + (i%2)*14}" y="${40 + i * 26}" width="${780 - (i%3)*40}" height="22" rx="3" fill="url(#al)"/>`).join('')}
+  <defs><linearGradient id="al" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5a6067"/><stop offset=".55" stop-color="#23272c"/><stop offset="1" stop-color="#40454b"/></linearGradient></defs>
+  <rect x="200" y="30" width="34" height="236" fill="#dbab88" opacity=".9"/><rect x="640" y="30" width="34" height="236" fill="#dbab88" opacity=".9"/></svg>
+  <div style="font:700 30px 'JetBrains Mono',monospace;color:#00203f">PROFILES L1–L6 · 14 PCS · LABELLED PER DOOR</div></div>`);
+const bGlass = mk(`<div class="abs bundle" style="left:110px;top:930px;width:420px">
+  <svg width="420" height="300" viewBox="0 0 420 300">${[0,1,2].map(i => `<rect x="${70 + i*30}" y="${30 + i*10}" width="220" height="240" fill="rgba(150,195,220,.35)" stroke="#22262b" stroke-width="5"/>`).join('')}
+  <path d="M40 285 L210 15 L380 285" stroke="#8a6a4a" stroke-width="12" fill="none"/></svg>
+  <div style="font:700 28px 'JetBrains Mono',monospace;color:#00203f">GLASS · 3 PANELS</div></div>`);
+const bHw = mk(`<div class="abs bundle" style="left:560px;top:960px;width:400px">
+  <svg width="400" height="270" viewBox="0 0 400 270"><rect x="60" y="60" width="280" height="190" rx="8" fill="#c79a6b"/><rect x="60" y="60" width="280" height="44" fill="#b4875a"/><rect x="185" y="60" width="30" height="190" fill="#e8d3bd"/></svg>
+  <div style="font:700 28px 'JetBrains Mono',monospace;color:#00203f">HARDWARE · 12 PCS</div></div>`);
+const stickers = [[760, 560], [380, 1000], [800, 1040]].map(([x, y]) => mk(`<div class="abs sticker" style="left:${x}px;top:${y}px"></div>`));
+const t1 = mk(`<div class="abs tagline" style="top:1380px">Profiles <b>made, drilled &amp; milled</b> in-house.</div>`);
+const t2 = mk(`<div class="abs tagline" style="top:1560px">6+6 mesh glass — <b>laminated, cut, tempered.</b></div>`);
+[[8.15, 'whoosh'], [8.45, 'whoosh'], [8.7, 'whoosh']].forEach(([t, type]) => SFX.push({ t, type }));
+
+function set(e, { x = 0, y = 0, s = 1, r = 0, o = 1, tx = '' } = {}) { e.style.opacity = o; e.style.transform = `${tx} translate(${x}px, ${y}px) rotate(${r}deg) scale(${s})`; e.style.visibility = o <= .001 ? 'hidden' : 'visible'; }
+
+window.render = t => {
+  // CHAT visibility: 0–2.1 and 10.9–13.2
+  const chatO = t < 2.4 ? 1 - easeInOut(prog(t, 1.9, .5)) : easeInOut(prog(t, 10.8, .4)) * (1 - easeInOut(prog(t, 13.0, .35)));
+  show(chat, chatO);
+  const head = chat.querySelector('.wahead .av');
+  // bubble 1 (0–2), then bubbles 2 & 3 (11–13)
+  set(b1, { o: t < 3 ? clamp(prog(t, .15, .2)) : 0, x: lerp(-120, 0, easeOut(prog(t, .15, .4))), s: lerp(1, 1.08, easeInOut(prog(t, 1.6, .6))) });
+  set(b2, { o: t > 10 ? clamp(prog(t, 11.15, .2)) : 0, x: lerp(120, 0, easeOut(prog(t, 11.15, .4))) });
+  set(b3, { o: t > 10 ? clamp(prog(t, 12.05, .2)) : 0, x: lerp(-120, 0, easeOut(prog(t, 12.05, .4))) });
+
+  // DRAWING STAGE 2–8.2
+  const stO = clamp(prog(t, 1.9, .4)) * (1 - easeInOut(prog(t, 7.95, .4)));
+  show($('paper'), Math.max(stO, t > 7.9 && t < 11.2 ? 1 - easeInOut(prog(t, 10.8, .4)) : 0));
+  show($('drawing'), stO);
+  const straight = easeInOut(prog(t, 2.2, 1.0));                          // sketch -> clean line drawing
+  $('disp').setAttribute('scale', lerp(14, 0, straight).toFixed(2));
+  art.setAttribute('stroke', straight < .5 ? '#4a4a4a' : '#14325c');
+  art.style.opacity = 1;
+  art.querySelectorAll('text').forEach(n => n.style.opacity = 1 - prog(t, 2.9, .4));   // handwriting gives way to dimensions
+  const shrink = easeInOut(prog(t, 3.95, .5));
+  $('drawing').style.transform = `translateY(${lerp(-120, 50, shrink)}px) scale(${lerp(1.3, .58, shrink)}) rotate(${lerp(-3, 0, straight)}deg)`;
+  DIMS.forEach(([g, tx], i) => { const q = prog(t, DIM_AT[i], .12); g.style.opacity = q; tx.style.opacity = q; g.style.transform = `scale(${lerp(1.06, 1, q)})`; g.style.transformOrigin = '540px 700px'; });
+  // receipt prints downward
+  const rO = clamp(prog(t, 3.95, .25)) * (1 - easeInOut(prog(t, 7.95, .35)));
+  show($('receipt'), rO);
+  const shown = rowEls.filter(e => t >= e.r.at - .05).length;
+  $('receipt').style.height = (122 + 82 * shown) + 'px';
+  rowEls.forEach(e => { const p = prog(t, e.r.at, .3);
+    e.d.style.display = t >= e.r.at - .05 ? 'block' : 'none';
+    e.parts.forEach((pt, j) => { const q = prog(t, e.r.at + j * (e.r.k === 'glass' ? .15 : .2), .3);
+      if (e.r.k === 'bar') pt.style.transform = `translateX(${lerp(-500, 0, easeOut(q))}px)`;
+      else if (e.r.k === 'hw') pt.style.transform = `translateY(${lerp(-60, 0, easeBack(q))}px)`;
+      pt.style.opacity = clamp(q * 2); });
+    const n = Math.floor(e.r.text.length * prog(t, e.typeAt, e.dur)); e.l.textContent = e.r.text.slice(0, n) + (n < e.r.text.length && t >= e.typeAt ? '▌' : ''); });
+
+  // BUNDLES 8–11
+  const bo = t > 7.8 && t < 11.3 ? 1 - easeInOut(prog(t, 10.75, .35)) : 0;
+  [[bProf, 8.15], [bGlass, 8.45], [bHw, 8.7]].forEach(([b, a]) => set(b, { o: clamp(prog(t, a, .2)) * bo, y: lerp(-160, 0, easeBack(prog(t, a, .45))) }));
+  stickers.forEach((s, i) => set(s, { o: clamp(prog(t, 9.0 + i * .15, .3)) * bo }));        // logo sticker: fade only
+  set(t1, { o: clamp(prog(t, 8.3, .3)) * bo, y: lerp(30, 0, easeOut(prog(t, 8.3, .4))) });
+  set(t2, { o: clamp(prog(t, 9.35, .3)) * bo, y: lerp(30, 0, easeOut(prog(t, 9.35, .4))) });
+
+  // END CARD 13–end
+  const eo = easeInOut(prog(t, 13.0, .4)); show($('end'), eo);
+  $('endlogo').style.opacity = easeOut(prog(t, 13.2, .5));                                 // logo: fade only, never moves
+  $('end').querySelectorAll('.l1,.l2,.btn,.url').forEach((n, i) => { const q = prog(t, 13.35 + i * .25, .35); n.style.opacity = q;
+    n.style.transform = (n.classList.contains('btn') ? 'translateX(-50%) ' : '') + `translateY(${lerp(30, 0, easeOut(q))}px)`; });
+};
+// bubble sounds are left out on purpose (storyboard: only ticks, whooshes and Douglas)
+window.SFX = SFX.sort((a, b) => a.t - b.t); window.CFG = CFG;
+window.DURATION = CFG.duration; window.AUDIO_OFFSET = 0; window.AUDIO = 'sb-cutlist.mp3';
+const q = new URLSearchParams(location.search); window.render(q.has('t') ? +q.get('t') : 1);
+window.READY = true;
+</script>
+</body>
+</html>
