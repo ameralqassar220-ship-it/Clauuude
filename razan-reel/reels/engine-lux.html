@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Razan reel engine — dark luxury theme</title>
+<!-- Dark luxury theme: near-black, slow cross-dissolves and slow zooms, thin sand-gold hairlines, serif type, film grain.
+     Load with ?reel=<id> (reads <id>.js). Brand rule: the Razan logo never rolls, spins, bounces or scales — fade only. -->
+<style>
+  :root { --gold:#DBAB88; --gold2:#b9845f; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; background: #050608; }
+  body { color: #f3ede6; font-family: Caladea, "Bitstream Charter", serif; }
+  #stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: radial-gradient(ellipse at 50% 40%, #15120f 0%, #08090b 60%, #030304 100%); }
+  .abs { position: absolute; will-change: transform, opacity; visibility: hidden; }
+  .frame { left: 120px; top: 300px; width: 840px; height: 1080px; overflow: hidden; }
+  .frame .m { position: absolute; inset: 0; background-size: cover; background-position: center; object-fit: cover; width: 100%; height: 100%; filter: saturate(.85) contrast(1.05); }
+  .frame:after { content: ''; position: absolute; inset: 0; box-shadow: inset 0 0 160px rgba(0,0,0,.65); }
+  .hair { position: absolute; background: var(--gold); }
+  #grain { position: absolute; inset: -50%; width: 200%; height: 200%; opacity: .07; pointer-events: none; mix-blend-mode: screen; }
+  #mono { left: 0; right: 0; top: 140px; text-align: center; font: 400 26px/1 Inter, sans-serif; letter-spacing: .6em; color: var(--gold); }
+  #mono i { display: block; width: 64px; height: 64px; margin: 0 auto 22px; border-radius: 50%; background: url(../assets/logo-mark.png) center/cover; }
+  .head { left: 90px; right: 90px; top: 1430px; text-align: center; font: italic 400 76px/1.1 Caladea, serif; letter-spacing: .005em; }
+  .head small { display: block; margin-top: 18px; font: 400 26px/1.4 Inter, sans-serif; font-style: normal; letter-spacing: .42em; text-transform: uppercase; color: var(--gold); }
+  #caps { left: 90px; right: 90px; top: 1690px; visibility: visible; }
+  .cap { position: absolute; left: 0; right: 0; top: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 14px;
+    font: 400 40px/1.3 Caladea, serif; color: rgba(243,237,230,.86); }
+  .w { display: inline-block; } .w.hg { color: var(--gold); font-style: italic; }
+  #end { inset: 0; background: #050608; }
+  #logo { left: 240px; top: 620px; width: 600px; height: 240px; background: #fff url(../assets/logo.png) center/112% auto no-repeat; outline: 2px solid var(--gold); outline-offset: 14px; }
+  #tag { left: 0; right: 0; top: 960px; text-align: center; font: italic 400 84px/1.1 Caladea, serif; }
+  #site { left: 0; right: 0; top: 1110px; text-align: center; font: 400 34px/1 Inter, sans-serif; letter-spacing: .32em; color: var(--gold); }
+  #wa { left: 0; right: 0; top: 1180px; text-align: center; font: 400 30px/1 Inter, sans-serif; letter-spacing: .2em; color: rgba(243,237,230,.7); }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="layers"></div>
+  <div id="mono" class="abs"><i></i>RAZAN</div>
+  <div id="heads"></div>
+  <div id="end" class="abs"></div>
+  <div id="logo" class="abs"></div>
+  <div id="tag" class="abs"></div>
+  <div id="site" class="abs">RAZANUAE.COM</div>
+  <div id="wa" class="abs">WHATSAPP +971 50 201 9281</div>
+  <div id="caps" class="abs"></div>
+  <svg id="grain"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="3"/></filter><rect width="100%" height="100%" filter="url(#n)"/></svg>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, p) => a + (b - a) * p;
+const ease = p => p < .5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
+const easeOut = p => 1 - Math.pow(1 - p, 3);
+const prog = (t, a, d) => clamp((t - a) / d);
+const IMG = n => `../assets/${n}`;
+function set(e, { y = 0, o = 1, tx = '' } = {}) { e.style.opacity = o.toFixed(4); e.style.transform = `${tx} translateY(${y.toFixed(1)}px)`; e.style.visibility = o <= .001 ? 'hidden' : 'visible'; }
+
+function boot(R) {
+  const A = x => x + R.offset, XF = .8;                       // long, soft cross-dissolves
+  R.scenes.forEach((sc, i) => { sc.win = [i === 0 ? 0 : A(sc.at) - .3, i + 1 < R.scenes.length ? A(R.scenes[i + 1].at) - .3 : R.duration + 1]; });
+  const ups = R.scenes.map((sc, i) => {
+    if (sc.end) return null;
+    const f = document.createElement('div'); f.className = 'abs frame'; f.style.zIndex = i; $('layers').appendChild(f);
+    let media, last = -1;
+    if (sc.clip) { media = document.createElement('img'); } else { media = document.createElement('div'); media.style.backgroundImage = `url(${IMG(sc.img)})`; if (sc.pos) media.style.backgroundPosition = sc.pos; }
+    media.className = 'm'; f.appendChild(media);
+    const hl = [['top', 0, 'left', 0, '100%', '2px'], ['bottom', 0, 'right', 0, '100%', '2px'], ['top', 0, 'right', 0, '2px', '100%'], ['bottom', 0, 'left', 0, '2px', '100%']].map(([a, av, b, bv, w, h]) => {
+      const d = document.createElement('div'); d.className = 'hair'; d.style[a] = av; d.style[b] = bv; d.dataset.w = w; d.dataset.h = h; f.appendChild(d); return d; });
+    const head = sc.head && (() => { const d = document.createElement('div'); d.className = 'abs head'; d.innerHTML = sc.head + (sc.sub ? `<small>${sc.sub}</small>` : ''); $('heads').appendChild(d); return d; })();
+    return t => { const [S, E] = sc.win, o = (i === 0 ? 1 : ease(prog(t, S, XF))) * (1 - ease(prog(t, E, XF)));
+      set(f, { o }); const k = prog(t, S, E - S + XF), z = sc.zoom || [1.0, 1.1];
+      media.style.transform = `scale(${lerp(z[0], z[1], k).toFixed(4)})`;
+      hl.forEach((h, j) => { const p = easeOut(prog(t, S + .4 + j * .15, 1.2)); if (h.dataset.w === '100%') { h.style.width = p * 100 + '%'; h.style.height = '2px'; } else { h.style.height = p * 100 + '%'; h.style.width = '2px'; } });
+      if (head) { const D = E - S, hd = Math.min(.5, D * .2), hf = Math.min(.9, D * .3);
+        set(head, { o: ease(prog(t, S + hd, hf)) * (1 - ease(prog(t, E + Math.min(.2, D * .1), Math.min(.6, D * .3)))), y: lerp(20, 0, easeOut(prog(t, S + hd, 1.2))) }); }
+      if (sc.clip && o > 0) { const fr = Math.min(sc.frames, Math.max(1, 1 + Math.floor((t - S + (sc.from || 0)) * 30 * (sc.speed || .6))));   // slowed footage
+        if (fr !== last) { last = fr; media.src = `../.cache/clips/${sc.clip}/f_${String(fr).padStart(4, '0')}.jpg`; return media.decode().catch(() => {}); } }
+    };
+  }).filter(Boolean);
+  const endS = R.scenes[R.scenes.length - 1].win[0];
+  $('tag').innerHTML = R.tagline || '';
+  const SP = R.spoken || {};
+  const caps = R.caps.map((g, gi) => {
+    const box = document.createElement('div'); box.className = 'cap'; const words = [], times = [];
+    g.segs.forEach(([sa, sb, text]) => { const ws = text.split(' '), wt = ws.map(w => (SP[w] || w.replace(/[^\w]/g, '').length) + 2);
+      const tot = wt.reduce((a, b) => a + b, 0); let acc = 0; ws.forEach((w, i) => { times.push(A(sa + (sb - sa) * acc / tot) - .05); acc += wt[i]; words.push(w); }); });
+    const spans = words.map((w, i) => { const s = document.createElement('span'); s.className = 'w' + (g.hl && g.hl[i] ? ' ' + g.hl[i] : ''); s.textContent = w; box.appendChild(s); return s; });
+    $('caps').appendChild(box);
+    const b = gi + 1 < R.caps.length ? A(R.caps[gi + 1].segs[0][0]) - .1 : R.duration + 1;
+    return { a: times[0], b, box, spans, times };
+  });
+  window.render = t => {
+    const pend = ups.map(u => u(t)).filter(Boolean);
+    set($('mono'), { o: ease(prog(t, .3, 1.2)) * (1 - ease(prog(t, endS, .6))) });           // logo mark: fade only
+    set($('end'), { o: ease(prog(t, endS, 1.0)) });
+    set($('logo'), { o: ease(prog(t, endS + .5, 1.4)) });                                      // logo: slow fade, never moves
+    set($('tag'), { o: ease(prog(t, endS + 1.2, 1.2)) });
+    set($('site'), { o: ease(prog(t, endS + 2.0, 1.0)) }); set($('wa'), { o: ease(prog(t, endS + 2.4, 1.0)) });
+    $('grain').style.transform = `translate(${(Math.floor(t * 24) * 37) % 300 - 150}px, ${(Math.floor(t * 24) * 53) % 300 - 150}px)`;
+    caps.forEach(c => { c.box.style.visibility = (t >= c.a - .01 && t < c.b && t < endS + .3) ? 'visible' : 'hidden'; c.box.style.opacity = 1 - ease(prog(t, c.b - .35, .35));
+      c.spans.forEach((w, i) => { const p = prog(t, c.times[i], .45); w.style.display = t >= c.times[i] ? 'inline-block' : 'none'; w.style.opacity = ease(p); w.style.transform = `translateY(${lerp(10, 0, easeOut(p))}px)`; }); });
+    return pend.length ? Promise.all(pend) : undefined;
+  };
+  window.DURATION = R.duration; window.AUDIO_OFFSET = R.offset; window.AUDIO = R.audio;
+  const q = new URLSearchParams(location.search); window.render(q.has('t') ? +q.get('t') : 2);
+  window.READY = true;
+}
+const id = new URLSearchParams(location.search).get('reel');
+const s = document.createElement('script'); s.src = `${id}.js`; s.onload = () => boot(window.REEL); document.body.appendChild(s);
+</script>
+</body>
+</html>
