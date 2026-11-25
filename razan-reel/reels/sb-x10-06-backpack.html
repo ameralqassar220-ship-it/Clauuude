@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Razan — x10 #6 "The Backpack" (9:16, 20 s)</title>
+<!-- Flat 2D series (see sb-explainer.html). A kid packs from three shops; MON/TUE/WED something is missing each time.
+     Then a backpack arrives already packed and labelled — which becomes Razan's box: FRAME / GLASS / HINGES,
+     packed, labelled, delivered. Narration: audio/x10/06-backpack.mp3 (Douglas).
+     Brand rule: the logo block only slides straight in (no roll/spin); stickers and the end-card logo only fade. -->
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; }
+  body { font-family: "Inter Display", Inter, sans-serif; }
+  #stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: linear-gradient(180deg, #dff1ff 0%, #f3f9ff 62%, #fff7e6 62.1%, #fff2d6 100%); }
+  svg { position: absolute; left: 0; top: 0; }
+  .lbl { font: 900 40px "Inter Display", Inter; letter-spacing: .06em; fill: #fff; }
+  .shop { font: 900 28px Inter; fill: #fff; letter-spacing: .06em; }
+  .small { font: 800 34px Inter; fill: #1d2b3a; }
+  #caps { position: absolute; left: 60px; right: 60px; top: 1600px; display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 16px;
+    font: 900 64px/1.15 "Inter Display", Inter; color: #1d2b3a; text-align: center; }
+  .w { display: inline-block; } .w.k { color: #fff; background: #ff6b4a; padding: 0 14px 6px; border-radius: 14px; } .w.g { color: #fff; background: #1fae5b; padding: 0 14px 6px; border-radius: 14px; }
+  .w.b { color: #fff; background: #00203f; padding: 0 14px 6px; border-radius: 14px; }
+  #end { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 30%, #0b3358 0%, #00203f 60%, #00142a 100%); color: #fff; opacity: 0; }
+  #end .logo { position: absolute; left: 190px; top: 420px; width: 700px; height: 280px; border-radius: 34px; background: #fff url(../assets/logo.png) center/112% auto no-repeat; }
+  #end .l1 { position: absolute; left: 0; right: 0; top: 820px; text-align: center; font: 900 100px/1.05 "Inter Display", Inter; }
+  #end .l2 { position: absolute; left: 0; right: 0; top: 950px; text-align: center; font: 800 70px/1.1 "Inter Display", Inter; color: #DBAB88; }
+  #end .btn { position: absolute; left: 50%; top: 1140px; padding: 34px 90px; border-radius: 999px; background: #25D366; font: 800 56px/1 Inter; white-space: nowrap; }
+  #end .url { position: absolute; left: 0; right: 0; top: 1300px; text-align: center; font: 600 36px Inter; color: rgba(255,255,255,.8); }
+</style>
+</head>
+<body>
+<div id="stage">
+  <svg id="s" width="1080" height="1920" viewBox="0 0 1080 1920"></svg>
+  <div id="caps"></div>
+  <div id="end"><div class="logo" id="elogo"></div><div class="l1">Send your drawing.</div><div class="l2">Price in 2 hours.</div><div class="btn">Get a quote</div><div class="url">razanuae.com · WhatsApp +971 50 201 9281</div></div>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, p) => a + (b - a) * p;
+const easeOut = p => 1 - Math.pow(1 - p, 3);
+const easeInOut = p => p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
+const easeBack = p => { const c = 1.7; return 1 + (c + 1) * Math.pow(p - 1, 3) + c * Math.pow(p - 1, 2); };
+const prog = (t, a, d) => clamp((t - a) / d);
+const OFF = 0.3, A = x => x + OFF;
+const NS = 'http://www.w3.org/2000/svg', S = $('s');
+const SFX = [];
+function g(parent = S) { const n = document.createElementNS(NS, 'g'); parent.appendChild(n); return n; }
+function add(parent, tag, at, txt) { const n = document.createElementNS(NS, tag); for (const k in at) n.setAttribute(k, at[k]); if (txt != null) n.textContent = txt; parent.appendChild(n); return n; }
+function T(n, x, y, s = 1, o = 1, r = 0) { n.setAttribute('transform', `translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${r.toFixed(2)}) scale(${s.toFixed(4)})`); n.style.opacity = o.toFixed(3); n.style.display = o <= .001 ? 'none' : ''; }
+
+/* ---------- parts (drawn around their centre) ---------- */
+function studs(p, w, y, n, fill) { for (let i = 0; i < n; i++) add(p, 'rect', { x: -w / 2 + (i + .5) * w / n - 22, y: y - 18, width: 44, height: 22, rx: 8, fill }); }
+function frameBlock(p) { const b = g(p); studs(b, 300, -240, 3, '#a9b4c0');
+  add(b, 'path', { d: 'M-150,-240 h300 v480 h-300 Z M-120,-210 v420 h240 v-420 Z', fill: '#8d99a6', 'fill-rule': 'evenodd', stroke: '#5b6670', 'stroke-width': 6, 'stroke-linejoin': 'round' });
+  add(b, 'rect', { x: -150, y: -240, width: 300, height: 26, fill: 'rgba(255,255,255,.18)' }); return b; }
+function glassBlock(p) { const b = g(p);
+  add(b, 'rect', { x: -120, y: -210, width: 240, height: 420, rx: 8, fill: '#6cc4ff', stroke: '#2f8fd6', 'stroke-width': 6 });
+  add(b, 'path', { d: 'M-90,-160 L-20,-200 L-20,-170 L-90,-130 Z M-90,-90 L40,-170 L40,-150 L-90,-70 Z', fill: 'rgba(255,255,255,.6)' }); return b; }
+function hingeBlock(p) { const b = g(p); studs(b, 70, -55, 1, '#ffd36b');
+  add(b, 'rect', { x: -35, y: -55, width: 70, height: 110, rx: 12, fill: '#f5b915', stroke: '#c48c00', 'stroke-width': 6 });
+  add(b, 'circle', { cx: 0, cy: -22, r: 9, fill: '#c48c00' }); add(b, 'circle', { cx: 0, cy: 22, r: 9, fill: '#c48c00' }); return b; }
+function pill(p, text, color, y = 0) { const b = g(p); const w = text.length * 25 + 60;
+  add(b, 'rect', { x: -w / 2, y: y - 34, width: w, height: 68, rx: 34, fill: color }); add(b, 'text', { x: 0, y: y + 13, 'text-anchor': 'middle', class: 'lbl' }, text); return b; }
+function sticker(p, x, y) { const b = g(p); add(b, 'circle', { cx: x, cy: y, r: 34, fill: '#fff', stroke: '#00203f', 'stroke-width': 4 });
+  add(b, 'image', { href: '../assets/logo-mark.png', x: x - 26, y: y - 26, width: 52, height: 52 }); return b; }
+
+
+
+/* ---------- school items ---------- */
+function pencil(p) { const b = g(p); add(b, 'rect', { x: -14, y: -70, width: 28, height: 120, fill: '#f5b915', stroke: '#1d2b3a', 'stroke-width': 4 });
+  add(b, 'rect', { x: -14, y: -86, width: 28, height: 18, fill: '#ff8fa3', stroke: '#1d2b3a', 'stroke-width': 4 });
+  add(b, 'path', { d: 'M-14,50 L0,82 L14,50 Z', fill: '#f3d2a2', stroke: '#1d2b3a', 'stroke-width': 4 }); return b; }
+function book(p) { const b = g(p); add(b, 'rect', { x: -55, y: -70, width: 110, height: 140, rx: 8, fill: '#2f8fd6', stroke: '#1d2b3a', 'stroke-width': 4 });
+  add(b, 'rect', { x: -55, y: -70, width: 22, height: 140, fill: '#1e6fb0' }); add(b, 'rect', { x: -20, y: -40, width: 60, height: 12, rx: 6, fill: '#fff' }); return b; }
+function lunch(p) { const b = g(p); add(b, 'path', { d: 'M-30,-60 Q0,-95 30,-60', stroke: '#1d2b3a', 'stroke-width': 6, fill: 'none' });
+  add(b, 'rect', { x: -65, y: -60, width: 130, height: 110, rx: 14, fill: '#1fae5b', stroke: '#1d2b3a', 'stroke-width': 4 });
+  add(b, 'circle', { cx: 0, cy: -6, r: 24, fill: '#ff6b4a' }); add(b, 'path', { d: 'M0,-30 q6,-12 14,-10', stroke: '#1d2b3a', 'stroke-width': 4, fill: 'none' }); return b; }
+const ITEM = [pencil, book, lunch], ITEM_NAME = ['PENCILS', 'BOOKS', 'LUNCH'], ITEM_COL = ['#f5b915', '#2f8fd6', '#1fae5b'];
+function backpack(p, col = '#ff9f1c') { const b = g(p);
+  add(b, 'path', { d: 'M-80,-170 Q0,-230 80,-170', stroke: '#1d2b3a', 'stroke-width': 10, fill: 'none' });
+  add(b, 'rect', { x: -170, y: -170, width: 340, height: 330, rx: 60, fill: col, stroke: '#1d2b3a', 'stroke-width': 6 });
+  add(b, 'rect', { x: -110, y: 20, width: 220, height: 110, rx: 24, fill: 'rgba(0,0,0,.12)', stroke: '#1d2b3a', 'stroke-width': 5 });
+  add(b, 'path', { d: 'M-170,-90 Q0,-40 170,-90', stroke: '#1d2b3a', 'stroke-width': 6, fill: 'none' }); return b; }
+function shop(p, c, n) { const s = g(p);
+  add(s, 'rect', { x: -120, y: -90, width: 240, height: 180, rx: 12, fill: '#fff', stroke: '#1d2b3a', 'stroke-width': 5 });
+  for (let k = 0; k < 5; k++) add(s, 'rect', { x: -130 + k * 52, y: -110, width: 52, height: 48, fill: k % 2 ? '#fff' : c, stroke: '#1d2b3a', 'stroke-width': 4 });
+  add(s, 'rect', { x: -100, y: -40, width: 200, height: 50, rx: 8, fill: c }); add(s, 'text', { x: 0, y: -5, 'text-anchor': 'middle', class: 'shop' }, n);
+  add(s, 'rect', { x: -32, y: 20, width: 64, height: 70, fill: c, stroke: '#1d2b3a', 'stroke-width': 4 }); return s; }
+
+/* ---------- scene 1: three shops, MON / TUE / WED, one item missing each day ---------- */
+const s1 = g();
+const SHOPS = [[190, '#f5b915', 'PENCILS'], [540, '#2f8fd6', 'BOOKS'], [890, '#1fae5b', 'LUNCH']].map(([x, c, n]) => ({ s: shop(s1, c, n), x }));
+const cal = g(s1); add(cal, 'rect', { x: -120, y: -80, width: 240, height: 170, rx: 18, fill: '#fff', stroke: '#1d2b3a', 'stroke-width': 6 });
+add(cal, 'rect', { x: -120, y: -80, width: 240, height: 50, rx: 18, fill: '#ff6b4a' }); add(cal, 'rect', { x: -120, y: -50, width: 240, height: 20, fill: '#ff6b4a' });
+const calTxt = add(cal, 'text', { x: 0, y: 60, 'text-anchor': 'middle', style: 'font:900 76px Inter;fill:#1d2b3a' }, 'MON');
+const bag1 = g(s1); backpack(bag1);
+const DAYS = [['MON', 0], ['TUE', 1], ['WED', 2]].map(([d, missing], i) => ({ d, missing, at: A(.0 + i * .85) }));
+// flying items per day (3 per day) and the "missing" slot
+const fly = DAYS.map(day => [0, 1, 2].map(k => { const w = g(s1); ITEM[k](w); return w; }));
+const miss = [0, 1, 2].map(k => { const w = g(s1); add(w, 'rect', { x: -70, y: -90, width: 140, height: 180, rx: 16, fill: 'none', stroke: '#e03131', 'stroke-width': 6, 'stroke-dasharray': '16 12' });
+  add(w, 'path', { d: 'M-28,-28 L28,28 M28,-28 L-28,28', stroke: '#e03131', 'stroke-width': 12, 'stroke-linecap': 'round' }); return w; });
+const missP = [0, 1, 2].map(k => { const w = g(s1); const tx = 'NO ' + ITEM_NAME[k]; const ww = tx.length * 22 + 50;
+  add(w, 'rect', { x: -ww / 2, y: -30, width: ww, height: 60, rx: 30, fill: '#e03131' }); add(w, 'text', { x: 0, y: 12, 'text-anchor': 'middle', style: 'font:900 32px Inter;fill:#fff' }, tx); return w; });
+DAYS.forEach(d => { [0, 1, 2].forEach(k => { if (k !== d.missing) SFX.push({ t: d.at + .1 + k * .12, type: 'pop' }); }); SFX.push({ t: d.at + .45, type: 'clunk' }); });
+
+/* ---------- kid ---------- */
+const kid = g();
+add(kid, 'circle', { cx: 0, cy: -150, r: 44, fill: '#fff', stroke: '#1d2b3a', 'stroke-width': 8 });
+add(kid, 'circle', { cx: -15, cy: -158, r: 6, fill: '#1d2b3a' }); add(kid, 'circle', { cx: 15, cy: -158, r: 6, fill: '#1d2b3a' });
+const kMouth = add(kid, 'path', { d: '', stroke: '#1d2b3a', 'stroke-width': 7, fill: 'none', 'stroke-linecap': 'round' });
+add(kid, 'path', { d: 'M0,-106 V20 M0,20 L-36,110 M0,20 L36,110', stroke: '#1d2b3a', 'stroke-width': 9, fill: 'none', 'stroke-linecap': 'round' });
+const kArmL = add(kid, 'path', { d: '', stroke: '#1d2b3a', 'stroke-width': 9, fill: 'none', 'stroke-linecap': 'round' });
+const kArmR = add(kid, 'path', { d: '', stroke: '#1d2b3a', 'stroke-width': 9, fill: 'none', 'stroke-linecap': 'round' });
+
+/* ---------- scene 2: the bag arrives already packed, each item labelled ---------- */
+const s2 = g();
+const bag2 = g(s2); backpack(bag2, '#00203f');
+const packedItems = [0, 1, 2].map(k => { const w = g(s2); ITEM[k](w); const tg = g(s2); const ww = ITEM_NAME[k].length * 22 + 50;
+  add(tg, 'rect', { x: -ww / 2, y: -26, width: ww, height: 52, rx: 26, fill: ITEM_COL[k] }); add(tg, 'text', { x: 0, y: 11, 'text-anchor': 'middle', style: 'font:900 28px Inter;fill:#fff' }, ITEM_NAME[k]); return { w, tg }; });
+const readyP = g(s2); { const tx = 'PACKED FOR YOU ✓', ww = tx.length * 28 + 60; add(readyP, 'rect', { x: -ww / 2, y: -34, width: ww, height: 68, rx: 34, fill: '#1fae5b' }); add(readyP, 'text', { x: 0, y: 13, 'text-anchor': 'middle', class: 'lbl' }, tx); }
+SFX.push({ t: A(2.83), type: 'whoosh' }); SFX.push({ t: A(3.9), type: 'ding' });
+
+/* ---------- scene 3: Razan — the same idea for your wardrobe ---------- */
+const s3 = g();
+const logoBlock = g(s3);
+add(logoBlock, 'rect', { x: -230, y: -100, width: 460, height: 200, rx: 28, fill: '#fff', stroke: '#00203f', 'stroke-width': 6 });
+add(logoBlock, 'image', { href: '../assets/logo.png', x: -235, y: -92, width: 470, height: 184, preserveAspectRatio: 'xMidYMid meet' });
+studs(logoBlock, 460, -100, 4, '#e6ecf2');
+const box = g(s3); add(box, 'rect', { x: -230, y: -150, width: 460, height: 300, rx: 16, fill: '#c79a6b', stroke: '#8a6a4a', 'stroke-width': 6 });
+add(box, 'rect', { x: -230, y: -150, width: 460, height: 70, fill: '#b4875a' }); add(box, 'rect', { x: -26, y: -150, width: 52, height: 300, fill: '#e8d3bd' });
+sticker(box, 150, 40);
+const PARTS = [[frameBlock, 250, 1020, 'FRAME', '#5b6670', 7.49], [glassBlock, 560, 1020, 'GLASS', '#2f8fd6', 8.15], [hingeBlock, 850, 1020, 'HINGES', '#d99a00', 8.75]]
+  .map(([fn, x, y, l, c, at]) => { const w = g(s3); fn(w); sticker(w, fn === hingeBlock ? 0 : 70, fn === hingeBlock ? 80 : -140); const lb = pill(s3, l, c); SFX.push({ t: A(at), type: 'pop' }); return { w, lb, x, y, at: A(at), fn }; });
+const CHIPS = [['PACKED', 190, 9.47], ['LABELLED', 530, 10.08], ['DELIVERED', 880, 10.77]].map(([t, x, at]) => { const p = pill(s3, '✓ ' + t, '#1fae5b'); SFX.push({ t: A(at), type: 'tick' }); return { p, x, at: A(at) }; });
+SFX.push({ t: A(5.22), type: 'whoosh' }); SFX.push({ t: A(12.2), type: 'click' }); SFX.push({ t: A(12.8), type: 'ding' });
+const tick = g(s3); add(tick, 'circle', { cx: 0, cy: 0, r: 70, fill: '#1fae5b' }); add(tick, 'path', { d: 'M-30,0 L-8,24 L34,-24', stroke: '#fff', 'stroke-width': 14, fill: 'none', 'stroke-linecap': 'round', 'stroke-linejoin': 'round' });
+
+/* ---------- captions ---------- */
+const LINES = [
+  [0.0, 2.33, 'Every morning, something’s missing.', { 2: 'k', 3: 'k' }],
+  [2.83, 4.66, 'Unless someone packs the bag for you.', { 2: 'g' }],
+  [5.22, 7.17, 'That’s what Razan does for your wardrobe:', { 2: 'b', 6: 'b' }],
+  [7.49, 11.23, 'frame, glass and hinges — packed, labelled, delivered.', { 0: 'b', 1: 'b', 3: 'b', 5: 'g', 6: 'g', 7: 'g' }, [[7.49, 9.22], [9.47, 9.86], [10.08, 10.54], [10.77, 11.23]]],
+];
+const caps = LINES.map(([a, b, text, hl, segs]) => { const bx = document.createElement('div'); bx.style.cssText = 'position:absolute;left:0;right:0;top:0;display:flex;flex-wrap:wrap;justify-content:center;gap:4px 16px';
+  const words = text.split(' '); segs = segs || [[a, b]];
+  const per = segs.map(() => []); { const tot = words.reduce((s, w) => s + w.length, 0); let acc = 0, si = 0, segTot = segs.reduce((s, [x, y]) => s + (y - x), 0), segAcc = segs[0][1] - segs[0][0];
+    words.forEach(w => { if (acc / tot > segAcc / segTot + .02 && si < segs.length - 1) { si++; segAcc += segs[si][1] - segs[si][0]; } per[si].push(w); acc += w.length; }); }
+  const spans = [], times = []; let wi = 0;
+  per.forEach((ws, si) => { const [x, y] = segs[si], L = ws.reduce((s, w) => s + w.length + 2, 0); let acc = 0;
+    ws.forEach(w => { const sp = document.createElement('span'); sp.className = 'w' + (hl[wi] ? ' ' + hl[wi] : ''); sp.textContent = w; bx.appendChild(sp); spans.push(sp); times.push(A(x + (y - x) * acc / L) - .05); acc += w.length + 2; wi++; }); });
+  $('caps').appendChild(bx); return { box: bx, spans, times, a: A(a) - .1 }; });
+
+const END = 17.4, DUR = 20;
+const SLOT = [[400, 860], [600, 860], [800, 860]];      // where items sit above the bag in scene 1
+window.render = t => {
+  // SCENE 1 (0 – 3.0): MON / TUE / WED
+  const s1o = 1 - easeInOut(prog(t, A(2.7), .4)); T(s1, 0, 0, 1, s1o);
+  SHOPS.forEach((sh, i) => T(sh.s, sh.x, lerp(200, 300, easeBack(prog(t, .05 + i * .08, .4))), .9, clamp(prog(t, .05 + i * .08, .2))));
+  const di = Math.max(0, DAYS.filter(d => t >= d.at).length - 1), day = DAYS[di];
+  calTxt.textContent = day.d; T(cal, 540, 500, lerp(1.15, 1, easeOut(prog(t, day.at, .25))), clamp(prog(t, .2, .2)), lerp(-6, 0, easeOut(prog(t, day.at, .3))));
+  T(bag1, 600, 1180, 1, clamp(prog(t, .1, .3)));
+  DAYS.forEach((d, j) => fly[j].forEach((w, k) => { const on = j === di && k !== d.missing; const q = easeOut(prog(t, d.at + .05 + k * .12, .35));
+    T(w, lerp(SHOPS[k].x, SLOT[k][0], q), lerp(330, SLOT[k][1], q), .8, on ? clamp(q * 3) : 0); }));
+  miss.forEach((w, k) => { const on = k === day.missing; const q = prog(t, day.at + .4, .25); T(w, SLOT[k][0], SLOT[k][1], easeBack(q) * .9, on ? clamp(q * 2) : 0); });
+  missP.forEach((w, k) => T(w, SLOT[k][0], 700, 1, k === day.missing ? clamp(prog(t, day.at + .45, .2)) : 0));
+  // kid
+  const sceneKid = t < A(11.4);
+  const happy = t > A(2.9);
+  T(kid, 200, 1340, 1, clamp(prog(t, .2, .3)) * (1 - prog(t, A(5.1), .3)) + clamp(prog(t, A(12.6), .4)) * (1 - prog(t, END, .3)));
+  kMouth.setAttribute('d', happy ? 'M-18,-136 Q0,-114 18,-136' : 'M-18,-122 Q0,-138 18,-122');
+  kArmL.setAttribute('d', 'M0,-70 L-50,-20');
+  kArmR.setAttribute('d', happy ? 'M0,-70 L56,-150' : 'M0,-70 L50,-20');
+  // SCENE 2 (2.8 – 5.2): packed bag arrives
+  const s2o = clamp(prog(t, A(2.75), .3)) * (1 - easeInOut(prog(t, A(5.05), .35))); T(s2, 0, 0, 1, s2o);
+  const arr = easeOut(prog(t, A(2.83), .7)); T(bag2, lerp(1300, 600, arr), 1180, 1, 1);
+  packedItems.forEach((p, k) => { const q = easeBack(prog(t, A(3.1) + k * .15, .4)); T(p.w, 380 + k * 220, lerp(1180, 860, q), .8, clamp(prog(t, A(3.1) + k * .15, .15)));
+    T(p.tg, 380 + k * 220, 1000, 1, clamp(prog(t, A(3.35) + k * .15, .2))); });
+  T(readyP, 600, 1440, easeBack(prog(t, A(3.9), .4)), clamp(prog(t, A(3.9), .15)));
+  // SCENE 3 (5.2 – end): Razan box -> FRAME / GLASS / HINGES -> packed, labelled, delivered -> wardrobe
+  const s3o = clamp(prog(t, A(5.1), .35)) * (1 - prog(t, END, .3)); T(s3, 0, 0, 1, s3o);
+  const slide = easeOut(prog(t, A(5.22), .7)); T(logoBlock, lerp(-400, 540, slide), 360, .8, 1);                // slides straight in — no roll
+  T(box, 540, 700, easeBack(prog(t, A(5.9), .45)), clamp(prog(t, A(5.9), .2)) * (1 - prog(t, A(7.3), .3)));
+  const snap = easeBack(prog(t, A(11.6), .5));
+  PARTS.forEach((p, i) => { const q = easeBack(prog(t, p.at, .45));
+    let x = lerp(540, p.x, easeOut(prog(t, p.at, .45))), y = lerp(700, p.y, easeOut(prog(t, p.at, .45)));
+    x = lerp(x, [560, 560, 410][i], snap); y = lerp(y, [1000, 1000, 840][i], snap);
+    T(p.w, x, y, (i === 2 ? 1.1 : .8) * lerp(.6, 1, q) * lerp(1, i === 2 ? .8 : 1, snap), clamp(prog(t, p.at, .15)));
+    T(p.lb, p.x, 1340, 1, clamp(prog(t, p.at + .1, .2)) * (1 - prog(t, A(9.3), .3))); });
+  CHIPS.forEach(c => T(c.p, c.x, 1360, easeBack(prog(t, c.at, .35)), clamp(prog(t, c.at, .15)) * (1 - prog(t, A(11.6), .3))));
+  T(tick, 790, 760, easeBack(prog(t, A(12.6), .4)), clamp(prog(t, A(12.6), .15)));
+  // captions
+  caps.forEach((c, i) => { const nxt = i + 1 < caps.length ? caps[i + 1].a : END; c.box.style.display = t >= c.a && t < nxt ? 'flex' : 'none';
+    c.spans.forEach((w, j) => { const p = prog(t, c.times[j], .25); w.style.opacity = clamp(p * 3); w.style.transform = `translateY(${lerp(18, 0, easeOut(p))}px)`; }); });
+  // END CARD
+  $('end').style.opacity = easeInOut(prog(t, END, .5));
+  $('elogo').style.opacity = easeOut(prog(t, END + .15, .5));                                          // logo: fade only
+  $('end').querySelectorAll('.l1,.l2,.btn,.url').forEach((n, i) => { const q = prog(t, END + .3 + i * .3, .4); n.style.opacity = q;
+    n.style.transform = (n.classList.contains('btn') ? 'translateX(-50%) ' : '') + `translateY(${lerp(30, 0, easeOut(q))}px)`; });
+};
+window.SFX = SFX.sort((a, b) => a.t - b.t); window.CFG = { duration: DUR, voiceAt: OFF };
+window.DURATION = DUR; window.AUDIO_OFFSET = 0; window.AUDIO = 'sb-x10-06-backpack.mp3';
+const q = new URLSearchParams(location.search); window.render(q.has('t') ? +q.get('t') : 1); window.READY = true;
+</script>
+</body>
+</html>

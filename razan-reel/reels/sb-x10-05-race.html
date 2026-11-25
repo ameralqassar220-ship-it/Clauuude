@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Razan — x10 #5 "The Race" (9:16, 15 s)</title>
+<!-- Flat 2D series (see sb-explainer.html). Lane A: three supplier vans stuck at red lights, one out of fuel.
+     Lane B: one Razan van, green lights all the way to the THURSDAY flag. Narration: audio/x10/05-race.mp3 (Douglas).
+     Brand rule: the Razan logo never rolls or spins; on the van it is static (the van moves). End card: logo fades only. -->
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; }
+  body { font-family: "Inter Display", Inter, sans-serif; }
+  #stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: linear-gradient(180deg, #dff1ff 0%, #f3f9ff 62%, #fff7e6 62.1%, #fff2d6 100%); }
+  svg { position: absolute; left: 0; top: 0; }
+  .lbl { font: 900 40px "Inter Display", Inter; letter-spacing: .06em; fill: #fff; }
+  .small { font: 800 34px Inter; fill: #1d2b3a; }
+  #caps { position: absolute; left: 60px; right: 60px; top: 1600px; display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 16px;
+    font: 900 64px/1.15 "Inter Display", Inter; color: #1d2b3a; text-align: center; }
+  .w { display: inline-block; } .w.k { color: #fff; background: #ff6b4a; padding: 0 14px 6px; border-radius: 14px; } .w.g { color: #fff; background: #1fae5b; padding: 0 14px 6px; border-radius: 14px; }
+  .w.b { color: #fff; background: #00203f; padding: 0 14px 6px; border-radius: 14px; }
+  #end { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 30%, #0b3358 0%, #00203f 60%, #00142a 100%); color: #fff; opacity: 0; }
+  #end .logo { position: absolute; left: 190px; top: 420px; width: 700px; height: 280px; border-radius: 34px; background: #fff url(../assets/logo.png) center/112% auto no-repeat; }
+  #end .l1 { position: absolute; left: 0; right: 0; top: 820px; text-align: center; font: 900 100px/1.05 "Inter Display", Inter; }
+  #end .l2 { position: absolute; left: 0; right: 0; top: 950px; text-align: center; font: 800 70px/1.1 "Inter Display", Inter; color: #DBAB88; }
+  #end .btn { position: absolute; left: 50%; top: 1140px; padding: 34px 90px; border-radius: 999px; background: #25D366; font: 800 56px/1 Inter; white-space: nowrap; }
+  #end .url { position: absolute; left: 0; right: 0; top: 1300px; text-align: center; font: 600 36px Inter; color: rgba(255,255,255,.8); }
+</style>
+</head>
+<body>
+<div id="stage">
+  <svg id="s" width="1080" height="1920" viewBox="0 0 1080 1920"></svg>
+  <div id="caps"></div>
+  <div id="end"><div class="logo" id="elogo"></div><div class="l1">Send your drawing.</div><div class="l2">Price in 2 hours.</div><div class="btn">Get a quote</div><div class="url">razanuae.com · WhatsApp +971 50 201 9281</div></div>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, p) => a + (b - a) * p;
+const easeOut = p => 1 - Math.pow(1 - p, 3);
+const easeInOut = p => p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
+const easeBack = p => { const c = 1.7; return 1 + (c + 1) * Math.pow(p - 1, 3) + c * Math.pow(p - 1, 2); };
+const prog = (t, a, d) => clamp((t - a) / d);
+const OFF = 0.3, A = x => x + OFF;
+const NS = 'http://www.w3.org/2000/svg', S = $('s');
+const SFX = [];
+function g(parent = S) { const n = document.createElementNS(NS, 'g'); parent.appendChild(n); return n; }
+function add(parent, tag, at, txt) { const n = document.createElementNS(NS, tag); for (const k in at) n.setAttribute(k, at[k]); if (txt != null) n.textContent = txt; parent.appendChild(n); return n; }
+function T(n, x, y, s = 1, o = 1, r = 0) { n.setAttribute('transform', `translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${r.toFixed(2)}) scale(${s.toFixed(4)})`); n.style.opacity = o.toFixed(3); n.style.display = o <= .001 ? 'none' : ''; }
+function pill(p, text, color) { const b = g(p); const w = text.length * 25 + 60;
+  add(b, 'rect', { x: -w / 2, y: -34, width: w, height: 68, rx: 34, fill: color }); add(b, 'text', { x: 0, y: 13, 'text-anchor': 'middle', class: 'lbl' }, text); return b; }
+
+/* ---------- road lanes ---------- */
+const LANE_A = 700, LANE_B = 1260, FIN = 770;
+function lane(y, tint) { const l = g();
+  add(l, 'rect', { x: 0, y: y - 120, width: 1080, height: 240, fill: '#c9d3dd' });
+  add(l, 'rect', { x: 0, y: y - 120, width: 1080, height: 10, fill: '#aab6c2' }); add(l, 'rect', { x: 0, y: y + 110, width: 1080, height: 10, fill: '#aab6c2' });
+  for (let i = 0; i < 12; i++) add(l, 'rect', { x: 10 + i * 95, y: y - 5, width: 50, height: 10, rx: 5, fill: '#fff' });
+  const glow = add(l, 'rect', { x: 0, y: y - 120, width: 1080, height: 240, fill: tint, opacity: 0 });
+  return { l, glow }; }
+const LA = lane(LANE_A, '#ff6b4a'), LB = lane(LANE_B, '#1fae5b');
+// finish line + THURSDAY flags
+function finish(y) { const f = g(); for (let r = 0; r < 8; r++) for (let c = 0; c < 2; c++) add(f, 'rect', { x: FIN + c * 30, y: y - 120 + r * 30, width: 30, height: 30, fill: (r + c) % 2 ? '#1d2b3a' : '#fff' }); return f; }
+finish(LANE_A); finish(LANE_B);
+const flag = g(); add(flag, 'rect', { x: 0, y: -260, width: 10, height: 260, fill: '#1d2b3a' });
+const flagCloth = add(flag, 'path', { d: '', fill: '#DBAB88', stroke: '#00203f', 'stroke-width': 5 });
+add(flag, 'text', { x: 105, y: -200, 'text-anchor': 'middle', style: 'font:900 30px Inter;fill:#00203f;letter-spacing:.04em' }, 'THURSDAY');
+// lane labels
+const labA = pill(S, '3 SUPPLIERS', '#ff6b4a'), labB = pill(S, 'RAZAN', '#00203f');
+
+/* ---------- traffic lights ---------- */
+function light(x, y) { const L = g(); add(L, 'rect', { x: -6, y: -40, width: 12, height: 60, fill: '#1d2b3a' });
+  add(L, 'rect', { x: -34, y: -150, width: 68, height: 120, rx: 16, fill: '#1d2b3a' });
+  const red = add(L, 'circle', { cx: 0, cy: -118, r: 20, fill: '#5a2a2a' }), grn = add(L, 'circle', { cx: 0, cy: -62, r: 20, fill: '#1f4a2e' });
+  T(L, x, y - 120); return { red, grn }; }
+const LIGHTS_A = [light(530, LANE_A), light(700, LANE_A)], LIGHTS_B = [light(530, LANE_B), light(700, LANE_B)];
+
+/* ---------- vans ---------- */
+function van(p, c, razan) { const v = g(p);
+  add(v, 'rect', { x: -120, y: -80, width: 170, height: 110, rx: 12, fill: c, stroke: '#1d2b3a', 'stroke-width': 5 });
+  add(v, 'path', { d: 'M50,-50 h50 l30,40 v40 h-80 Z', fill: c, stroke: '#1d2b3a', 'stroke-width': 5, 'stroke-linejoin': 'round' });
+  add(v, 'rect', { x: 62, y: -42, width: 34, height: 26, rx: 4, fill: '#dff1ff' });
+  if (razan) { add(v, 'rect', { x: -110, y: -68, width: 150, height: 84, rx: 10, fill: '#fff' });
+    add(v, 'image', { href: '../assets/logo.png', x: -112, y: -66, width: 154, height: 80, preserveAspectRatio: 'xMidYMid meet' }); }   // static logo on the van
+  [-70, 85].forEach(x => { add(v, 'circle', { cx: x, cy: 34, r: 24, fill: '#1d2b3a' }); add(v, 'circle', { cx: x, cy: 34, r: 9, fill: '#c9d3dd' }); }); return v; }
+// Lane A vans: queue behind red lights; van 3 runs out of fuel
+const VA = [['#ff6b4a', 390, 0.0], ['#ff9f1c', 240, 0.15], ['#9b5de5', 95, 0.3]].map(([c, stop, d]) => ({ v: van(S, c, false), stop, d }));
+const clocks = VA.map(() => { const c = g(); add(c, 'circle', { cx: 0, cy: 0, r: 34, fill: '#e03131' }); add(c, 'circle', { cx: 0, cy: 0, r: 24, fill: '#fff' });
+  add(c, 'path', { d: 'M0,-16 V0 L11,8', stroke: '#e03131', 'stroke-width': 6, fill: 'none', 'stroke-linecap': 'round' }); return c; });
+const gauge = g(); add(gauge, 'path', { d: 'M-46,0 A46,46 0 0 1 46,0', stroke: '#1d2b3a', 'stroke-width': 10, fill: 'none' });
+add(gauge, 'text', { x: -50, y: 30, style: 'font:900 24px Inter;fill:#e03131' }, 'E'); add(gauge, 'text', { x: 40, y: 30, style: 'font:900 24px Inter;fill:#1d2b3a' }, 'F');
+const needle = add(gauge, 'line', { x1: 0, y1: 0, x2: -38, y2: -8, stroke: '#e03131', 'stroke-width': 7, 'stroke-linecap': 'round' });
+add(gauge, 'circle', { cx: 0, cy: 0, r: 8, fill: '#1d2b3a' });
+const fuelP = pill(S, 'OUT OF FUEL', '#e03131');
+const VB = van(S, '#00203f', true);
+const onTime = pill(S, 'ON TIME ✓', '#1fae5b');
+const qMark = g(); add(qMark, 'circle', { cx: 0, cy: 0, r: 70, fill: '#fff', stroke: '#00203f', 'stroke-width': 6 }); add(qMark, 'text', { x: 0, y: 30, 'text-anchor': 'middle', style: 'font:900 90px Inter;fill:#00203f' }, '?');
+VA.forEach((v, i) => SFX.push({ t: A(.2 + v.d), type: 'whoosh' }));
+SFX.push({ t: A(3.26), type: 'whoosh' }); SFX.push({ t: A(5.65), type: 'ding' }); SFX.push({ t: A(2.0), type: 'clunk' });
+[0.9, 1.5, 2.1].forEach(t => SFX.push({ t: A(t), type: 'tick' })); SFX.push({ t: A(6.47), type: 'pop' });
+
+/* ---------- captions ---------- */
+const LINES = [
+  [0.0, 2.63, 'Three deliveries, three chances to be late.', { 0: 'k', 2: 'k', 3: 'k', 6: 'k' }],
+  [3.26, 5.65, 'One delivery, one chance to be on time.', { 0: 'g', 1: 'g', 6: 'g', 7: 'g' }, [[3.26, 4.06], [4.34, 5.65]]],
+  [6.47, 7.63, 'Which van do you want?', { 1: 'b' }],
+];
+const caps = LINES.map(([a, b, text, hl, segs]) => { const box = document.createElement('div'); box.style.cssText = 'position:absolute;left:0;right:0;top:0;display:flex;flex-wrap:wrap;justify-content:center;gap:4px 16px';
+  const words = text.split(' '); segs = segs || [[a, b]];
+  const per = segs.map(() => []); { const tot = words.reduce((s, w) => s + w.length, 0); let acc = 0, si = 0, segTot = segs.reduce((s, [x, y]) => s + (y - x), 0), segAcc = segs[0][1] - segs[0][0];
+    words.forEach(w => { if (acc / tot > segAcc / segTot + .02 && si < segs.length - 1) { si++; segAcc += segs[si][1] - segs[si][0]; } per[si].push(w); acc += w.length; }); }
+  const spans = [], times = []; let wi = 0;
+  per.forEach((ws, si) => { const [x, y] = segs[si], L = ws.reduce((s, w) => s + w.length + 2, 0); let acc = 0;
+    ws.forEach(w => { const sp = document.createElement('span'); sp.className = 'w' + (hl[wi] ? ' ' + hl[wi] : ''); sp.textContent = w; box.appendChild(sp); spans.push(sp); times.push(A(x + (y - x) * acc / L) - .05); acc += w.length + 2; wi++; }); });
+  $('caps').appendChild(box); return { box, spans, times, a: A(a) - .1 }; });
+
+const END = 12.4, DUR = 15;
+window.render = t => {
+  T(labA, 215, LANE_A - 210, 1, clamp(prog(t, .1, .4))); T(labB, 140, LANE_B - 210, 1, clamp(prog(t, .2, .4)));
+  // lights: lane A red (one flickers green briefly but vans stay stuck); lane B green from the start of "One delivery"
+  LIGHTS_A.forEach(L => { L.red.setAttribute('fill', '#e03131'); L.grn.setAttribute('fill', '#1f4a2e'); });
+  const bGo = t >= A(3.1);
+  LIGHTS_B.forEach(L => { L.red.setAttribute('fill', bGo ? '#5a2a2a' : '#e03131'); L.grn.setAttribute('fill', bGo ? '#2ee06b' : '#1f4a2e'); });
+  // lane A vans roll in and stop in the queue; van 3 sputters to a stop
+  VA.forEach((v, i) => { const q = easeOut(prog(t, A(.1 + v.d), 1.1)); const x = lerp(-220, v.stop, q);
+    T(v.v, x, LANE_A + 10 + (q < 1 ? Math.sin(t * 40) * 2 : 0), .7, 1);
+    T(clocks[i], x - 20, LANE_A - 100, easeBack(prog(t, A([0.9, 1.5, 2.1][i]), .35)), clamp(prog(t, A([0.9, 1.5, 2.1][i]), .15))); });
+  T(gauge, 110, LANE_A + 190, 1, clamp(prog(t, A(1.8), .3)));
+  needle.setAttribute('x2', lerp(30, -38, easeInOut(prog(t, A(1.8), .6))).toFixed(1));
+  T(fuelP, 300, LANE_A + 190, easeBack(prog(t, A(2.15), .35)), clamp(prog(t, A(2.15), .15)));
+  // lane B: one Razan van, green all the way, crosses the THURSDAY line on "on time"
+  const bq = easeInOut(prog(t, A(3.26), 2.5)); const bx = lerp(-220, FIN + 20, bq);
+  T(VB, bx, LANE_B + 10 + (bq > 0 && bq < 1 ? Math.sin(t * 40) * 2 : 0), .9, t >= A(3.1) ? 1 : 0);
+  T(flag, FIN + 50, LANE_B - 130, 1, clamp(prog(t, .3, .4)));
+  const wave = t > A(5.65) ? Math.sin(t * 9) * 12 : Math.sin(t * 3) * 4;
+  flagCloth.setAttribute('d', `M10,-258 C70,${-270 + wave} 140,${-246 - wave} 200,-258 L200,-170 C140,${-158 - wave} 70,${-182 + wave} 10,-170 Z`);
+  T(onTime, 600, LANE_B + 185, easeBack(prog(t, A(5.65), .4)), clamp(prog(t, A(5.65), .15)));
+  // "Which van do you want?" — hold both lanes, tint them
+  const qq = prog(t, A(6.47), .5);
+  LA.glow.setAttribute('opacity', (.18 * qq).toFixed(3)); LB.glow.setAttribute('opacity', (.22 * qq).toFixed(3));
+  T(qMark, 600, 960, easeBack(prog(t, A(6.6), .45)), clamp(prog(t, A(6.6), .2)) * (1 - prog(t, END, .3)));
+  // captions (hidden once the end card is up)
+  caps.forEach((c, i) => { const nxt = i + 1 < caps.length ? caps[i + 1].a : END; c.box.style.display = t >= c.a && t < nxt ? 'flex' : 'none';
+    c.spans.forEach((w, j) => { const p = prog(t, c.times[j], .25); w.style.opacity = clamp(p * 3); w.style.transform = `translateY(${lerp(18, 0, easeOut(p))}px)`; }); });
+  // END CARD
+  $('end').style.opacity = easeInOut(prog(t, END, .5));
+  $('elogo').style.opacity = easeOut(prog(t, END + .15, .5));                                          // logo: fade only
+  $('end').querySelectorAll('.l1,.l2,.btn,.url').forEach((n, i) => { const q = prog(t, END + .3 + i * .3, .4); n.style.opacity = q;
+    n.style.transform = (n.classList.contains('btn') ? 'translateX(-50%) ' : '') + `translateY(${lerp(30, 0, easeOut(q))}px)`; });
+};
+window.SFX = SFX.sort((a, b) => a.t - b.t); window.CFG = { duration: DUR, voiceAt: OFF };
+window.DURATION = DUR; window.AUDIO_OFFSET = 0; window.AUDIO = 'sb-x10-05-race.mp3';
+const q = new URLSearchParams(location.search); window.render(q.has('t') ? +q.get('t') : 1); window.READY = true;
+</script>
+</body>
+</html>

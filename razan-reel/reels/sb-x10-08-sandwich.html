@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Razan — "The Sandwich" mesh glass (9:16)</title>
+<!-- Flat 2D series ad 8 (mesh glass). Bread / mesh / bread becomes glass / metal mesh / glass, pressed into one piece;
+     thickness chips 6 mm · 8 mm · 6+6; hands can't pull it apart; light shines through, the mesh sparkles.
+     Narration audio/x10/08-sandwich.mp3 (times below = that file). Logo never rolls/spins/scales. -->
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; }
+  body { font-family: "Inter Display", Inter, sans-serif; }
+  #stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: linear-gradient(180deg, #dff1ff 0%, #f3f9ff 62%, #fff7e6 62.1%, #fff2d6 100%); }
+  svg { position: absolute; left: 0; top: 0; }
+  .lbl { font: 900 40px "Inter Display", Inter; letter-spacing: .06em; fill: #fff; }
+  #caps { position: absolute; left: 60px; right: 60px; top: 1600px; }
+  .w { display: inline-block; } .w.k { color: #fff; background: #ff6b4a; padding: 0 14px 6px; border-radius: 14px; } .w.g { color: #fff; background: #1fae5b; padding: 0 14px 6px; border-radius: 14px; }
+  .w.b { color: #fff; background: #00203f; padding: 0 14px 6px; border-radius: 14px; }
+  #end { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 30%, #0b3358 0%, #00203f 60%, #00142a 100%); color: #fff; opacity: 0; }
+  #end .logo { position: absolute; left: 190px; top: 420px; width: 700px; height: 280px; border-radius: 34px; background: #fff url(../assets/logo.png) center/112% auto no-repeat; }
+  #end .l1 { position: absolute; left: 0; right: 0; top: 820px; text-align: center; font: 900 90px/1.05 "Inter Display", Inter; }
+  #end .l2 { position: absolute; left: 0; right: 0; top: 950px; text-align: center; font: 800 70px/1.1 "Inter Display", Inter; color: #DBAB88; }
+  #end .btn { position: absolute; left: 50%; top: 1140px; padding: 34px 90px; border-radius: 999px; background: #25D366; font: 800 56px/1 Inter; white-space: nowrap; }
+  #end .url { position: absolute; left: 0; right: 0; top: 1300px; text-align: center; font: 600 36px Inter; color: rgba(255,255,255,.8); }
+</style>
+</head>
+<body>
+<div id="stage">
+  <svg id="s" width="1080" height="1920" viewBox="0 0 1080 1920">
+    <defs>
+      <pattern id="mesh" width="22" height="22" patternUnits="userSpaceOnUse"><rect width="22" height="22" fill="#e2bd5f"/><path d="M0,11 H22 M11,0 V22" stroke="#8a6a1a" stroke-width="3"/></pattern>
+      <pattern id="weave" width="36" height="36" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><path d="M0,18 H36 M18,0 V36" stroke="#c9a24a" stroke-width="5" opacity=".9"/></pattern>
+      <linearGradient id="beam" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff6b0" stop-opacity=".0"/><stop offset=".35" stop-color="#fff6b0" stop-opacity=".75"/><stop offset="1" stop-color="#fff6b0" stop-opacity="0"/></linearGradient>
+    </defs>
+  </svg>
+  <div id="caps"></div>
+  <div id="end"><div class="logo" id="elogo"></div><div class="l1">Mesh glass, cut to size.</div><div class="l2">Price in 2 hours.</div><div class="btn">Get a quote</div><div class="url">razanuae.com · WhatsApp +971 50 201 9281</div></div>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, p) => a + (b - a) * p;
+const easeOut = p => 1 - Math.pow(1 - p, 3);
+const easeInOut = p => p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
+const easeBack = p => { const c = 1.7; return 1 + (c + 1) * Math.pow(p - 1, 3) + c * Math.pow(p - 1, 2); };
+const prog = (t, a, d) => clamp((t - a) / d);
+const OFF = 0.3, A = x => x + OFF;
+const NS = 'http://www.w3.org/2000/svg', S = $('s');
+const SFX = [];
+const DUR = 16.4, END = A(13.6);
+function g(parent = S) { const n = document.createElementNS(NS, 'g'); parent.appendChild(n); return n; }
+function add(parent, tag, at, txt) { const n = document.createElementNS(NS, tag); for (const k in at) n.setAttribute(k, at[k]); if (txt != null) n.textContent = txt; parent.appendChild(n); return n; }
+function T(n, x, y, s = 1, o = 1, r = 0, sy) { n.setAttribute('transform', `translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${r.toFixed(2)}) scale(${s.toFixed(4)} ${(sy ?? s).toFixed(4)})`); n.style.opacity = o.toFixed(3); n.style.display = o <= .001 ? 'none' : ''; }
+function pill(p, text, color) { const b = g(p); const w = text.length * 25 + 60;
+  add(b, 'rect', { x: -w / 2, y: -34, width: w, height: 68, rx: 34, fill: color }); add(b, 'text', { x: 0, y: 13, 'text-anchor': 'middle', class: 'lbl' }, text); return b; }
+
+/* ---------- side view: three layers (each a bread version and a glass version, cross-faded) ---------- */
+const W = 680;
+const side = g();
+function layer(kind) { // returns {bread, glass} groups drawn around center, unit height 1 (scaled per frame via rect attrs)
+  const L = g(side);
+  const bread = g(L), glass = g(L), mesh = g(L);
+  return { L, bread, glass, mesh, kind };
+}
+// build drawable rects we can resize each frame
+function breadShape(p, top) {
+  const crust = add(p, 'path', { fill: '#e8b874', stroke: '#b07a3a', 'stroke-width': 7, 'stroke-linejoin': 'round' });
+  const crumb = add(p, 'rect', { fill: '#f6d9a6', rx: 14 });
+  return (h) => { const r = 18, d = top ? `M${-W / 2},${h / 2} V${-h / 2 + 40} Q${-W / 2},${-h / 2 - 34} 0,${-h / 2 - 34} Q${W / 2},${-h / 2 - 34} ${W / 2},${-h / 2 + 40} V${h / 2} Z`
+        : `M${-W / 2},${-h / 2} H${W / 2} V${h / 2 - r} Q${W / 2},${h / 2} ${W / 2 - r},${h / 2} H${-W / 2 + r} Q${-W / 2},${h / 2} ${-W / 2},${h / 2 - r} Z`;
+    crust.setAttribute('d', d); crumb.setAttribute('x', -W / 2 + 22); crumb.setAttribute('y', -h / 2 + (top ? 0 : 16)); crumb.setAttribute('width', W - 44); crumb.setAttribute('height', Math.max(0, h - (top ? 22 : 32))); };
+}
+function glassShape(p) {
+  const r = add(p, 'rect', { fill: 'rgba(108,196,255,.78)', stroke: '#2f8fd6', 'stroke-width': 7, rx: 10 });
+  const sh = add(p, 'rect', { fill: 'rgba(255,255,255,.55)', rx: 6 });
+  return (h) => { r.setAttribute('x', -W / 2); r.setAttribute('y', -h / 2); r.setAttribute('width', W); r.setAttribute('height', h);
+    sh.setAttribute('x', -W / 2 + 30); sh.setAttribute('y', -h / 2 + Math.min(10, h * .2)); sh.setAttribute('width', W * .55); sh.setAttribute('height', Math.max(3, h * .16)); };
+}
+function meshShape(p) {
+  const r = add(p, 'rect', { fill: 'url(#mesh)', stroke: '#8a6a1a', 'stroke-width': 5, rx: 6 });
+  return (h) => { r.setAttribute('x', -W / 2 + 10); r.setAttribute('y', -h / 2); r.setAttribute('width', W - 20); r.setAttribute('height', h); };
+}
+const lTop = layer(), mid = layer(), bot = layer();
+const topB = breadShape(lTop.bread, true), topG = glassShape(lTop.glass);
+const midM = meshShape(mid.mesh);
+const botB = breadShape(bot.bread, false), botG = glassShape(bot.glass);
+// labels for the three layers
+const lGlass1 = pill(S, 'GLASS', '#2f8fd6'), lMesh = pill(S, 'METAL MESH', '#b08a2a'), lGlass2 = pill(S, 'GLASS', '#2f8fd6');
+// press plates
+const pressT = g(), pressB = g();
+[pressT, pressB].forEach((p, i) => { add(p, 'rect', { x: -380, y: -26, width: 760, height: 52, rx: 12, fill: '#5b6670' });
+  add(p, 'path', { d: i ? 'M0,-40 L-36,-90 H36 Z' : 'M0,40 L-36,90 H36 Z', fill: '#5b6670', transform: i ? 'translate(0 120) rotate(180)' : 'translate(0 -120) rotate(180)' }); });
+const onePiece = pill(S, 'ONE PIECE', '#1fae5b');
+// thickness chips + dimension bracket
+const CH = [['6 mm', 6.50, .62], ['8 mm', 7.80, .82], ['6+6 mm', 8.38, 1.15]].map(([txt, at, k], i) => ({ p: pill(S, txt, '#00203f'), at: A(at), k, x: [270, 540, 810][i] }));
+const dim = g(); const dimL = add(dim, 'path', { stroke: '#1e6fd9', 'stroke-width': 6, fill: 'none', 'stroke-linecap': 'round' });
+
+/* ---------- front view: the finished panel ---------- */
+const front = g();
+add(front, 'rect', { x: -260, y: -360, width: 520, height: 720, rx: 14, fill: 'rgba(108,196,255,.55)', stroke: '#2f8fd6', 'stroke-width': 10 });
+add(front, 'rect', { x: -236, y: -336, width: 472, height: 672, fill: 'url(#weave)', opacity: '.95' });
+add(front, 'rect', { x: -236, y: -336, width: 472, height: 672, fill: 'rgba(226,189,95,.22)' });
+add(front, 'path', { d: 'M-220,-250 L-60,-340 L-20,-340 L-220,-228 Z M-220,-170 L80,-340 L110,-340 L-220,-150 Z', fill: 'rgba(255,255,255,.55)' });
+function hand(p, dir) { const h = g(p);
+  add(h, 'rect', { x: -50, y: -60, width: 100, height: 120, rx: 36, fill: '#f2c29b', stroke: '#1d2b3a', 'stroke-width': 6 });
+  [-38, -13, 12, 37].forEach(y => add(h, 'rect', { x: dir > 0 ? -98 : 30, y: y - 12, width: 68, height: 26, rx: 13, fill: '#f2c29b', stroke: '#1d2b3a', 'stroke-width': 5 }));
+  add(h, 'rect', { x: dir > 0 ? 40 : -160, y: -40, width: 120, height: 80, rx: 20, fill: '#6cc4ff', stroke: '#1d2b3a', 'stroke-width': 6 });   // sleeve
+  return h; }
+const handL = hand(S, -1), handR = hand(S, 1);
+const strain = g(); [[-330, -40], [-345, 10], [330, -40], [345, 10]].forEach(([x, y]) => add(strain, 'path', { d: `M${x},${y} l${x < 0 ? -30 : 30},-10`, stroke: '#1d2b3a', 'stroke-width': 6, 'stroke-linecap': 'round' }));
+const holds = pill(S, "WON'T COME APART", '#1fae5b');
+const beam = add(S, 'path', { d: 'M-80,260 L260,200 L1160,1240 L760,1420 Z', fill: 'url(#beam)', opacity: 0 });
+const sparkles = [[-150, -220], [90, -120], [-60, 40], [160, 150], [-170, 230], [40, 300], [180, -280]].map(([x, y]) => {
+  const st = add(S, 'path', { d: 'M0,-26 L6,-6 L26,0 L6,6 L0,26 L-6,6 L-26,0 L-6,-6 Z', fill: '#fffbe0', stroke: '#e2bd5f', 'stroke-width': 3 }); return { st, x, y }; });
+
+/* ---------- SFX ---------- */
+[[2.23, 'whoosh'], [2.92, 'pop'], [3.77, 'whoosh'], [6.5, 'pop'], [7.8, 'pop'], [8.38, 'pop'], [10.5, 'tick'], [10.9, 'tick'], [11.3, 'tick'], [12.5, 'ding']].forEach(([t, type]) => SFX.push({ t: A(t), type }));
+const PRESS = A(4.52), CLICK = PRESS + .55; SFX.push({ t: CLICK, type: 'click' });
+
+/* ---------- captions ---------- */
+const LINES = [
+  [0.0, 1.89, 'Our mesh glass is a sandwich.', { 1: 'b', 2: 'b', 5: 'b' }],
+  [2.23, 5.93, 'Glass, metal mesh, glass — pressed into one piece.', { 0: 'b', 1: 'b', 2: 'b', 3: 'b', 7: 'g', 8: 'g' }, [[2.23, 2.76], [2.92, 3.58], [3.77, 4.26], [4.52, 5.93]]],
+  [6.50, 9.81, 'Six millimetre, eight, or six plus six.', { 0: 'b', 1: 'b', 2: 'b', 4: 'b', 5: 'b', 6: 'b' }, [[6.50, 7.48], [7.80, 8.17], [8.38, 9.81]]],
+  [10.40, 13.51, "You can't pull it apart, and it looks beautiful in the light.", { 1: 'g', 2: 'g', 3: 'g', 4: 'g', 8: 'g', 11: 'g' }, [[10.40, 12.22], [12.41, 13.51]]],
+];
+const caps = LINES.map(([a, b, text, hl, segs]) => { const box = document.createElement('div'); box.style.cssText = 'position:absolute;left:0;right:0;top:0;display:flex;flex-wrap:wrap;justify-content:center;gap:4px 16px;font:900 64px/1.15 "Inter Display",Inter;color:#1d2b3a;text-align:center';
+  const words = text.split(' '); segs = segs || [[a, b]];
+  const per = segs.map(() => []); { const tot = words.reduce((s, w) => s + w.length, 0); let acc = 0, si = 0, segTot = segs.reduce((s, [x, y]) => s + (y - x), 0), segAcc = segs[0][1] - segs[0][0];
+    words.forEach(w => { if (acc / tot > segAcc / segTot + .02 && si < segs.length - 1) { si++; segAcc += segs[si][1] - segs[si][0]; } per[si].push(w); acc += w.length; }); }
+  const spans = [], times = []; let wi = 0;
+  per.forEach((ws, si) => { const [x, y] = segs[si], L = ws.reduce((s, w) => s + w.length + 2, 0); let acc = 0;
+    ws.forEach(w => { const sp = document.createElement('span'); sp.className = 'w' + (hl[wi] ? ' ' + hl[wi] : ''); sp.textContent = w; box.appendChild(sp); spans.push(sp); times.push(A(x + (y - x) * acc / L) - .05); acc += w.length + 2; wi++; }); });
+  $('caps').appendChild(box); return { box, spans, times, a: A(a) - .1 }; });
+
+const CY = 820, SC = 1.3;           // sandwich centre
+window.render = t => {
+  // SIDE VIEW (0 – ~10.3)
+  const sideO = clamp(prog(t, .05, .4)) * (1 - easeInOut(prog(t, A(10.1), .45)));
+  const intro = easeBack(prog(t, .05, .6));
+  const press = easeInOut(prog(t, PRESS, .55));
+  // layer heights and centres: loose sandwich -> pressed panel
+  const hT = lerp(120, 56, press), hM = lerp(64, 16, press), hB = lerp(120, 56, press), gapv = lerp(34, 0, press);
+  const total = hT + hM + hB + 2 * gapv;
+  // thickness options scale the pressed panel after the click
+  let kk = 1; CH.forEach(c => { if (t >= c.at) kk = lerp(kk, c.k, easeOut(prog(t, c.at, .35))); });
+  const sy = t > CLICK ? kk : 1;
+  const yT = CY - total / 2 + hT / 2, yM = yT + hT / 2 + gapv + hM / 2, yB = yM + hM / 2 + gapv + hB / 2;
+  T(side, 540, CY + lerp(120, 0, intro) - CY * 0, 1, sideO, 0); side.setAttribute('transform', `translate(540 ${CY + lerp(120, 0, intro)}) scale(${SC} ${(SC * sy).toFixed(3)}) translate(0 ${-CY})`);
+  topB(hT); topG(hT); botB(hB); botG(hB); midM(hM);
+  T(lTop.L, 0, yT); T(mid.L, 0, yM); T(bot.L, 0, yB);
+  const g1 = easeOut(prog(t, A(2.23), .35)), g2 = easeOut(prog(t, A(3.77), .35)), m1 = prog(t, A(2.92), .3);
+  lTop.bread.style.opacity = 1 - g1; lTop.glass.style.opacity = g1; bot.bread.style.opacity = 1 - g2; bot.glass.style.opacity = g2;
+  mid.mesh.style.opacity = 1; mid.mesh.style.filter = m1 > 0 && m1 < 1 ? `brightness(${1 + .6 * Math.sin(Math.PI * m1)})` : '';
+  // layer labels (right side) — only while loose
+  const lo = 1 - prog(t, PRESS, .3);
+  T(lGlass1, 540, CY + (yT - CY - hT / 2) * SC - 90, easeBack(prog(t, A(2.23), .35)), clamp(prog(t, A(2.23), .15)) * lo * sideO);
+  T(lMesh, 540, CY + (yM - CY) * SC, easeBack(prog(t, A(2.92), .35)), clamp(prog(t, A(2.92), .15)) * lo * sideO);
+  T(lGlass2, 540, CY + (yB - CY + hB / 2) * SC + 70, easeBack(prog(t, A(3.77), .35)), clamp(prog(t, A(3.77), .15)) * lo * sideO);
+  // press plates come in, squeeze, leave
+  const pin = easeOut(prog(t, PRESS - .35, .35)), pout = easeInOut(prog(t, CLICK + .35, .4));
+  const plateGap = total / 2 * SC + 26;
+  T(pressT, 540, lerp(CY - 520, CY - plateGap * sy, pin) - 300 * pout, 1, clamp(prog(t, PRESS - .35, .15)) * (1 - pout) * sideO);
+  T(pressB, 540, lerp(CY + 520, CY + plateGap * sy, pin) + 300 * pout, 1, clamp(prog(t, PRESS - .35, .15)) * (1 - pout) * sideO);
+  T(onePiece, 540, CY - 260, easeBack(prog(t, CLICK, .35)), clamp(prog(t, CLICK, .15)) * (1 - prog(t, A(6.3), .3)));
+  // thickness chips and a blue dimension bracket on the left edge
+  CH.forEach((c, i) => { const on = t >= c.at, act = on && (i === CH.length - 1 || t < CH[i + 1].at);
+    T(c.p, c.x, CY + 330, easeBack(prog(t, c.at, .35)) * (act ? 1.12 : 1), clamp(prog(t, c.at, .15)) * (act ? 1 : .55) * sideO); });
+  const dimOn = clamp(prog(t, A(6.5), .3)) * sideO, hh = total / 2 * sy * SC;
+  const ex = W / 2 * SC; dimL.setAttribute('d', `M${-ex - 50},${-hh} H${-ex - 20} M${-ex - 50},${hh} H${-ex - 20} M${-ex - 35},${-hh} V${hh}`);
+  T(dim, 540, CY, 1, dimOn);
+  // FRONT VIEW (10.2 – end)
+  const fo = easeInOut(prog(t, A(10.1), .45));
+  T(front, 540, CY, lerp(1.05, 1.22, fo), fo);
+  // hands pull from 10.4 to ~11.9 — the panel doesn't move
+  const hp = prog(t, A(10.4), .3) * (1 - prog(t, A(11.9), .4)), jit = Math.sin(t * 34) * 6;
+  const pull = hp > 0 ? 18 + jit : 0;
+  T(handL, 540 - 370 - pull, CY, 1.15, hp); T(handR, 540 + 370 + pull, CY, 1.15, hp);
+  T(strain, 540, CY, 1.25, hp * (Math.sin(t * 20) > 0 ? 1 : .4));
+  T(holds, 540, CY + 510, easeBack(prog(t, A(11.0), .35)), clamp(prog(t, A(11.0), .15)) * (1 - prog(t, A(12.3), .3)));
+  // light beam + sparkles from 12.41
+  const lp = prog(t, A(12.41), .6); beam.style.opacity = (.95 * easeOut(lp)).toFixed(3);
+  sparkles.forEach((s, i) => { const k = Math.max(0, Math.sin((t - A(12.5)) * 6 + i * 1.7)); T(s.st, 540 + s.x * 1.22, CY + s.y * 1.22, .5 + 1.1 * k, lp > 0 ? (.3 + .7 * k) * clamp(lp * 2) : 0, (t * 60 + i * 20) % 360); });
+  // captions
+  caps.forEach((c, i) => { const nxt = i + 1 < caps.length ? caps[i + 1].a : END; c.box.style.display = t >= c.a && t < nxt ? 'flex' : 'none';
+    c.spans.forEach((w, j) => { const p = prog(t, c.times[j], .25); w.style.opacity = clamp(p * 3); w.style.transform = `translateY(${lerp(18, 0, easeOut(p))}px)`; }); });
+  // END CARD
+  $('end').style.opacity = easeInOut(prog(t, END, .5));
+  $('elogo').style.opacity = easeOut(prog(t, END + .15, .5));                       // logo: fade only
+  $('end').querySelectorAll('.l1,.l2,.btn,.url').forEach((n, i) => { const q = prog(t, END + .3 + i * .3, .4); n.style.opacity = q;
+    n.style.transform = (n.classList.contains('btn') ? 'translateX(-50%) ' : '') + `translateY(${lerp(30, 0, easeOut(q))}px)`; });
+};
+window.SFX = SFX.sort((a, b) => a.t - b.t); window.CFG = { duration: DUR, voiceAt: OFF };
+window.DURATION = DUR; window.AUDIO_OFFSET = 0; window.AUDIO = 'sb-x10-08-sandwich.mp3';
+const q = new URLSearchParams(location.search); window.render(q.has('t') ? +q.get('t') : 1); window.READY = true;
+</script>
+</body>
+</html>

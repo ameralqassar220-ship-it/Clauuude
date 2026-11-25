@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Razan — x10 #2 "The Recipe" (9:16, 20 s)</title>
+<!-- Flat 2D, same style as sb-explainer. A wardrobe is like a cake: three shops send the flour late, the eggs broken and
+     forget the sugar — the timer rings and the cake is half-baked. Razan sends every ingredient, measured, in one box —
+     a perfect cake for Thursday. Narration: audio/x10/02-recipe.mp3.
+     Brand rule: the Razan logo never rolls or spins (logo block slides straight in; end-card logo only fades). -->
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; }
+  body { font-family: "Inter Display", Inter, sans-serif; }
+  #stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: linear-gradient(180deg, #dff1ff 0%, #f3f9ff 62%, #fff7e6 62.1%, #fff2d6 100%); }
+  svg { position: absolute; left: 0; top: 0; }
+  .lbl { font: 900 40px "Inter Display", Inter; letter-spacing: .06em; fill: #fff; }
+  .shop { font: 900 30px Inter; fill: #fff; letter-spacing: .08em; }
+  .small { font: 800 34px Inter; fill: #1d2b3a; }
+  .item { font: 900 30px Inter; fill: #6b4b2a; letter-spacing: .06em; }
+  #caps { position: absolute; left: 60px; right: 60px; top: 1600px; font: 900 64px/1.15 "Inter Display", Inter; color: #1d2b3a; text-align: center; }
+  .w { display: inline-block; } .w.k { color: #fff; background: #ff6b4a; padding: 0 14px 6px; border-radius: 14px; } .w.g { color: #fff; background: #1fae5b; padding: 0 14px 6px; border-radius: 14px; }
+  .w.b { color: #fff; background: #00203f; padding: 0 14px 6px; border-radius: 14px; }
+  #end { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 30%, #0b3358 0%, #00203f 60%, #00142a 100%); color: #fff; opacity: 0; }
+  #end .logo { position: absolute; left: 190px; top: 420px; width: 700px; height: 280px; border-radius: 34px; background: #fff url(../assets/logo.png) center/112% auto no-repeat; }
+  #end .l1 { position: absolute; left: 0; right: 0; top: 820px; text-align: center; font: 900 100px/1.05 "Inter Display", Inter; }
+  #end .l2 { position: absolute; left: 0; right: 0; top: 950px; text-align: center; font: 800 70px/1.1 "Inter Display", Inter; color: #DBAB88; }
+  #end .btn { position: absolute; left: 50%; top: 1140px; padding: 34px 90px; border-radius: 999px; background: #25D366; font: 800 56px/1 Inter; white-space: nowrap; }
+  #end .url { position: absolute; left: 0; right: 0; top: 1300px; text-align: center; font: 600 36px Inter; color: rgba(255,255,255,.8); }
+</style>
+</head>
+<body>
+<div id="stage">
+  <svg id="s" width="1080" height="1920" viewBox="0 0 1080 1920"></svg>
+  <div id="caps"></div>
+  <div id="end"><div class="logo" id="elogo"></div><div class="l1">Send your drawing.</div><div class="l2">Price in 2 hours.</div><div class="btn">Get a quote</div><div class="url">razanuae.com · WhatsApp +971 50 201 9281</div></div>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, p) => a + (b - a) * p;
+const easeOut = p => 1 - Math.pow(1 - p, 3);
+const easeInOut = p => p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
+const easeBack = p => { const c = 1.7; return 1 + (c + 1) * Math.pow(p - 1, 3) + c * Math.pow(p - 1, 2); };
+const prog = (t, a, d) => clamp((t - a) / d);
+const OFF = 0.3, A = x => x + OFF;
+const DUR = 20, END = 17.3;
+const NS = 'http://www.w3.org/2000/svg', S = $('s');
+const SFX = [];
+function g(parent = S) { const n = document.createElementNS(NS, 'g'); parent.appendChild(n); return n; }
+function add(parent, tag, at, txt) { const n = document.createElementNS(NS, tag); for (const k in at) n.setAttribute(k, at[k]); if (txt != null) n.textContent = txt; parent.appendChild(n); return n; }
+function T(n, x, y, s = 1, o = 1, r = 0) { n.setAttribute('transform', `translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${r.toFixed(2)}) scale(${s.toFixed(4)})`); n.style.opacity = o.toFixed(3); n.style.display = o <= .001 ? 'none' : ''; }
+function pill(p, text, color) { const b = g(p); const w = text.length * 25 + 60;
+  add(b, 'rect', { x: -w / 2, y: -34, width: w, height: 68, rx: 34, fill: color }); add(b, 'text', { x: 0, y: 13, 'text-anchor': 'middle', class: 'lbl' }, text); return b; }
+
+/* ---------- drawings ---------- */
+function wardrobe(p) { const b = g(p);
+  add(b, 'rect', { x: -130, y: -190, width: 260, height: 380, rx: 10, fill: '#8d99a6', stroke: '#5b6670', 'stroke-width': 6 });
+  [-118, 4].forEach(x => { add(b, 'rect', { x, y: -178, width: 114, height: 356, rx: 6, fill: '#6cc4ff', stroke: '#2f8fd6', 'stroke-width': 4 });
+    add(b, 'path', { d: `M${x + 14},${-140} l50,-28 v18 l-50,28 Z`, fill: 'rgba(255,255,255,.6)' }); });
+  add(b, 'rect', { x: -140, y: -120, width: 16, height: 40, rx: 4, fill: '#f5b915' }); return b; }
+function cake(p, good) { const b = g(p);
+  add(b, 'ellipse', { cx: 0, cy: 150, rx: 210, ry: 34, fill: '#e3e9f0', stroke: '#9fb0c2', 'stroke-width': 5 });
+  if (good) {
+    add(b, 'rect', { x: -170, y: -20, width: 340, height: 170, rx: 18, fill: '#f7c6d9', stroke: '#c4607f', 'stroke-width': 6 });
+    add(b, 'rect', { x: -130, y: -150, width: 260, height: 140, rx: 18, fill: '#fde2b8', stroke: '#c48c00', 'stroke-width': 6 });
+    add(b, 'path', { d: 'M-130,-150 h260 v34 q-16,30 -32,0 q-16,30 -32,0 q-16,30 -32,0 q-16,30 -32,0 q-16,30 -32,0 q-16,30 -32,0 q-16,30 -32,0 q-16,30 -36,0 Z', fill: '#fff' });
+    add(b, 'path', { d: 'M-170,-20 h340 v30 q-20,30 -40,0 q-20,30 -40,0 q-20,30 -40,0 q-20,30 -40,0 q-20,30 -40,0 q-20,30 -40,0 q-20,30 -40,0 q-20,30 -60,0 Z', fill: '#fff' });
+    add(b, 'circle', { cx: 0, cy: -172, r: 24, fill: '#e03131' }); add(b, 'path', { d: 'M0,-194 q10,-30 30,-36', stroke: '#1fae5b', 'stroke-width': 6, fill: 'none' });
+  } else {
+    // half-baked: low, pale, sunk in the middle, sad face
+    add(b, 'path', { d: 'M-170,150 L-170,40 Q-90,40 -40,90 Q0,120 40,90 Q90,40 170,40 L170,150 Z', fill: '#f3e6c4', stroke: '#b9a46a', 'stroke-width': 6 });
+    add(b, 'circle', { cx: -40, cy: 120, r: 7, fill: '#6b5a2e' }); add(b, 'circle', { cx: 40, cy: 120, r: 7, fill: '#6b5a2e' });
+    add(b, 'path', { d: 'M-24,146 Q0,130 24,146', stroke: '#6b5a2e', 'stroke-width': 6, fill: 'none', 'stroke-linecap': 'round' });
+    add(b, 'path', { d: 'M-120,60 q6,-14 12,0 M100,62 q6,-14 12,0', stroke: '#b9a46a', 'stroke-width': 5, fill: 'none' });
+  }
+  return b; }
+function shopB(p, c, n) { const s = g(p);
+  add(s, 'rect', { x: -130, y: -110, width: 260, height: 220, rx: 12, fill: '#fff', stroke: '#1d2b3a', 'stroke-width': 5 });
+  for (let k = 0; k < 5; k++) add(s, 'rect', { x: -140 + k * 56, y: -130, width: 56, height: 54, fill: k % 2 ? '#fff' : c, stroke: '#1d2b3a', 'stroke-width': 4 });
+  add(s, 'rect', { x: -40, y: 10, width: 80, height: 100, fill: c, stroke: '#1d2b3a', 'stroke-width': 4 });
+  add(s, 'rect', { x: -110, y: -60, width: 230, height: 50, rx: 8, fill: c }); add(s, 'text', { x: 5, y: -24, 'text-anchor': 'middle', class: 'shop' }, n); return s; }
+function flour(p) { const b = g(p); add(b, 'path', { d: 'M-80,-90 Q-60,-120 -40,-100 Q0,-130 40,-100 Q60,-120 80,-90 L95,90 Q0,115 -95,90 Z', fill: '#f4ead6', stroke: '#b9a46a', 'stroke-width': 6 });
+  add(b, 'text', { x: 0, y: 20, 'text-anchor': 'middle', class: 'item' }, 'FLOUR'); return b; }
+function eggs(p, broken) { const b = g(p); add(b, 'rect', { x: -110, y: 0, width: 220, height: 70, rx: 14, fill: '#c9d3dd', stroke: '#8796a6', 'stroke-width': 5 });
+  [-70, 0, 70].forEach((x, i) => { if (broken && i !== 1) { add(b, 'path', { d: `M${x - 30},0 l10,-24 l10,14 l10,-18 l10,16 l10,-14 l10,26 Z`, fill: '#fff', stroke: '#c9b79a', 'stroke-width': 4 });
+      add(b, 'path', { d: `M${x - 36},26 q20,-30 40,-6 q24,-20 36,10 q-30,30 -76,-4 Z`, fill: '#ffc93c' }); }
+    else add(b, 'ellipse', { cx: x, cy: -26, rx: 30, ry: 38, fill: '#fffaf0', stroke: '#c9b79a', 'stroke-width': 4 }); });
+  add(b, 'text', { x: 0, y: 48, 'text-anchor': 'middle', class: 'item', style: 'fill:#4a5866' }, 'EGGS'); return b; }
+function sugar(p, missing) { const b = g(p);
+  if (missing) { add(b, 'rect', { x: -75, y: -95, width: 150, height: 190, rx: 16, fill: 'none', stroke: '#e03131', 'stroke-width': 6, 'stroke-dasharray': '16 12' });
+    add(b, 'text', { x: 0, y: 30, 'text-anchor': 'middle', style: 'font:900 90px Inter;fill:#e03131' }, '?'); }
+  else { add(b, 'rect', { x: -75, y: -95, width: 150, height: 190, rx: 16, fill: '#fff', stroke: '#c4607f', 'stroke-width': 6 }); add(b, 'rect', { x: -75, y: -95, width: 150, height: 40, rx: 12, fill: '#f7c6d9' });
+    add(b, 'text', { x: 0, y: 30, 'text-anchor': 'middle', class: 'item', style: 'fill:#c4607f' }, 'SUGAR'); }
+  return b; }
+function oven(p) { const b = g(p);
+  add(b, 'rect', { x: -170, y: -150, width: 340, height: 300, rx: 20, fill: '#5b6670', stroke: '#1d2b3a', 'stroke-width': 6 });
+  add(b, 'rect', { x: -130, y: -70, width: 260, height: 180, rx: 14, fill: '#ffb347', stroke: '#1d2b3a', 'stroke-width': 5 });
+  add(b, 'rect', { x: -110, y: -110, width: 120, height: 26, rx: 8, fill: '#1d2b3a' });
+  [60, 110].forEach(x => add(b, 'circle', { cx: x, cy: -97, r: 14, fill: '#c9d3dd' })); return b; }
+function timer(p) { const b = g(p); add(b, 'circle', { cx: 0, cy: 0, r: 50, fill: '#fff', stroke: '#e03131', 'stroke-width': 8 });
+  add(b, 'path', { d: 'M0,-30 V0 L22,14', stroke: '#e03131', 'stroke-width': 8, fill: 'none', 'stroke-linecap': 'round' });
+  add(b, 'path', { d: 'M-70,-50 q-14,20 0,40 M70,-50 q14,20 0,40', stroke: '#e03131', 'stroke-width': 6, fill: 'none', 'stroke-linecap': 'round' }); return b; }
+function banner(p) { const b = g(p); const path = add(b, 'path', { d: '', stroke: '#1d2b3a', 'stroke-width': 4, fill: 'none' });
+  const flags = ['P', 'A', 'R', 'T', 'Y'].map((ch, i) => { const f = g(b); add(f, 'path', { d: 'M-34,0 h68 l-34,60 Z', fill: ['#ff6b4a', '#ff9f1c', '#1fae5b', '#2f8fd6', '#9b5de5'][i] });
+    add(f, 'text', { x: 0, y: 34, 'text-anchor': 'middle', style: 'font:900 28px Inter;fill:#fff' }, ch); return f; }); return { b, path, flags }; }
+function lateClock(p) { const b = g(p); add(b, 'circle', { cx: 0, cy: 0, r: 40, fill: '#e03131' }); add(b, 'circle', { cx: 0, cy: 0, r: 29, fill: '#fff' });
+  add(b, 'path', { d: 'M0,-20 V0 L14,10', stroke: '#e03131', 'stroke-width': 7, fill: 'none', 'stroke-linecap': 'round' }); return b; }
+
+/* ---------- scene 1: wardrobe = cake ---------- */
+const s1 = g(); const w1 = wardrobe(s1), c1 = cake(s1, true), eq = add(s1, 'text', { x: 540, y: 920, 'text-anchor': 'middle', style: 'font:900 140px Inter;fill:#00203f' }, '=');
+SFX.push({ t: A(.3), type: 'pop' }); SFX.push({ t: A(1.6), type: 'pop' });
+/* ---------- scene 2: three shops, three problems ---------- */
+const s2 = g();
+const SHOPS = [[200, '#ff6b4a', 'SHOP 1'], [540, '#ff9f1c', 'SHOP 2'], [880, '#9b5de5', 'SHOP 3']].map(([x, c, n]) => ({ s: shopB(s2, c, n), x }));
+const fl = flour(s2), eg = eggs(s2, true), su = sugar(s2, true), clk = lateClock(s2);
+const ITEMS = [[fl, 200, 3.4], [eg, 540, 4.1], [su, 880, 4.8]].map(([n, x, at]) => { SFX.push({ t: A(at), type: at === 4.1 ? 'clunk' : 'whoosh' }); return { n, x, at: A(at) }; });
+const BADP = [['LATE', 200, 3.6], ['BROKEN', 540, 4.3], ['NO SUGAR', 880, 5.0]].map(([tx, x, at]) => ({ p: pill(s2, tx, '#e03131'), x, at: A(at) }));
+const ov = oven(s2), tm = timer(s2), halfCake = cake(s2, false), ban = banner(s2);
+SFX.push({ t: A(5.6), type: 'ding' }); SFX.push({ t: A(5.95), type: 'clunk' });
+/* ---------- scene 3+4: Razan box, perfect cake ---------- */
+const s3 = g();
+const logoBlock = g(s3);
+add(logoBlock, 'rect', { x: -230, y: -100, width: 460, height: 200, rx: 28, fill: '#fff', stroke: '#00203f', 'stroke-width': 6 });
+add(logoBlock, 'image', { href: '../assets/logo.png', x: -235, y: -92, width: 470, height: 184, preserveAspectRatio: 'xMidYMid meet' });
+for (let i = 0; i < 4; i++) add(logoBlock, 'rect', { x: -230 + (i + .5) * 115 - 22, y: -118, width: 44, height: 22, rx: 8, fill: '#e6ecf2' });
+SFX.push({ t: A(7.76), type: 'whoosh' });
+const rbox = g(s3);
+const flapL = add(rbox, 'path', { d: 'M-200,-110 L0,-110 L-30,-190 L-230,-190 Z', fill: '#c48a52', stroke: '#8a5a2b', 'stroke-width': 5 });
+const flapR = add(rbox, 'path', { d: 'M200,-110 L0,-110 L30,-190 L230,-190 Z', fill: '#c48a52', stroke: '#8a5a2b', 'stroke-width': 5 });
+add(rbox, 'rect', { x: -200, y: -110, width: 400, height: 260, rx: 8, fill: '#d9a066', stroke: '#8a5a2b', 'stroke-width': 5 });
+add(rbox, 'rect', { x: -200, y: -40, width: 400, height: 40, fill: '#00203f' });
+add(rbox, 'circle', { cx: 0, cy: 70, r: 48, fill: '#fff', stroke: '#00203f', 'stroke-width': 5 }); add(rbox, 'image', { href: '../assets/logo-mark.png', x: -38, y: 32, width: 76, height: 76 });
+const gFl = flour(s3), gEg = eggs(s3, false), gSu = sugar(s3, false);
+const GOOD = [[gFl, 220, 9.0], [gEg, 540, 9.35], [gSu, 860, 9.7]].map(([n, x, at]) => { SFX.push({ t: A(at), type: 'pop' }); return { n, x, at: A(at) }; });
+const MEAS = [['500 g', 220, 10.2], ['×4', 540, 10.55], ['200 g', 860, 10.9]].map(([tx, x, at]) => { SFX.push({ t: A(at), type: 'tick' }); return { p: pill(s3, tx, '#00203f'), x, at: A(at) }; });
+const oneBox = pill(s3, 'ONE BOX', '#1fae5b'); SFX.push({ t: A(11.3), type: 'tick' });
+const goodCake = cake(s3, true);
+const flag = g(s3); add(flag, 'line', { x1: 0, y1: 0, x2: 0, y2: -170, stroke: '#1d2b3a', 'stroke-width': 6 });
+add(flag, 'path', { d: 'M0,-170 h250 l-30,40 l30,40 h-250 Z', fill: '#1fae5b' }); add(flag, 'text', { x: 112, y: -118, 'text-anchor': 'middle', style: 'font:900 34px Inter;fill:#fff;letter-spacing:.06em' }, 'THURSDAY');
+SFX.push({ t: A(12.9), type: 'ding' });
+const ban2 = banner(s3);
+const confetti = g(s3); const CONF = Array.from({ length: 46 }, (_, i) => { const c = add(confetti, 'rect', { x: -7, y: -12, width: 14, height: 24, rx: 3, fill: ['#ff6b4a', '#ff9f1c', '#1fae5b', '#2f8fd6', '#9b5de5', '#f5b915'][i % 6] });
+  return { c, x: 60 + (i * 211) % 960, sp: 260 + (i * 97) % 220, ph: (i * 37) % 100 / 100, rot: (i * 53) % 360 }; });
+const tagline = pill(s3, 'EVERY INGREDIENT · ONE BOX', '#1fae5b');
+
+/* ---------- captions ---------- */
+const LINES = [
+  [0.0, 2.49, 'Building a wardrobe is like baking a cake.', { 2: 'b', 7: 'b' }],
+  [2.82, 7.05, 'If the ingredients arrive at different times, the cake is never ready for the party.', { 5: 'k', 6: 'k', 10: 'k', 11: 'k' }],
+  [7.76, 11.74, 'Razan sends every ingredient together, measured, in one box.', { 0: 'b', 4: 'g', 5: 'g', 7: 'g', 8: 'g' }, [[7.76, 10.0], [10.2, 11.74]]],
+  [12.01, 13.6, 'Your cake is ready on Thursday.', { 3: 'g', 5: 'g' }],
+];
+const caps = LINES.map(([a, b, text, hl, segs]) => { const box = document.createElement('div'); box.style.cssText = 'position:absolute;left:0;right:0;top:0;display:flex;flex-wrap:wrap;justify-content:center;gap:4px 16px';
+  const words = text.split(' '); segs = segs || [[a, b]];
+  const per = segs.map(() => []); { const tot = words.reduce((s, w) => s + w.length, 0); let acc = 0, si = 0, segTot = segs.reduce((s, [x, y]) => s + (y - x), 0), segAcc = segs[0][1] - segs[0][0];
+    words.forEach(w => { if (acc / tot > segAcc / segTot + .02 && si < segs.length - 1) { si++; segAcc += segs[si][1] - segs[si][0]; } per[si].push(w); acc += w.length; }); }
+  const spans = [], times = []; let wi = 0;
+  per.forEach((ws, si) => { const [x, y] = segs[si], L = ws.reduce((s, w) => s + w.length + 2, 0); let acc = 0;
+    ws.forEach(w => { const sp = document.createElement('span'); sp.className = 'w' + (hl[wi] ? ' ' + hl[wi] : ''); sp.textContent = w; box.appendChild(sp); spans.push(sp); times.push(A(x + (y - x) * acc / L) - .05); acc += w.length + 2; wi++; }); });
+  $('caps').appendChild(box); return { box, spans, times, a: A(a) - .1 }; });
+
+function drawBanner(B, t, droop, x0, x1, y) {
+  const sag = lerp(30, 150, droop), mid = (x0 + x1) / 2;
+  B.path.setAttribute('d', `M${x0},${y} Q${mid},${y + sag * 2} ${x1},${y}`);
+  B.flags.forEach((f, i) => { const u = (i + .5) / 5, x = lerp(x0, x1, u), yy = (1 - u) * (1 - u) * y + 2 * u * (1 - u) * (y + sag * 2) + u * u * y;
+    T(f, x, yy, 1, 1, droop * (i - 2) * 12 + Math.sin(t * 3 + i) * (1 - droop) * 6); });
+}
+
+/* ---------- timeline ---------- */
+window.render = t => {
+  // 1: wardrobe = cake
+  const o1 = 1 - easeInOut(prog(t, A(2.6), .4));
+  T(s1, 0, 0, 1, o1);
+  T(w1, 270, 880, 1.25 * easeBack(prog(t, A(.2), .5)), clamp(prog(t, A(.2), .2)));
+  T(eq, 0, 0, 1, clamp(prog(t, A(1.2), .3)));
+  T(c1, 810, 840, easeBack(prog(t, A(1.6), .5)) * 1.15, clamp(prog(t, A(1.6), .2)));
+  // 2: shops, problems, oven, half-baked cake
+  const o2 = easeInOut(prog(t, A(2.82), .4)) * (1 - easeInOut(prog(t, A(7.5), .4)));
+  T(s2, 0, 0, 1, o2);
+  SHOPS.forEach((s, i) => T(s.s, s.x, lerp(200, 300, easeBack(prog(t, A(2.9) + i * .15, .5))), 1, clamp(prog(t, A(2.9) + i * .15, .25))));
+  ITEMS.forEach((it, i) => { const q = easeOut(prog(t, it.at, .5)); T(it.n, it.x, lerp(420, 700, q) + (i === 1 ? Math.sin(prog(t, it.at + .4, .4) * 30) * 6 * (1 - prog(t, it.at + .4, .4)) : 0), .9, clamp(prog(t, it.at, .15))); });
+  T(clk, 300, 620, easeBack(prog(t, A(3.55), .35)), clamp(prog(t, A(3.55), .15)));
+  BADP.forEach(b => T(b.p, b.x, 860, easeBack(prog(t, b.at, .35)), clamp(prog(t, b.at, .15))));
+  const ring = prog(t, A(5.6), .8);
+  T(ov, 300, 1220, 1, clamp(prog(t, A(5.0), .4)), ring > 0 && ring < 1 ? Math.sin(ring * 50) * 2 : 0);
+  T(tm, 300, 1010, easeBack(prog(t, A(5.45), .3)), clamp(prog(t, A(5.45), .15)), ring > 0 && ring < 1 ? Math.sin(ring * 60) * 14 : 0);
+  T(halfCake, 790, 1230, .9, clamp(prog(t, A(5.9), .3)));
+  T(ban.b, 0, 0, 1, clamp(prog(t, A(5.9), .3))); drawBanner(ban, t, easeInOut(prog(t, A(6.4), .6)), 600, 990, 1010);
+  // 3: Razan box, ingredients, measures
+  const o3 = easeInOut(prog(t, A(7.6), .4));
+  T(s3, 0, 0, 1, o3);
+  T(logoBlock, lerp(-400, 540, easeOut(prog(t, A(7.76), .7))), 230, .62, 1 - prog(t, END, .3));        // slides straight in, no roll
+  const boxOut = easeInOut(prog(t, A(11.75), .45));
+  T(rbox, 540, lerp(1900, 1200, easeBack(prog(t, A(8.0), .6))), 1, 1 - boxOut);
+  const open = easeInOut(prog(t, A(8.7), .4));
+  flapL.setAttribute('transform', `rotate(${lerp(0, -110, open)} -200 -110)`); flapR.setAttribute('transform', `rotate(${lerp(0, 110, open)} 200 -110)`);
+  GOOD.forEach(it => { const q = easeBack(prog(t, it.at, .55)); T(it.n, lerp(540, it.x, easeOut(prog(t, it.at, .55))), lerp(1150, 760, q), .85, clamp(prog(t, it.at, .15)) * (1 - boxOut)); });
+  MEAS.forEach(m => T(m.p, m.x, 920, easeBack(prog(t, m.at, .35)), clamp(prog(t, m.at, .15)) * (1 - boxOut)));
+  T(oneBox, 540, 1440, easeBack(prog(t, A(11.3), .35)), clamp(prog(t, A(11.3), .15)) * (1 - boxOut));
+  // 4: perfect cake for Thursday
+  const ck = easeBack(prog(t, A(12.0), .6));
+  T(goodCake, 540, 1120, ck * 1.25, clamp(prog(t, A(12.0), .2)));
+  T(flag, 600, 880, 1, clamp(prog(t, A(12.85), .2)), lerp(-30, 0, easeBack(prog(t, A(12.85), .45))));
+  T(ban2.b, 0, 0, 1, clamp(prog(t, A(12.3), .3))); drawBanner(ban2, t, 0, 120, 960, 520);
+  T(confetti, 0, 0, 1, clamp(prog(t, A(12.9), .2)) * (1 - prog(t, END, .3)));
+  CONF.forEach(c => { const tt = t - A(12.9); const y = ((c.ph * 1250 + tt * c.sp) % 1250) + 280; T(c.c, c.x + Math.sin(tt * 3 + c.ph * 6) * 30, y, 1, tt > 0 ? 1 : 0, c.rot + tt * 200); });
+  T(tagline, 540, 1450, easeBack(prog(t, A(14.2), .35)), clamp(prog(t, A(14.2), .15)));
+  // captions
+  caps.forEach((c, i) => { const nxt = i + 1 < caps.length ? caps[i + 1].a : END; c.box.style.display = t >= c.a && t < nxt ? 'flex' : 'none';
+    c.spans.forEach((w, j) => { const p = prog(t, c.times[j], .25); w.style.opacity = clamp(p * 3); w.style.transform = `translateY(${lerp(18, 0, easeOut(p))}px)`; }); });
+  // end card
+  $('end').style.opacity = easeInOut(prog(t, END, .5));
+  $('elogo').style.opacity = easeOut(prog(t, END + .15, .5));                                      // logo: fade only
+  $('end').querySelectorAll('.l1,.l2,.btn,.url').forEach((n, i) => { const q = prog(t, END + .3 + i * .35, .4); n.style.opacity = q;
+    n.style.transform = (n.classList.contains('btn') ? 'translateX(-50%) ' : '') + `translateY(${lerp(30, 0, easeOut(q))}px)`; });
+};
+window.SFX = SFX.sort((a, b) => a.t - b.t); window.CFG = { duration: DUR, voiceAt: OFF };
+window.DURATION = DUR; window.AUDIO_OFFSET = 0; window.AUDIO = 'sb-x10-02-recipe.mp3';
+const q = new URLSearchParams(location.search); window.render(q.has('t') ? +q.get('t') : 1); window.READY = true;
+</script>
+</body>
+</html>
