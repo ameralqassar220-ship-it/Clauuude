@@ -17,6 +17,14 @@ SPECS = {
   ('compare-body.mp3', 14.81, 16.48, 'No waste. No stress.'),
   ('compare-body.mp3', 16.59, 20.05, 'Get it right the first time at razanuae.com!'),
  ],
+ 'cine-team': [
+  ('precision.mp3',     0.00,  3.25, 'Big project in Dubai? Every door has to fit!'),
+  ('workshop.mp3',      3.30,  5.42, 'Razan sends complete door kits!'),
+  ('compare-body.mp3',  9.80, 13.36, 'Our engineers check every size and every hole before production.'),
+  ('workshop.mp3',     12.83, 16.45, 'Delivered next day by our own fleet, across all seven emirates!'),
+  ('precision.mp3',    20.85, 24.80, 'Trusted by big developers in Dubai, with huge stock ready to go.'),
+  ('compare-body.mp3', 16.59, 20.05, 'Get it right the first time at razanuae.com!'),
+ ],
  'bp-drawn': [
   ('hook-blueprint.mp3', 0.00, 9.99, 'Drawn to the millimetre. Made to the millimetre!'),
   ('precision.mp3',     3.40,  7.75, 'You send us your measurements, and we send back technical drawings for every single door.'),

@@ -36,6 +36,9 @@
   .chip { padding: 20px 34px; border-radius: 999px; font: 800 40px/1 Inter, sans-serif; white-space: nowrap;
     background: rgba(255,255,255,.16); border: 2px solid rgba(255,255,255,.4); backdrop-filter: blur(18px); }
   .chip.sand { background: var(--sand); color: var(--navy); border-color: var(--sand); }
+  svg.map { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+  svg.map text { font: 700 28px "JetBrains Mono", monospace; fill: rgba(255,255,255,.9); }
+  svg.map text.f { font: 800 32px "JetBrains Mono", monospace; fill: #DBAB88; }
   #caps { left: 64px; right: 64px; top: 1500px; visibility: visible; }
   .cap { position: absolute; left: 0; right: 0; top: 0; display: flex; flex-wrap: wrap; gap: 4px 18px;
     font: 900 70px/1.12 "Inter Display", sans-serif; letter-spacing: -.01em; text-shadow: 0 4px 18px rgba(0,0,0,.6); }
@@ -91,7 +94,30 @@ function boot(R) {
     const L = el(`<div class="layer"></div>`, $('layers'));
     let media, last = -1;
     if (sc.clip) { media = document.createElement('img'); media.className = 'm'; L.appendChild(media); }
-    else { media = document.createElement('div'); media.className = 'm'; media.style.backgroundImage = `url(${IMG(sc.img)})`; if (sc.pos) media.style.backgroundPosition = sc.pos; L.appendChild(media); }
+    else { media = document.createElement('div'); media.className = 'm';
+      media.style.background = sc.img ? `center/cover url(${IMG(sc.img)})` : 'radial-gradient(ellipse at 55% 38%, #0f3a63 0%, #071a2e 60%, #030b14 100%)'; if (sc.pos) media.style.backgroundPosition = sc.pos; L.appendChild(media); }
+    // Optional delivery map: factories (sand pins) send lines to every emirate. Approximate city positions, no coastline drawn.
+    let mapUp = null;
+    if (sc.map) {
+      const NS = 'http://www.w3.org/2000/svg', svg = document.createElementNS(NS, 'svg'); svg.setAttribute('class', 'map'); svg.setAttribute('viewBox', '0 0 1080 1920'); L.appendChild(svg);
+      const P = (lon, lat) => [150 + (lon - 54.3) * 400, 1040 - (lat - 24.45) * 520];
+      const C = { 'ABU DHABI': [54.37, 24.45], 'DUBAI': [55.27, 25.20], 'SHARJAH': [55.41, 25.35], 'AJMAN': [55.51, 25.41], 'UMM AL QUWAIN': [55.55, 25.56], 'RAS AL KHAIMAH': [55.94, 25.79], 'FUJAIRAH': [56.33, 25.12] };
+      const F = ['RAS AL KHAIMAH', 'UMM AL QUWAIN'], mk = (tag, at) => { const n = document.createElementNS(NS, tag); for (const k in at) n.setAttribute(k, at[k]); svg.appendChild(n); return n; };
+      const lines = [];
+      F.forEach(f => Object.keys(C).filter(c => !F.includes(c)).forEach(c => { const [x1, y1] = P(...C[f]), [x2, y2] = P(...C[c]);
+        const mx = (x1 + x2) / 2 + (y2 - y1) * .18, my = (y1 + y2) / 2 - (x2 - x1) * .18;
+        const pth = mk('path', { d: `M${x1},${y1} Q${mx},${my} ${x2},${y2}`, stroke: 'rgba(219,171,136,.75)', 'stroke-width': 4, fill: 'none', 'stroke-linecap': 'round' });
+        const L0 = pth.getTotalLength(); pth.style.strokeDasharray = L0; lines.push([pth, L0]); }));
+      const LBL = { 'ABU DHABI': [0, 60, 'middle'], 'DUBAI': [-30, 50, 'end'], 'SHARJAH': [-36, 6, 'end'], 'AJMAN': [-36, -10, 'end'], 'UMM AL QUWAIN': [-38, -26, 'end'], 'RAS AL KHAIMAH': [0, -48, 'middle'], 'FUJAIRAH': [0, 60, 'middle'] };
+      const dots = Object.keys(C).map(c => { const [x, y] = P(...C[c]), fac = F.includes(c), [dx, dy, an] = LBL[c];
+        const ring = fac ? mk('circle', { cx: x, cy: y, r: 30, fill: 'none', stroke: '#DBAB88', 'stroke-width': 4 }) : null;
+        const dot = mk('circle', { cx: x, cy: y, r: fac ? 18 : 11, fill: fac ? '#DBAB88' : '#fff' });
+        const tx = mk('text', { x: x + dx, y: y + dy, 'text-anchor': an, class: fac ? 'f' : '' }); tx.textContent = fac ? c + ' · FACTORY' : c;
+        return { ring, dot, tx, fac }; });
+      mapUp = (t, S) => { dots.forEach((d, i) => { const q = prog(t, S + (d.fac ? .2 : .9 + i * .08), .35); d.dot.style.opacity = q; d.tx.style.opacity = q;
+          if (d.ring) { const ph = ((t - S) % 1.4) / 1.4; d.ring.setAttribute('r', 22 + ph * 40); d.ring.style.opacity = q * (1 - ph); } });
+        lines.forEach(([pth, L0], i) => { pth.style.strokeDashoffset = L0 * (1 - easeInOut(prog(t, S + 1.0 + (i % 5) * .12, 1.1))); }); };
+    }
     const title = sc.title && el(`<div class="abs title"><div class="line"></div><div class="h">${sc.title}</div>${sc.sub ? `<div class="s">${sc.sub}</div>` : ''}</div>`);
     const stats = (sc.stats || []).map((s, k) => el(`<div class="abs glass stat" style="left:${s.x ?? 64}px;top:${s.y}px"><div class="n"><span>0</span><small>${s.suffix || ''}</small></div><div class="l">${s.label}</div></div>`));
     const chips = (sc.chips || []).map(c => el(`<div class="abs chip ${c.sand ? 'sand' : ''}" style="left:${c.x}px;top:${c.y}px">${c.text}</div>`));
@@ -102,6 +128,7 @@ function boot(R) {
       L.style.zIndex = i;
       const k = prog(t, S, E - S + FADE), z = sc.zoom || [1.12, 1.0];
       media.style.transform = `scale(${lerp(z[0], z[1], easeInOut(k))}) translate(${lerp(sc.panX ? sc.panX[0] : 0, sc.panX ? sc.panX[1] : 0, k)}%, 0)`;
+      if (mapUp) mapUp(t, S);
       if (title) { const r = rise(t, sc.win, .25); set(title, r); title.querySelector('.line').style.width = lerp(0, 120, easeOut(prog(t, S + .3, .6))) + 'px'; }
       stats.forEach((st, j) => { const s = sc.stats[j]; set(st, rise(t, sc.win, s.at ?? (.3 + j * .35)));
         st.querySelector('span').textContent = Math.max(s.n > 9 ? 0 : 1, Math.round(s.n * easeOut(prog(t, S + (s.at ?? (.3 + j * .35)), 1.3)))); });
