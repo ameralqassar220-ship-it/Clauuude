@@ -49,17 +49,34 @@
   .callout { padding: 18px 30px; border-radius: 999px; background: var(--navy); color: #fff; font: 800 36px/1 Inter, sans-serif;
     white-space: nowrap; box-shadow: 0 16px 36px rgba(0,32,63,.35); }
   .callout.sand { background: var(--sand); color: var(--navy); }
+  #mood { position: absolute; inset: 0; background: linear-gradient(180deg, #d9dde2 0%, #c4cad1 60%, #b5bcc4 100%); opacity: 0; }
+  .title { left: 0; right: 0; top: 560px; text-align: center; }
+  .title .ic { width: 230px; height: 230px; border-radius: 50%; margin: 0 auto 50px; display: grid; place-items: center;
+    font: 900 150px/1 Inter, sans-serif; color: #fff; box-shadow: 0 30px 70px rgba(0,0,0,.25); }
+  .title .big { font: 900 132px/1 "Inter Display", sans-serif; letter-spacing: -.03em; }
+  .title .sub { margin-top: 26px; font: 700 44px/1.2 Inter, sans-serif; }
+  .title.bad .ic { background: #d83b3b; } .title.bad .big { color: #3b4652; } .title.bad .sub { color: #6b7680; }
+  .title.good .ic { background: #1f9d55; } .title.good .big { color: var(--navy); } .title.good .sub { color: var(--sand-d); }
+  .card.bad .img { filter: grayscale(.85) contrast(1.05) brightness(.95); }
+  .mark { position: absolute; width: 150px; height: 150px; margin: -75px 0 0 -75px; border: 9px solid #e03131; border-radius: 50%;
+    box-shadow: 0 0 0 6px rgba(255,255,255,.7); }
+  .stamp { padding: 10px 40px; border: 10px solid #e03131; border-radius: 20px; color: #e03131; font: 900 100px/1 "Inter Display", sans-serif;
+    letter-spacing: .04em; background: rgba(255,255,255,.82); white-space: nowrap; }
+  .tag.red { background: #e03131; color: #fff; }
+  .card img.frame { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 30px; }
   #caps { left: 70px; right: 70px; top: 1390px; text-align: center; visibility: visible; }
   .cap { position: absolute; left: 0; right: 0; top: 0; display: flex; flex-wrap: wrap; justify-content: center;
     gap: 6px 20px; font: 900 76px/1.12 "Inter Display", sans-serif; letter-spacing: -.02em; color: var(--navy); }
   .w { display: inline-block; padding: 2px 0; }
   .w.hl { background: var(--navy); color: #fff; padding: 2px 18px 8px; border-radius: 14px; }
+  .w.hr { background: #e03131; color: #fff; padding: 2px 18px 8px; border-radius: 14px; }
   .w.hs { background: var(--sand); color: var(--navy); padding: 2px 18px 8px; border-radius: 14px; }
 </style>
 </head>
 <body>
 <div id="stage">
   <div id="glow" class="abs" style="visibility:visible"></div>
+  <div id="mood"></div>
   <div id="glow2" class="abs" style="visibility:visible"></div>
   <div id="kicker" class="abs"></div>
   <div id="mark" class="abs"></div>
@@ -97,8 +114,10 @@ const TYPES = {
   hook2(sc) {
     const a = card(70, 330, 560, 720, sc.imgs[0]), b = card(450, 470, 560, 720, sc.imgs[1]);
     const tag = sc.tag && el(`<div class="abs tag sand" style="left:50%;top:1240px;font-size:44px;padding:20px 36px">${sc.tag}</div>`);
+    const tag2 = sc.tag2 && el(`<div class="abs tag" style="left:50%;top:180px;font-size:44px;padding:20px 36px;z-index:5">${sc.tag2}</div>`);
     return t => { const d = Math.sin(t * 1.2) * 8, w = sc.win;
-      if (tag) set(tag, pop(t, w, .15, { tx: 'translateX(-50%)' }));
+      if (tag) set(tag, pop(t, w, sc.tagAt ?? .15, { tx: 'translateX(-50%)' }));
+      if (tag2) set(tag2, pop(t, w, sc.tag2At ?? .6, { tx: 'translateX(-50%)' }));
       set(a, pop(t, w, 0, { r: -6, y: d })); set(b, pop(t, w, .25, { r: 5, y: -d }));
       kb(a, t, w, 1, 1.1); kb(b, t, w, 1.1, 1); shine(a, t, w[0] + .9); shine(b, t, w[0] + 1.2); };
   },
@@ -139,6 +158,44 @@ const TYPES = {
         const v = it.n * easeOut(prog(t, w[0] + .3 + i * .25, 1.2)); r.querySelector('span').textContent = it.dec ? v.toFixed(it.dec) : Math.ceil(v); });
     };
   },
+  // Big "Without Razan" / "With Razan" statement. mood: 'bad' | 'good'.
+  title(sc) {
+    const n = el(`<div class="abs title ${sc.mood}"><div class="ic">${sc.mood === 'bad' ? '✕' : '✓'}</div><div class="big">${sc.text}</div><div class="sub">${sc.sub || ''}</div></div>`);
+    return t => { const w = sc.win, p = pop(t, w, 0);
+      if (sc.mood === 'bad') p.x = Math.sin(t * 38) * 6 * (1 - prog(t, w[0] + .2, .6));     // short shudder
+      set(n, p); };
+  },
+  // A mistake: desaturated photo, red circle markers (card fractions), a stamp, and red cost tags.
+  mistake(sc) {
+    const c = card(120, 300, 840, 1000, sc.img); c.classList.add('bad');
+    const marks = (sc.marks || []).map(([x, y]) => { const m = document.createElement('div'); m.className = 'mark'; m.style.left = x * 100 + '%'; m.style.top = y * 100 + '%'; c.appendChild(m); return m; });
+    const stamp = sc.stamp && el(`<div class="abs stamp" style="left:50%;top:620px">${sc.stamp.text}</div>`);
+    const tags = (sc.tags || []).map((g, i) => el(`<div class="abs tag ${g.red === false ? '' : 'red'}" style="left:${g.x ?? 150}px;top:${g.y}px;font-size:40px;padding:18px 30px">${g.text}</div>`));
+    return t => { const w = sc.win; set(c, pop(t, w, 0, { x: Math.sin(t * 30) * 3 * prog(t, w[0] + (sc.stamp ? sc.stamp.at : 99), .1) * (1 - prog(t, w[0] + (sc.stamp ? sc.stamp.at : 99) + .3, .3)) }));
+      kb(c, t, w, 1.0, 1.08);
+      marks.forEach((m, i) => { const q = prog(t, w[0] + (sc.markAt || .4) + i * .25, .35); m.style.opacity = q; m.style.transform = `scale(${lerp(1.8, 1, easeOut(q))})`; });
+      if (stamp) { const q = prog(t, w[0] + sc.stamp.at, .22), o = 1 - easeInOut(prog(t, w[1] - .4, .4));
+        stamp.style.visibility = q > 0 && o > 0 ? 'visible' : 'hidden'; stamp.style.opacity = clamp(q * 3) * o;
+        stamp.style.transform = `translateX(-50%) rotate(-12deg) scale(${lerp(2.2, 1, easeOut(q))})`; }
+      tags.forEach((g, i) => set(g, pop(t, w, sc.tags[i].at, { x: lerp(-50, 0, easeOut(prog(t, w[0] + sc.tags[i].at, .4))) })));
+    };
+  },
+  // Real footage: frames pre-extracted by render.js to ../.cache/clips/<clip>/f_0001.jpg… (30 fps), plus optional check chips.
+  clip(sc) {
+    const c = el(`<div class="abs card" style="left:120px;top:300px;width:840px;height:1000px"></div>`);
+    const img = document.createElement('img'); img.className = 'frame'; c.appendChild(img);
+    const sh = document.createElement('div'); sh.className = 'shine'; c.appendChild(sh);
+    const tag = sc.tag && el(`<div class="abs tag sand" style="left:170px;top:350px">${sc.tag}</div>`);
+    const ks = (sc.checks || []).map((g, i) => el(`<div class="abs tag ${g.sand ? 'sand' : ''}" style="left:${g.x ?? 150}px;top:${g.y}px;font-size:40px;padding:18px 30px">✓ ${g.text}</div>`));
+    let last = -1;
+    return t => { const w = sc.win; set(c, pop(t, w, 0, { r: sc.r || 0 })); shine(c, t, w[0] + .5);
+      if (tag) set(tag, pop(t, w, .4));
+      ks.forEach((k, i) => set(k, pop(t, w, sc.checks[i].at, { x: lerp(50, 0, easeOut(prog(t, w[0] + sc.checks[i].at, .4))) })));
+      if (t < w[0] - .1 || t > w[1] + .1) return;
+      const f = Math.min(sc.frames, Math.max(1, 1 + Math.floor((t - w[0] + (sc.from || 0)) * 30)));
+      if (f !== last) { last = f; img.src = `../.cache/clips/${sc.clip}/f_${String(f).padStart(4, '0')}.jpg`; return img.decode().catch(() => {}); }
+    };
+  },
   // Document close-up: a page image (aspect W:H) panned/zoomed from `from` to `to` ({fx, fy, z}: focus point 0..1 and zoom,
   // z=1 fits page width), with optional highlight boxes [x0,y0,x1,y1] (page fractions) and callout chips {text, x, y, at, sand}.
   doc(sc) {
@@ -175,6 +232,7 @@ function boot(R) {
   $('kicker').textContent = R.kicker;
   // scene windows come from the voiceover: each scene starts where its first line starts
   R.scenes.forEach((sc, i) => { const s = i === 0 ? 0 : A(sc.at) - .15, e = i + 1 < R.scenes.length ? A(R.scenes[i + 1].at) - .15 : R.duration + 1; sc.win = [s, e]; });
+  R.moods = (R.moods || []).map(([a, b]) => [A(a) - .15, A(b) - .15]);
   const updates = R.scenes.map(sc => TYPES[sc.type](sc));
   const SP = R.spoken || {};
   const caps = R.caps.map((g, gi) => {
@@ -196,13 +254,17 @@ function boot(R) {
     set($('glow2'), { x: Math.cos(t * .3) * 100, y: Math.sin(t * .4) * 60 });
     set($('kicker'), { o: clamp(prog(t, .1, .6)) * (1 - prog(t, ctaStart - .3, .4)), y: lerp(-20, 0, easeOut(prog(t, .1, .6))) });
     set($('mark'), { o: prog(t, .2, .5) });                 // logo mark: fade only, never rolls
-    updates.forEach(u => u(t));
+    const moodBad = (R.moods || []).some(([a, b]) => t >= a && t < b);
+    const mp = (R.moods || []).reduce((m, [a, b]) => Math.max(m, prog(t, a, .35) * (1 - prog(t, b - .2, .35))), 0);
+    $('mood').style.opacity = mp.toFixed(3);
+    const pend = updates.map(u => u(t)).filter(Boolean);
     caps.forEach(c => {
       c.box.style.visibility = (t >= c.a - .01 && t < c.b) ? 'visible' : 'hidden';
       c.box.style.opacity = 1 - easeInOut(prog(t, c.b - .25, .25));
       c.spans.forEach((w, i) => { const p = prog(t, c.times[i], .28);
         w.style.opacity = clamp(p * 2.5); w.style.transform = `translateY(${lerp(28, 0, easeOut(p))}px) scale(${lerp(.7, 1, easeBack(p))})`; });
     });
+    return pend.length ? Promise.all(pend) : undefined;
   };
   window.DURATION = R.duration; window.AUDIO_OFFSET = R.offset; window.AUDIO = R.audio;
   const q = new URLSearchParams(location.search);

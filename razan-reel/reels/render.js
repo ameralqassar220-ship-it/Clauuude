@@ -11,6 +11,14 @@ const si = rest.indexOf('--stills'), stills = si >= 0 ? rest[si + 1] : null;
 const outDir = path.join(__dirname, '..', 'out'); fs.mkdirSync(outDir, { recursive: true });
 const fps = 30;
 
+// Extract video clip frames once into ../.cache/clips/<name>/ (kept out of git).
+const vidDir = path.join(__dirname, '..', 'assets', 'video'), cache = path.join(__dirname, '..', '.cache', 'clips');
+if (fs.existsSync(vidDir)) for (const f of fs.readdirSync(vidDir).filter(f => f.endsWith('.mp4'))) {
+  const d = path.join(cache, f.replace(/\.mp4$/, ''));
+  if (!fs.existsSync(d)) { fs.mkdirSync(d, { recursive: true });
+    require('child_process').execFileSync('ffmpeg', ['-v', 'error', '-i', path.join(vidDir, f), '-vf', 'fps=30', '-q:v', '3', path.join(d, 'f_%04d.jpg')]); }
+}
+
 (async () => {
   const browser = await chromium.launch();
   const page = await browser.newPage({ viewport: { width: 1080, height: 1920 }, deviceScaleFactor: 1 });
