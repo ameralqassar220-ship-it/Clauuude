@@ -142,11 +142,16 @@ const TYPES = {
       if (tag) set(tag, pop(t, w, 1.6, { tx: 'translateX(-50%)' }));
     };
   },
+  // Photo + check chips. Optional sc.swaps: [{img, at}] crossfades the photo at scene-relative times
+  // (with sc.checkAt, each chip appears exactly then — e.g. on the spoken colour name).
   checks(sc) {
     const c = card(90, 320, 640, 860, sc.img);
+    const layers = (sc.swaps || []).map(sw => { const d = document.createElement('div'); d.className = 'img'; d.style.backgroundImage = `url(${IMG(sw.img)})`; d.style.opacity = 0; c.insertBefore(d, c.querySelector('.shine')); return d; });
     const ks = sc.checks.map((txt, i) => el(`<div class="abs tag ${i === sc.checks.length - 1 ? 'sand' : ''}" style="left:540px;top:${560 + i * 130}px">✓ ${txt}</div>`));
     return t => { const w = sc.win;
       set(c, pop(t, w, 0, { r: -2 })); kb(c, t, w, 1.12, 1); shine(c, t, w[0] + .6);
+      layers.forEach((l, i) => { l.style.opacity = easeOut(prog(t, w[0] + sc.swaps[i].at, .18)); l.style.transform = c.querySelector('.img').style.transform; });
+      if (sc.checkAt) { ks.forEach((k, i) => set(k, pop(t, w, sc.checkAt[i], { x: lerp(60, 0, easeOut(prog(t, w[0] + sc.checkAt[i], .4))) }))); return; }
       const step = Math.max(.22, Math.min(.45, (w[1] - w[0] - 1.6) / ks.length));
       ks.forEach((k, i) => set(k, pop(t, w, Math.min(.6, (w[1] - w[0]) * .2) + i * step, { x: lerp(60, 0, easeOut(prog(t, w[0] + Math.min(.6, (w[1] - w[0]) * .2) + i * step, .5))) })));
     };
