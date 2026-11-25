@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Razan UAE reel</title>
+<style>
+  :root { --navy:#00203f; --navy2:#14212e; --sand:#DBAB88; --sand-d:#b9845f; --mist:#f0f3f5; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; background: #f4ede6; }
+  body { font-family: "Inter Display", Inter, sans-serif; color: var(--navy); }
+  #stage { position: relative; width: 1080px; height: 1920px; overflow: hidden;
+    background: linear-gradient(180deg, #f7f2ed 0%, #f1e4d8 55%, #ead3c0 100%); }
+  #glow { position: absolute; width: 1400px; height: 1400px; left: -160px; top: 300px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(219,171,136,.55) 0%, rgba(219,171,136,0) 65%); }
+  #glow2 { position: absolute; width: 1100px; height: 1100px; left: 300px; top: -300px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(0,32,63,.10) 0%, rgba(0,32,63,0) 65%); }
+  .abs { position: absolute; will-change: transform, opacity; }
+
+  /* brand chrome */
+  #kicker { left: 0; right: 0; top: 170px; text-align: center; font: 700 26px/1 Inter, sans-serif;
+    letter-spacing: .32em; color: var(--sand-d); text-transform: uppercase; }
+  #mark { right: 70px; top: 140px; width: 84px; height: 84px; border-radius: 50%;
+    box-shadow: 0 10px 30px rgba(0,32,63,.25); background: url(assets/logo-mark.png) center/cover; }
+
+  /* image cards */
+  .card { border-radius: 40px; overflow: hidden; background: #fff; border: 10px solid #fff;
+    box-shadow: 0 40px 90px rgba(0,32,63,.28), 0 8px 20px rgba(0,32,63,.12); }
+  .card .img { position: absolute; inset: 0; background-size: cover; background-position: center; border-radius: 30px; }
+  .card .shine { position: absolute; inset: 0; border-radius: 30px;
+    background: linear-gradient(105deg, rgba(255,255,255,0) 35%, rgba(255,255,255,.55) 50%, rgba(255,255,255,0) 65%);
+    background-size: 300% 100%; mix-blend-mode: screen; }
+  .tag { padding: 16px 28px; border-radius: 999px; background: var(--navy); color: #fff;
+    font: 700 34px/1 Inter, sans-serif; white-space: nowrap; box-shadow: 0 14px 30px rgba(0,32,63,.3); }
+  .tag.sand { background: var(--sand); color: var(--navy); }
+  .label { font: 800 44px/1 "Inter Display", sans-serif; color: var(--navy); text-align: center; }
+
+  /* stats */
+  .stat { left: 110px; width: 860px; height: 230px; border-radius: 40px; background: #fff;
+    box-shadow: 0 30px 70px rgba(0,32,63,.18); display: flex; align-items: center; padding: 0 56px; gap: 44px; }
+  .stat .num { font: 900 128px/1 "Inter Display", sans-serif; color: var(--navy); min-width: 290px; letter-spacing: -.03em; }
+  .stat .num small { font-size: 72px; color: var(--sand-d); }
+  .stat .txt { font: 700 40px/1.2 Inter, sans-serif; color: #4a5a6a; }
+
+  /* steps */
+  .step { left: 150px; width: 780px; height: 150px; border-radius: 999px; background: #fff;
+    display: flex; align-items: center; gap: 40px; padding: 0 26px; box-shadow: 0 20px 50px rgba(0,32,63,.15); }
+  .step .n { width: 100px; height: 100px; border-radius: 50%; display: grid; place-items: center;
+    font: 900 50px/1 "Inter Display", sans-serif; background: var(--mist); color: var(--navy); }
+  .step .s { font: 800 56px/1 "Inter Display", sans-serif; }
+  .step .d { font: 600 30px/1.2 Inter, sans-serif; color: #6a7886; margin-top: 8px; }
+
+  /* CTA */
+  #logoCard { left: 130px; top: 430px; width: 820px; height: 340px; border-radius: 44px; background: #fff;
+    box-shadow: 0 40px 90px rgba(0,32,63,.22); background-image: url(assets/logo.png);
+    background-size: 112% auto; background-position: center; background-repeat: no-repeat; }
+  #url { left: 0; right: 0; top: 850px; text-align: center; font: 900 104px/1 "Inter Display", sans-serif; letter-spacing: -.03em; }
+  #wa { left: 50%; top: 1010px; padding: 24px 44px; border-radius: 999px; background: #25D366; color: #fff;
+    font: 800 46px/1 Inter, sans-serif; white-space: nowrap; box-shadow: 0 20px 40px rgba(37,211,102,.35); }
+  #wa svg { width: 46px; height: 46px; vertical-align: -9px; margin-right: 14px; }
+  #ship { left: 0; right: 0; top: 1130px; text-align: center; font: 700 36px/1.3 Inter, sans-serif; color: #5b6b7a; }
+
+  /* captions */
+  #caps { left: 70px; right: 70px; top: 1390px; text-align: center; }
+  .cap { position: absolute; left: 0; right: 0; top: 0; display: flex; flex-wrap: wrap; justify-content: center;
+    gap: 6px 20px; font: 900 76px/1.12 "Inter Display", sans-serif; letter-spacing: -.02em; color: var(--navy); }
+  .w { display: inline-block; padding: 2px 0; }
+  .w.hl { background: var(--navy); color: #fff; padding: 2px 18px 8px; border-radius: 14px; }
+  .w.hs { background: var(--sand); color: var(--navy); padding: 2px 18px 8px; border-radius: 14px; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="glow" class="abs"></div>
+  <div id="glow2" class="abs"></div>
+
+  <div id="kicker" class="abs">Razan UAE · Glass &amp; Aluminium</div>
+  <div id="mark" class="abs"></div>
+
+  <!-- S1: hook -->
+  <div id="s1a" class="abs card" style="left:70px;top:330px;width:560px;height:720px"><div class="img" style="background-image:url(assets/dark-walk-in-closet-glass-doors-lit-shelves.jpg)"></div><div class="shine"></div></div>
+  <div id="s1b" class="abs card" style="left:450px;top:470px;width:560px;height:720px"><div class="img" style="background-image:url(assets/fluted-glass-wardrobe-doors-uae.jpg)"></div><div class="shine"></div></div>
+
+  <!-- S2: profiles -->
+  <div id="s2a" class="abs card" style="left:120px;top:330px;width:840px;height:740px"><div class="img" style="background-image:url(assets/air-hinge-aluminium-profile-corner.jpg)"></div><div class="shine"></div></div>
+  <div id="s2t" class="abs tag sand" style="left:170px;top:380px">In stock · cut in 48h</div>
+  <div id="s2c1" class="abs tag" style="left:110px;top:1140px">Slim 2×2</div>
+  <div id="s2c2" class="abs tag" style="left:400px;top:1140px">Air-Hinge</div>
+  <div id="s2c3" class="abs tag" style="left:710px;top:1140px">Sliding</div>
+
+  <!-- S3: glass -->
+  <div id="s3a" class="abs card" style="left:350px;top:430px;width:380px;height:490px"><div class="img" style="background-image:url(assets/fluted-glass-panel-sample-uae.jpg)"></div><div class="shine"></div></div>
+  <div id="s3b" class="abs card" style="left:350px;top:430px;width:380px;height:490px"><div class="img" style="background-image:url(assets/fabric-mesh-glass-panel-uae.jpg)"></div><div class="shine"></div></div>
+  <div id="s3c" class="abs card" style="left:350px;top:430px;width:380px;height:490px"><div class="img" style="background-image:url(assets/grey-bronze-tinted-glass-panels-uae.jpg)"></div><div class="shine"></div></div>
+  <div id="s3l1" class="abs label" style="left:40px;top:1030px;width:340px">Fluted</div>
+  <div id="s3l2" class="abs label" style="left:370px;top:1030px;width:340px">Mesh</div>
+  <div id="s3l3" class="abs label" style="left:700px;top:1030px;width:340px">Tinted</div>
+  <div id="s3t" class="abs tag sand" style="left:50%;top:1130px">6mm · cut to size</div>
+
+  <!-- S4: result -->
+  <div id="s4a" class="abs card" style="left:90px;top:320px;width:640px;height:860px"><div class="img" style="background-image:url(assets/walk-in-closet-aluminium-glass-doors-uae.jpg)"></div><div class="shine"></div></div>
+  <div id="s4c1" class="abs tag" style="left:560px;top:560px">✓ Pre-cut</div>
+  <div id="s4c2" class="abs tag" style="left:560px;top:690px">✓ Labelled</div>
+  <div id="s4c3" class="abs tag sand" style="left:560px;top:820px">✓ Ready to install</div>
+
+  <!-- S5: stats -->
+  <div id="s5a" class="abs stat" style="top:380px"><div class="num"><span id="n1">0</span><small>h</small></div><div class="txt">Detailed<br>quotation</div></div>
+  <div id="s5b" class="abs stat" style="top:650px"><div class="num"><span id="n2">0</span><small>h</small></div><div class="txt">Cut to size<br>&amp; ready to ship</div></div>
+  <div id="s5c" class="abs stat" style="top:920px"><div class="num"><span id="n3">0</span><small>+</small></div><div class="txt">Products in<br>the catalogue</div></div>
+
+  <!-- S6: steps -->
+  <div id="s6a" class="abs step" style="top:330px"><div class="n">1</div><div><div class="s">Measure</div><div class="d">Send sizes by WhatsApp</div></div></div>
+  <div id="s6b" class="abs step" style="top:530px"><div class="n">2</div><div><div class="s">Quote</div><div class="d">Full bill of materials in 2h</div></div></div>
+  <div id="s6c" class="abs step" style="top:730px"><div class="n">3</div><div><div class="s">Confirm</div><div class="d">Sign &amp; pay the advance</div></div></div>
+  <div id="s6d" class="abs step" style="top:930px"><div class="n">4</div><div><div class="s">Deliver</div><div class="d">Labelled, packed, install-ready</div></div></div>
+
+  <!-- S7: CTA -->
+  <div id="logoCard" class="abs"></div>
+  <div id="url" class="abs">razanuae.com</div>
+  <div id="wa" class="abs"><svg viewBox="0 0 32 32" fill="#fff"><path d="M16 3C9 3 3.3 8.6 3.3 15.6c0 2.4.7 4.7 1.9 6.7L3 29l6.9-2.1c1.9 1 4 1.6 6.1 1.6 7 0 12.7-5.7 12.7-12.7S23 3 16 3zm0 23.2c-2 0-3.9-.6-5.5-1.6l-.4-.2-4.1 1.2 1.3-4-.3-.4c-1.1-1.7-1.7-3.6-1.7-5.6C5.3 9.8 10.1 5 16 5s10.7 4.8 10.7 10.7S21.9 26.2 16 26.2zm5.9-8c-.3-.2-1.9-.9-2.2-1-.3-.1-.5-.2-.7.2-.2.3-.8 1-1 1.2-.2.2-.4.2-.7.1-.3-.2-1.4-.5-2.6-1.6-1-.9-1.6-1.9-1.8-2.3-.2-.3 0-.5.1-.7l.5-.6c.2-.2.2-.3.3-.6.1-.2 0-.4 0-.6l-1-2.4c-.3-.6-.5-.5-.7-.5h-.6c-.2 0-.6.1-.9.4-.3.3-1.2 1.2-1.2 2.9s1.2 3.4 1.4 3.6c.2.2 2.4 3.7 5.9 5.1 2.9 1.1 3.5.9 4.1.9.6-.1 1.9-.8 2.2-1.5.3-.8.3-1.4.2-1.5-.1-.2-.3-.3-.6-.4z"/></svg>+971 50 201 9281</div>
+  <div id="ship" class="abs">RAK showroom · Delivery across the UAE &amp; GCC</div>
+
+  <div id="caps" class="abs"></div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, p) => a + (b - a) * p;
+const easeOut = p => 1 - Math.pow(1 - p, 3);
+const easeInOut = p => p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
+const easeBack = p => { const c = 1.6; return 1 + (c + 1) * Math.pow(p - 1, 3) + c * Math.pow(p - 1, 2); };
+const prog = (t, a, d) => clamp((t - a) / d);
+
+// Scene windows [start, end] in seconds
+const SC = { s1: [0, 3.6], s2: [3.6, 7.8], s3: [7.8, 12.2], s4: [12.2, 16.4], s5: [16.4, 20.6], s6: [20.6, 24.4], s7: [24.4, 30] };
+const DURATION = 30;
+
+// Captions: [start, end, "words", highlight-indexes {i: 'hl'|'hs'}]
+const CAPS = [
+  [0.25, 3.5,  "Building a closet or a kitchen in the UAE?", { 2: 'hs', 5: 'hs' }],
+  [3.75, 7.7,  "Aluminium profiles for all four sides.", { 3: 'hl', 4: 'hl', 5: 'hl' }],
+  [7.95, 12.1, "6mm glass, cut to your exact size.", { 5: 'hs', 6: 'hs' }],
+  [12.35, 16.3, "Delivered pre-cut, labelled, ready to install.", { 3: 'hl', 4: 'hl', 5: 'hl' }],
+  [16.55, 20.5, "Your quote in 2 hours. Cut in 48.", { 3: 'hs', 4: 'hs' }],
+  [20.75, 24.3, "Four steps. One supplier.", { 3: 'hl' }],
+  [24.55, 30,  "Get your quote today.", { 2: 'hs' }],
+];
+const capsEl = $('caps');
+const capData = CAPS.map(([a, b, text, hl]) => {
+  const el = document.createElement('div'); el.className = 'cap';
+  const words = text.split(' ').map((w, i) => {
+    const s = document.createElement('span'); s.className = 'w' + (hl[i] ? ' ' + hl[i] : ''); s.textContent = w; el.appendChild(s); return s;
+  });
+  capsEl.appendChild(el);
+  // reveal words across the first ~60% of the window, weighted by length
+  const lens = words.map(w => w.textContent.length + 3), tot = lens.reduce((x, y) => x + y, 0);
+  const span = Math.min(2.4, (b - a) * 0.62); let acc = 0;
+  const times = lens.map(l => { const tt = a + span * acc / tot; acc += l; return tt; });
+  return { a, b, el, words, times };
+});
+
+function set(el, { x = 0, y = 0, s = 1, r = 0, o = 1, tx = '' } = {}) {
+  el.style.opacity = o.toFixed(4);
+  el.style.transform = `${tx} translate(${x.toFixed(2)}px, ${y.toFixed(2)}px) rotate(${r.toFixed(3)}deg) scale(${s.toFixed(4)})`;
+  el.style.visibility = o <= 0.001 ? 'hidden' : 'visible';
+}
+// enter/exit envelope for an element inside a scene
+function env(t, [S, E], delay = 0, inDur = .6, outDur = .4) {
+  const pi = prog(t, S + delay, inDur), po = prog(t, E - outDur, outDur);
+  return { pi, po, live: t >= S + delay && t < E };
+}
+function pop(t, scene, delay, extra = {}) {
+  const { pi, po } = env(t, scene, delay);
+  const e = easeBack(pi), x = easeInOut(po);
+  return { o: clamp(pi * 2) * (1 - x), y: lerp(140, 0, e) - 90 * x + (extra.y || 0), s: lerp(.86, 1, e) * lerp(1, .96, x) * (extra.s || 1), r: extra.r || 0, x: extra.x || 0, tx: extra.tx || '' };
+}
+function shine(el, t, at) { const p = prog(t, at, 1.1); el.querySelector('.shine').style.backgroundPosition = `${lerp(130, -30, easeInOut(p))}% 0`; }
+function kb(el, t, [S, E], from = 1.0, to = 1.1) { el.querySelector('.img').style.transform = `scale(${lerp(from, to, prog(t, S, E - S))})`; }
+
+window.render = function (t) {
+  // ambient
+  set($('glow'), { x: Math.sin(t * .35) * 120, y: Math.cos(t * .25) * 90, s: 1 + Math.sin(t * .5) * .05 });
+  set($('glow2'), { x: Math.cos(t * .3) * 100, y: Math.sin(t * .4) * 60 });
+  set($('kicker'), { o: clamp(prog(t, .1, .6)) * (1 - prog(t, SC.s7[0] - .3, .4)), y: lerp(-20, 0, easeOut(prog(t, .1, .6))) });
+  set($('mark'), { o: prog(t, .2, .5), s: easeBack(prog(t, .2, .6)), r: t * 12 });
+
+  // S1 — two closet photos, tilted, drifting
+  let d = Math.sin(t * 1.2) * 8;
+  set($('s1a'), pop(t, SC.s1, 0, { r: -6, y: d }));
+  set($('s1b'), pop(t, SC.s1, .25, { r: 5, y: -d }));
+  kb($('s1a'), t, SC.s1); kb($('s1b'), t, SC.s1, 1.1, 1.0);
+  shine($('s1a'), t, .9); shine($('s1b'), t, 1.2);
+
+  // S2 — profile corner + system chips
+  set($('s2a'), pop(t, SC.s2, 0)); kb($('s2a'), t, SC.s2, 1.0, 1.15); shine($('s2a'), t, SC.s2[0] + .7);
+  set($('s2t'), pop(t, SC.s2, .5));
+  ['s2c1', 's2c2', 's2c3'].forEach((id, i) => set($(id), pop(t, SC.s2, 1.0 + i * .28)));
+
+  // S3 — three glass samples fan out from a stack
+  const f = easeBack(prog(t, SC.s3[0] + .55, .8));
+  [['s3a', -1], ['s3b', 0], ['s3c', 1]].forEach(([id, k], i) => {
+    const p = pop(t, SC.s3, i * .12); p.x = k * 300 * f; p.r = k * 7 * f; p.y += Math.abs(k) * 40 * f;
+    set($(id), p); shine($(id), t, SC.s3[0] + 1.6 + i * .25);
+  });
+  $('s3b').style.zIndex = 3;
+  ['s3l1', 's3l2', 's3l3'].forEach((id, i) => set($(id), pop(t, SC.s3, 1.3 + i * .25)));
+  set($('s3t'), pop(t, SC.s3, 2.2, { tx: 'translateX(-50%)' }));
+
+  // S4 — finished closet + checklist
+  set($('s4a'), pop(t, SC.s4, 0, { r: -2 })); kb($('s4a'), t, SC.s4, 1.12, 1.0); shine($('s4a'), t, SC.s4[0] + .6);
+  ['s4c1', 's4c2', 's4c3'].forEach((id, i) => set($(id), pop(t, SC.s4, .8 + i * .45, { x: lerp(60, 0, easeOut(prog(t, SC.s4[0] + .8 + i * .45, .5))) })));
+
+  // S5 — counters
+  ['s5a', 's5b', 's5c'].forEach((id, i) => set($(id), pop(t, SC.s5, i * .3)));
+  const cnt = (target, delay) => Math.round(target * easeOut(prog(t, SC.s5[0] + delay, 1.3)));
+  $('n1').textContent = cnt(2, .3); $('n2').textContent = cnt(48, .6); $('n3').textContent = cnt(650, .9);
+
+  // S6 — steps light up in sequence
+  ['s6a', 's6b', 's6c', 's6d'].forEach((id, i) => {
+    set($(id), pop(t, SC.s6, i * .18));
+    const on = prog(t, SC.s6[0] + .9 + i * .55, .3);
+    const n = $(id).querySelector('.n');
+    n.style.background = on > .5 ? 'var(--navy)' : 'var(--mist)';
+    n.style.color = on > .5 ? '#fff' : 'var(--navy)';
+    n.style.transform = `scale(${1 + .18 * Math.sin(Math.PI * on)})`;
+  });
+
+  // S7 — CTA
+  const S7 = [SC.s7[0], DURATION + 1];
+  set($('logoCard'), pop(t, S7, 0, { y: Math.sin(t * 1.4) * 6 }));
+  set($('url'), pop(t, S7, .4));
+  set($('wa'), pop(t, S7, .7, { tx: 'translateX(-50%)', s: 1 + .03 * Math.max(0, Math.sin((t - S7[0] - 1.6) * 4)) * (t > S7[0] + 1.6) }));
+  set($('ship'), pop(t, S7, 1.0));
+
+  // captions — word-by-word pop, group fades out at its end
+  capData.forEach(c => {
+    const out = easeInOut(prog(t, c.b - .25, .25));
+    c.el.style.visibility = (t >= c.a - .01 && t < c.b) ? 'visible' : 'hidden';
+    c.el.style.opacity = 1 - out;
+    c.words.forEach((w, i) => {
+      const p = prog(t, c.times[i], .28);
+      w.style.opacity = clamp(p * 2.5);
+      w.style.transform = `translateY(${lerp(28, 0, easeOut(p))}px) scale(${lerp(.7, 1, easeBack(p))})`;
+    });
+  });
+};
+window.DURATION = DURATION;
+window.render(new URLSearchParams(location.search).has('t') ? +new URLSearchParams(location.search).get('t') : 2.5);
+</script>
+</body>
+</html>
