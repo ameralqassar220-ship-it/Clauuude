@@ -42,6 +42,13 @@
   .wa { left: 50%; top: 1010px; padding: 24px 44px; border-radius: 999px; background: #25D366; color: #fff;
     font: 800 46px/1 Inter, sans-serif; white-space: nowrap; box-shadow: 0 20px 40px rgba(37,211,102,.35); }
   .ship { left: 0; right: 0; top: 1130px; text-align: center; font: 700 36px/1.3 Inter, sans-serif; color: #5b6b7a; }
+  .doc { border-radius: 36px; overflow: hidden; background: #fff; border: 10px solid #fff;
+    box-shadow: 0 40px 90px rgba(0,32,63,.28), 0 8px 20px rgba(0,32,63,.12); }
+  .doc .page { position: absolute; left: 0; top: 0; background-size: 100% 100%; transform-origin: 0 0; }
+  .doc .hi { position: absolute; border: 6px solid var(--sand); border-radius: 12px; box-shadow: 0 0 0 9999px rgba(0,32,63,.0); }
+  .callout { padding: 18px 30px; border-radius: 999px; background: var(--navy); color: #fff; font: 800 36px/1 Inter, sans-serif;
+    white-space: nowrap; box-shadow: 0 16px 36px rgba(0,32,63,.35); }
+  .callout.sand { background: var(--sand); color: var(--navy); }
   #caps { left: 70px; right: 70px; top: 1390px; text-align: center; visibility: visible; }
   .cap { position: absolute; left: 0; right: 0; top: 0; display: flex; flex-wrap: wrap; justify-content: center;
     gap: 6px 20px; font: 900 76px/1.12 "Inter Display", sans-serif; letter-spacing: -.02em; color: var(--navy); }
@@ -128,6 +135,25 @@ const TYPES = {
     return t => { const w = sc.win;
       rows.forEach((r, i) => { set(r, pop(t, w, i * .25)); const it = sc.items[i];
         const v = it.n * easeOut(prog(t, w[0] + .3 + i * .25, 1.2)); r.querySelector('span').textContent = it.dec ? v.toFixed(it.dec) : Math.ceil(v); });
+    };
+  },
+  // Document close-up: a page image (aspect W:H) panned/zoomed from `from` to `to` ({fx, fy, z}: focus point 0..1 and zoom,
+  // z=1 fits page width), with optional highlight boxes [x0,y0,x1,y1] (page fractions) and callout chips {text, x, y, at, sand}.
+  doc(sc) {
+    const CW = 920, CH = sc.h || 990, AR = sc.aspect || 1653 / 2339;
+    const c = el(`<div class="abs doc" style="left:70px;top:${sc.top || 300}px;width:${CW + 20}px;height:${CH + 20}px"></div>`);
+    const page = document.createElement('div'); page.className = 'page'; page.style.backgroundImage = `url(${IMG(sc.img)})`;
+    page.style.width = CW + 'px'; page.style.height = CW / AR + 'px'; c.appendChild(page);
+    const his = (sc.highlights || []).map(([x0, y0, x1, y1]) => { const h = document.createElement('div'); h.className = 'hi';
+      Object.assign(h.style, { left: x0 * 100 + '%', top: y0 * 100 + '%', width: (x1 - x0) * 100 + '%', height: (y1 - y0) * 100 + '%' }); page.appendChild(h); return h; });
+    const cos = (sc.callouts || []).map(k => el(`<div class="abs callout ${k.sand ? 'sand' : ''}" style="left:${k.x}px;top:${k.y}px">${k.text}</div>`));
+    return t => { const w = sc.win, p = easeInOut(prog(t, w[0] + .3, Math.max(1, (w[1] - w[0]) * .55)));
+      set(c, pop(t, w, 0));
+      const fx = lerp(sc.from.fx, sc.to.fx, p), fy = lerp(sc.from.fy, sc.to.fy, p), z = lerp(sc.from.z, sc.to.z, p);
+      const pw = CW * z, ph = CW / AR * z;
+      page.style.transform = `translate(${(CW / 2 - fx * pw).toFixed(1)}px, ${(CH / 2 - fy * ph).toFixed(1)}px) scale(${z.toFixed(4)})`;
+      his.forEach((h, i) => { const q = prog(t, w[0] + (sc.hiAt || 1.0) + i * .3, .4); h.style.opacity = q; h.style.borderWidth = (6 / z).toFixed(2) + 'px'; });
+      cos.forEach((k, i) => set(k, pop(t, w, sc.callouts[i].at, { x: lerp(-40, 0, easeOut(prog(t, w[0] + sc.callouts[i].at, .5))) })));
     };
   },
   cta(sc) {
