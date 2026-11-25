@@ -4,10 +4,10 @@ window.REEL = {
   spoken: { 'razanuae.com!': 17, 'UAE!': 6 },
   scenes: [
     { type: 'hook2', at: 0, imgs: ['grey-fluted-glass-walk-in-closet-black-frame.jpg', 'fluted-glass-wardrobe-doors-uae.jpg'] },
-    { type: 'hero', at: 2.76, img: 'fluted-glass-panel-sample-uae.jpg', tag: '5.5mm reeded glass', chips: ['Privacy', 'Daylight', 'Texture'] },
+    { type: 'hero', at: 2.76, img: 'fluted-glass-panel-sample-uae.jpg', tag: '6mm & 8mm fluted glass', chips: ['Privacy', 'Daylight', 'Texture'] },
     { type: 'fan3', at: 7.19, imgs: ['fluted-glass-wardrobe-doors-uae.jpg', 'grey-fluted-glass-walk-in-closet-black-frame.jpg', 'dark-walk-in-closet-glass-doors-lit-shelves.jpg'], labels: ['Wardrobes', 'Closets', 'Cabinets'], tag: 'Soft, private, bright' },
-    { type: 'checks', at: 10.81, img: 'fluted-glass-panel-sample-uae.jpg', checks: ['Clear', 'Grey', 'Brown'] },
-    { type: 'stats', at: 12.80, items: [{ n: 5.5, dec: 1, suffix: 'mm', txt: 'Fluted<br>glass' }, { n: 1, suffix: ' day', txt: 'Delivery<br>across the UAE' }, { n: 12, suffix: ' days', txt: 'Delivery<br>to the GCC' }] },
+    { type: 'checks', at: 10.81, img: 'fluted-glass-panel-sample-uae.jpg', checks: ['Clear', 'Grey', 'Brown tinted'] },
+    { type: 'stats', at: 12.80, items: [{ n: 6, suffix: 'mm', txt: 'Closets &amp;<br>kitchens' }, { n: 8, suffix: 'mm', txt: 'Glass showers<br>&amp; partitions' }, { n: 1, suffix: ' day', txt: 'Delivery<br>across the UAE' }] },
     { type: 'cta', at: 16.25 },
   ],
   caps: [
