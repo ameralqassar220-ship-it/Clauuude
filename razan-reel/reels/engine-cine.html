@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Razan reel engine — cinematic theme</title>
+<!-- Full-screen cinematic theme: edge-to-edge photos/footage, dark gradients, big white type, frosted-glass cards.
+     Load with ?reel=<id> (reads <id>.js). Brand rule: the Razan logo never rolls, spins, bounces or scales — fade only. -->
+<style>
+  :root { --navy:#00203f; --sand:#DBAB88; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; background: #000; }
+  body { font-family: "Inter Display", Inter, sans-serif; color: #fff; }
+  #stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: #05080c; }
+  #layers { position: absolute; inset: 0; z-index: 0; }
+  .layer { position: absolute; inset: 0; overflow: hidden; opacity: 0; }
+  .layer .m { position: absolute; inset: -2%; width: 104%; height: 104%; object-fit: cover; background-size: cover; background-position: center; }
+  #shadeTop { position: absolute; left: 0; right: 0; top: 0; height: 520px; background: linear-gradient(180deg, rgba(0,8,16,.78), rgba(0,8,16,0)); }
+  #shadeBot { position: absolute; left: 0; right: 0; bottom: 0; height: 1000px; background: linear-gradient(0deg, rgba(0,8,16,.92) 0%, rgba(0,8,16,.7) 45%, rgba(0,8,16,0) 100%); }
+  #vignette { position: absolute; inset: 0; box-shadow: inset 0 0 220px rgba(0,0,0,.55); }
+  .abs { position: absolute; will-change: transform, opacity; visibility: hidden; }
+  #brand { left: 64px; top: 120px; display: flex; align-items: center; gap: 22px; }
+  #brand i { width: 76px; height: 76px; border-radius: 50%; background: url(../assets/logo-mark.png) center/cover; box-shadow: 0 6px 24px rgba(0,0,0,.4); }
+  #brand b { font: 800 34px/1 Inter, sans-serif; letter-spacing: .28em; }
+  #brand span { display: block; font: 600 20px/1.2 Inter, sans-serif; letter-spacing: .24em; color: var(--sand); margin-top: 8px; }
+  #count { right: 64px; top: 140px; font: 700 26px/1 "JetBrains Mono", monospace; letter-spacing: .12em; color: rgba(255,255,255,.8); }
+  #bar { position: absolute; left: 0; top: 0; height: 8px; background: var(--sand); }
+  .title { left: 64px; right: 64px; top: 1110px; }
+  .title .h { font: 900 92px/.98 "Inter Display", sans-serif; letter-spacing: -.02em; text-transform: uppercase; text-shadow: 0 6px 30px rgba(0,0,0,.5); }
+  .title .s { margin-top: 18px; font: 600 36px/1.3 Inter, sans-serif; color: var(--sand); }
+  .title .line { width: 120px; height: 8px; background: var(--sand); border-radius: 4px; margin-bottom: 26px; }
+  .glass { padding: 30px 40px; border-radius: 34px; background: rgba(255,255,255,.14); border: 2px solid rgba(255,255,255,.35);
+    backdrop-filter: blur(22px) saturate(1.3); box-shadow: 0 30px 60px rgba(0,0,0,.35); }
+  .stat .n { font: 900 128px/1 "Inter Display", sans-serif; letter-spacing: -.03em; }
+  .stat .n small { font-size: 72px; color: var(--sand); }
+  .stat .l { font: 700 34px/1.2 Inter, sans-serif; color: rgba(255,255,255,.88); margin-top: 6px; }
+  .chip { padding: 20px 34px; border-radius: 999px; font: 800 40px/1 Inter, sans-serif; white-space: nowrap;
+    background: rgba(255,255,255,.16); border: 2px solid rgba(255,255,255,.4); backdrop-filter: blur(18px); }
+  .chip.sand { background: var(--sand); color: var(--navy); border-color: var(--sand); }
+  #caps { left: 64px; right: 64px; top: 1500px; visibility: visible; }
+  .cap { position: absolute; left: 0; right: 0; top: 0; display: flex; flex-wrap: wrap; gap: 4px 18px;
+    font: 900 70px/1.12 "Inter Display", sans-serif; letter-spacing: -.01em; text-shadow: 0 4px 18px rgba(0,0,0,.6); }
+  .w { display: inline-block; }
+  .w.hs { background: var(--sand); color: var(--navy); padding: 0 16px 6px; border-radius: 12px; text-shadow: none; }
+  .w.hw { background: #fff; color: var(--navy); padding: 0 16px 6px; border-radius: 12px; text-shadow: none; }
+  #cta { inset: 0; background: rgba(0,10,20,.72); }
+  #logoCard { left: 130px; top: 560px; width: 820px; height: 330px; border-radius: 44px; background: #fff url(../assets/logo.png) center/112% auto no-repeat; box-shadow: 0 40px 90px rgba(0,0,0,.5); }
+  #url { left: 0; right: 0; top: 960px; text-align: center; font: 900 100px/1 "Inter Display", sans-serif; letter-spacing: -.02em; }
+  #wa { left: 50%; top: 1100px; padding: 24px 44px; border-radius: 999px; background: #25D366; font: 800 46px/1 Inter, sans-serif; white-space: nowrap; }
+  #ship { left: 0; right: 0; top: 1210px; text-align: center; font: 700 36px/1.3 Inter, sans-serif; color: var(--sand); }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="layers"></div>
+  <div id="vignette"></div>
+  <div id="shadeTop"></div>
+  <div id="shadeBot"></div>
+  <div id="cta" class="abs"></div>
+  <div id="logoCard" class="abs"></div>
+  <div id="url" class="abs">razanuae.com</div>
+  <div id="wa" class="abs">WhatsApp +971 50 201 9281</div>
+  <div id="ship" class="abs"></div>
+  <div id="over"></div>
+  <div id="brand" class="abs"><i></i><div><b>RAZAN</b><span>GLASS &amp; ALUMINIUM</span></div></div>
+  <div id="count" class="abs"></div>
+  <div id="bar"></div>
+  <div id="caps" class="abs"></div>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, p) => a + (b - a) * p;
+const easeOut = p => 1 - Math.pow(1 - p, 3);
+const easeInOut = p => p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
+const easeBack = p => { const c = 1.4; return 1 + (c + 1) * Math.pow(p - 1, 3) + c * Math.pow(p - 1, 2); };
+const prog = (t, a, d) => clamp((t - a) / d);
+const IMG = n => `../assets/${n}`;
+function el(html, parent = $('over')) { const d = document.createElement('div'); d.innerHTML = html.trim(); const n = d.firstChild; parent.appendChild(n); return n; }
+function set(e, { x = 0, y = 0, s = 1, o = 1, tx = '' } = {}) {
+  e.style.opacity = o.toFixed(4); e.style.transform = `${tx} translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) scale(${s.toFixed(4)})`;
+  e.style.visibility = o <= 0.001 ? 'hidden' : 'visible';
+}
+// rise-in / fade-out inside a window
+function rise(t, [S, E], d = 0, dy = 60) { const p = easeOut(prog(t, S + d, .55)), q = easeInOut(prog(t, E - .3, .3)); return { o: clamp(prog(t, S + d, .3)) * (1 - q), y: lerp(dy, 0, p) - 30 * q }; }
+
+function boot(R) {
+  const A = x => x + R.offset, FADE = .35;
+  R.scenes.forEach((sc, i) => { sc.win = [i === 0 ? 0 : A(sc.at) - .2, i + 1 < R.scenes.length ? A(R.scenes[i + 1].at) - .2 : R.duration + 1]; });
+  const n = R.scenes.length;
+  const ups = R.scenes.map((sc, i) => {
+    const L = el(`<div class="layer"></div>`, $('layers'));
+    let media, last = -1;
+    if (sc.clip) { media = document.createElement('img'); media.className = 'm'; L.appendChild(media); }
+    else { media = document.createElement('div'); media.className = 'm'; media.style.backgroundImage = `url(${IMG(sc.img)})`; if (sc.pos) media.style.backgroundPosition = sc.pos; L.appendChild(media); }
+    const title = sc.title && el(`<div class="abs title"><div class="line"></div><div class="h">${sc.title}</div>${sc.sub ? `<div class="s">${sc.sub}</div>` : ''}</div>`);
+    const stats = (sc.stats || []).map((s, k) => el(`<div class="abs glass stat" style="left:${s.x ?? 64}px;top:${s.y}px"><div class="n"><span>0</span><small>${s.suffix || ''}</small></div><div class="l">${s.label}</div></div>`));
+    const chips = (sc.chips || []).map(c => el(`<div class="abs chip ${c.sand ? 'sand' : ''}" style="left:${c.x}px;top:${c.y}px">${c.text}</div>`));
+    return t => {
+      const [S, E] = sc.win, inP = i === 0 ? 1 : prog(t, S, FADE), outP = i === n - 1 ? 0 : prog(t, E, FADE);
+      const o = inP * (1 - outP * 0);   // next layer fades in on top; this one stays underneath
+      L.style.opacity = (t >= S && t < E + FADE) ? o : 0;
+      L.style.zIndex = i;
+      const k = prog(t, S, E - S + FADE), z = sc.zoom || [1.12, 1.0];
+      media.style.transform = `scale(${lerp(z[0], z[1], easeInOut(k))}) translate(${lerp(sc.panX ? sc.panX[0] : 0, sc.panX ? sc.panX[1] : 0, k)}%, 0)`;
+      if (title) { const r = rise(t, sc.win, .25); set(title, r); title.querySelector('.line').style.width = lerp(0, 120, easeOut(prog(t, S + .3, .6))) + 'px'; }
+      stats.forEach((st, j) => { const s = sc.stats[j]; set(st, rise(t, sc.win, s.at ?? (.3 + j * .35)));
+        st.querySelector('span').textContent = Math.max(s.n > 9 ? 0 : 1, Math.round(s.n * easeOut(prog(t, S + (s.at ?? (.3 + j * .35)), 1.3)))); });
+      chips.forEach((c, j) => set(c, rise(t, sc.win, sc.chips[j].at ?? (.4 + j * .3), 40)));
+      if (sc.clip && t >= S - .1 && t < E + FADE + .1) {
+        const f = Math.min(sc.frames, Math.max(1, 1 + Math.floor((t - S + (sc.from || 0)) * 30)));
+        if (f !== last) { last = f; media.src = `../.cache/clips/${sc.clip}/f_${String(f).padStart(4, '0')}.jpg`; return media.decode().catch(() => {}); }
+      }
+    };
+  });
+  // captions
+  const SP = R.spoken || {};
+  const caps = R.caps.map((g, gi) => {
+    const box = document.createElement('div'); box.className = 'cap'; const words = [], times = [];
+    g.segs.forEach(([sa, sb, text]) => { const ws = text.split(' '), wt = ws.map(w => (SP[w] || w.replace(/[^\w]/g, '').length) + 2);
+      const tot = wt.reduce((a, b) => a + b, 0); let acc = 0; ws.forEach((w, i) => { times.push(A(sa + (sb - sa) * acc / tot) - .04); acc += wt[i]; words.push(w); }); });
+    const spans = words.map((w, i) => { const s = document.createElement('span'); s.className = 'w' + (g.hl && g.hl[i] ? ' ' + g.hl[i] : ''); s.textContent = w; box.appendChild(s); return s; });
+    $('caps').appendChild(box);
+    const b = gi + 1 < R.caps.length ? A(R.caps[gi + 1].segs[0][0]) - .06 : R.duration + 1;
+    return { a: times[0], b, box, spans, times };
+  });
+  const ctaS = R.scenes[n - 1].win[0];
+  $('ship').innerHTML = R.ship || '';
+  window.render = t => {
+    const pend = ups.map(u => u(t)).filter(Boolean);
+    set($('brand'), { o: prog(t, .15, .5) * (1 - prog(t, ctaS, .3)) });            // logo: fade only
+    const si = R.scenes.findIndex(sc => t >= sc.win[0] && t < sc.win[1]);
+    $('count').textContent = `${String(Math.min(n - 1, si + 1)).padStart(2, '0')} / ${String(n - 1).padStart(2, '0')}`;
+    set($('count'), { o: prog(t, .3, .5) * (1 - prog(t, ctaS, .3)) });
+    $('bar').style.width = (1080 * clamp(t / R.duration)).toFixed(1) + 'px';
+    // CTA
+    set($('cta'), { o: easeOut(prog(t, ctaS, .5)) });
+    set($('logoCard'), { o: easeOut(prog(t, ctaS + .2, .6)) });                    // logo: fade only, never moves
+    set($('url'), rise(t, [ctaS, 1e9], .5)); set($('wa'), { ...rise(t, [ctaS, 1e9], .8), tx: 'translateX(-50%)' }); set($('ship'), rise(t, [ctaS, 1e9], 1.1));
+    caps.forEach(c => { c.box.style.visibility = (t >= c.a - .01 && t < c.b) ? 'visible' : 'hidden'; c.box.style.opacity = 1 - easeInOut(prog(t, c.b - .2, .2));
+      c.spans.forEach((w, i) => { const p = prog(t, c.times[i], .22); w.style.opacity = clamp(p * 3); w.style.transform = `translateY(${lerp(24, 0, easeOut(p))}px) scale(${lerp(.8, 1, easeBack(p))})`; }); });
+    return pend.length ? Promise.all(pend) : undefined;
+  };
+  window.DURATION = R.duration; window.AUDIO_OFFSET = R.offset; window.AUDIO = R.audio;
+  const q = new URLSearchParams(location.search); window.render(q.has('t') ? +q.get('t') : 2);
+  window.READY = true;
+}
+const id = new URLSearchParams(location.search).get('reel');
+const s = document.createElement('script'); s.src = `${id}.js`; s.onload = () => boot(window.REEL); document.body.appendChild(s);
+</script>
+</body>
+</html>
