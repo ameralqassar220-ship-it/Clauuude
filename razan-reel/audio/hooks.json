@@ -1,0 +1,32 @@
+{
+ "designers": {
+  "start": 0.0,
+  "end": 4.63,
+  "dur": 4.63,
+  "split": 2.79
+ },
+ "joinery": {
+  "start": 5.61,
+  "end": 9.38,
+  "dur": 3.77,
+  "split": 1.69
+ },
+ "architects": {
+  "start": 10.25,
+  "end": 14.62,
+  "dur": 4.37,
+  "split": 1.17
+ },
+ "developers": {
+  "start": 15.51,
+  "end": 19.98,
+  "dur": 4.47,
+  "split": 1.7
+ },
+ "construction": {
+  "start": 20.83,
+  "end": 25.29,
+  "dur": 4.46,
+  "split": 1.76
+ }
+}
