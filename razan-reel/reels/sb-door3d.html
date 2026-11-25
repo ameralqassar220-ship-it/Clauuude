@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Razan — 3D exploded door hero (Blender render + labels)</title>
+<!-- Plays the Blender frames (../.cache/door3d/f_0001.png … f_0135.png, transparent, 540×960, 30 fps — rendered by
+     ../blender/exploded_door.py) over the brand background, with labels timed to each part. Holds the last frame.
+     Brand rule: the Razan logo never rolls, spins, bounces or scales — fade only. -->
+<style>
+  :root { --navy:#00203f; --sand:#DBAB88; --green:#1fae5b; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; }
+  body { font-family: "Inter Display", Inter, sans-serif; }
+  #stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: radial-gradient(ellipse at 50% 42%, #faf7f3 0%, #f1ece6 55%, #e6ddd2 100%); }
+  #door { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+  .abs { position: absolute; opacity: 0; }
+  #brand { left: 0; right: 0; top: 110px; display: flex; justify-content: center; align-items: center; gap: 20px; font: 800 34px Inter; letter-spacing: .26em; color: var(--navy); }
+  #brand i { width: 70px; height: 70px; border-radius: 50%; background: url(../assets/logo-mark.png) center/cover; }
+  .lab { padding: 18px 30px; border-radius: 999px; background: var(--navy); color: #fff; font: 800 40px/1 Inter; white-space: nowrap; box-shadow: 0 14px 30px rgba(0,32,63,.25); }
+  .lab small { font: 600 30px Inter; color: var(--sand); margin-left: 10px; }
+  .lab.ok { background: var(--green); } .lab.ok small { color: #e9fff1; }
+  #title { left: 0; right: 0; top: 1640px; text-align: center; font: 900 72px/1.1 "Inter Display", Inter; color: var(--navy); }
+  #title span { color: var(--green); }
+</style>
+</head>
+<body>
+<div id="stage">
+  <img id="door">
+  <div id="brand" class="abs"><i></i>RAZAN</div>
+  <div class="abs lab" id="l1" style="left:70px;top:330px">PROFILES<small>cut &amp; drilled</small></div>
+  <div class="abs lab" id="l2" style="left:470px;top:1290px">GLASS<small>fluted bronze</small></div>
+  <div class="abs lab" id="l3" style="left:70px;top:1180px">HINGES<small>soft-close</small></div>
+  <div class="abs lab ok" id="l4" style="left:50%;top:1450px">✓ FITS THE FIRST TIME</div>
+  <div class="abs" id="title">One drawing. <span>One door.</span></div>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, p) => a + (b - a) * p;
+const easeOut = p => 1 - Math.pow(1 - p, 3);
+const prog = (t, a, d) => clamp((t - a) / d);
+const FRAMES = 135, FPS = 30, DUR = 6.0;
+const SFX = [{ t: .5, type: 'whoosh' }, { t: 1.0, type: 'whoosh' }, { t: 1.75, type: 'whoosh' }, { t: 3.3, type: 'click' }, { t: 3.47, type: 'click' }, { t: 3.75, type: 'ding' }];
+let last = -1;
+const LABELS = [['l1', .55, 4.2], ['l2', 1.8, 4.2], ['l3', 2.75, 4.2], ['l4', 3.6, 99]];
+window.render = t => {
+  $('brand').style.opacity = easeOut(prog(t, .1, .5));                     // logo mark: fade only
+  LABELS.forEach(([id, a, b]) => { const p = easeOut(prog(t, a, .35)), q = prog(t, b, .3), n = $(id);
+    n.style.opacity = p * (1 - q); n.style.transform = (id === 'l4' ? 'translateX(-50%) ' : '') + `translateY(${lerp(24, 0, p)}px)`; });
+  const tp = easeOut(prog(t, 4.0, .5)); $('title').style.opacity = tp; $('title').style.transform = `translateY(${lerp(30, 0, tp)}px)`;
+  const f = Math.min(FRAMES, 1 + Math.floor(t * FPS));
+  if (f !== last) { last = f; $('door').src = `../.cache/door3d/f_${String(f).padStart(4, '0')}.png`; return $('door').decode().catch(() => {}); }
+};
+window.SFX = SFX; window.CFG = { duration: DUR, voiceAt: null };
+window.DURATION = DUR; window.AUDIO_OFFSET = 0; window.AUDIO = 'sb-door3d.mp3';
+const q = new URLSearchParams(location.search); window.render(q.has('t') ? +q.get('t') : 4.4); window.READY = true;
+</script>
+</body>
+</html>
