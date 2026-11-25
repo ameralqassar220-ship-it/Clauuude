@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Razan x10 #4 — "The Measuring Tape" (9:16)</title>
+<!-- Flat 2D series (matches sb-explainer.html). Narration audio/x10/04-tape.mp3 (Douglas), times = that file:
+     0.05 "Measure the wall." · 1.43 "Cut the frame." · 2.64 "Doesn't fit." · 3.83 "Measure again." · 4.84 "Cut again." ·
+     6.36 "With Razan, you send the drawing once —" · 8.76 "we cut it to the millimetre" · 10.63 "and label every piece." ·
+     11.71–13.43 "You never measure on site again."  The tape snaps back into its case with a click.
+     Brand rule: the Razan logo never rolls, spins or scales (logo block slides straight in; end card fades). -->
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; }
+  body { font-family: "Inter Display", Inter, sans-serif; }
+  #stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: linear-gradient(180deg, #dff1ff 0%, #f3f9ff 62%, #fff7e6 62.1%, #fff2d6 100%); }
+  svg { position: absolute; left: 0; top: 0; }
+  .lbl { font: 900 36px "Inter Display", Inter; letter-spacing: .05em; fill: #fff; }
+  .small { font: 800 30px Inter; fill: #1d2b3a; }
+  #caps { position: absolute; left: 60px; right: 60px; top: 1600px; }
+  .w { display: inline-block; } .w.k { color: #fff; background: #ff6b4a; padding: 0 14px 6px; border-radius: 14px; } .w.g { color: #fff; background: #1fae5b; padding: 0 14px 6px; border-radius: 14px; }
+  .w.b { color: #fff; background: #00203f; padding: 0 14px 6px; border-radius: 14px; }
+  #end { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 30%, #0b3358 0%, #00203f 60%, #00142a 100%); color: #fff; opacity: 0; }
+  #end .logo { position: absolute; left: 190px; top: 420px; width: 700px; height: 280px; border-radius: 34px; background: #fff url(../assets/logo.png) center/112% auto no-repeat; }
+  #end .l1 { position: absolute; left: 0; right: 0; top: 820px; text-align: center; font: 900 100px/1.05 "Inter Display", Inter; }
+  #end .l2 { position: absolute; left: 0; right: 0; top: 950px; text-align: center; font: 800 70px/1.1 "Inter Display", Inter; color: #DBAB88; }
+  #end .btn { position: absolute; left: 50%; top: 1140px; padding: 34px 90px; border-radius: 999px; background: #25D366; font: 800 56px/1 Inter; white-space: nowrap; }
+  #end .url { position: absolute; left: 0; right: 0; top: 1300px; text-align: center; font: 600 36px Inter; color: rgba(255,255,255,.8); }
+</style>
+</head>
+<body>
+<div id="stage">
+  <svg id="s" width="1080" height="1920" viewBox="0 0 1080 1920"></svg>
+  <div id="caps"></div>
+  <div id="end"><div class="logo" id="elogo"></div><div class="l1">Send your drawing.</div><div class="l2">Price in 2 hours.</div><div class="btn">Get a quote</div><div class="url">razanuae.com · WhatsApp +971 50 201 9281</div></div>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, p) => a + (b - a) * p;
+const easeOut = p => 1 - Math.pow(1 - p, 3);
+const easeIn = p => p * p * p;
+const easeInOut = p => p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
+const easeBack = p => { const c = 1.7; return 1 + (c + 1) * Math.pow(p - 1, 3) + c * Math.pow(p - 1, 2); };
+const prog = (t, a, d) => clamp((t - a) / d);
+const OFF = 0.3, A = x => x + OFF;
+const NS = 'http://www.w3.org/2000/svg', S = $('s'), SFX = [];
+const END = A(13.43) + .45, DUR = +(END + 2.45).toFixed(2);
+function g(p = S) { const n = document.createElementNS(NS, 'g'); p.appendChild(n); return n; }
+function add(p, tag, at, txt) { const n = document.createElementNS(NS, tag); for (const k in at) n.setAttribute(k, at[k]); if (txt != null) n.textContent = txt; p.appendChild(n); return n; }
+function T(n, x, y, s = 1, o = 1, r = 0) { n.setAttribute('transform', `translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${r.toFixed(2)}) scale(${s.toFixed(4)})`); n.style.opacity = o.toFixed(3); n.style.display = o <= .001 ? 'none' : ''; }
+function pill(p, text, color) { const b = g(p); const w = text.length * 23 + 60; add(b, 'rect', { x: -w / 2, y: -32, width: w, height: 64, rx: 32, fill: color }); add(b, 'text', { x: 0, y: 12, 'text-anchor': 'middle', class: 'lbl' }, text); return b; }
+function studs(p, w, y, n, fill) { for (let i = 0; i < n; i++) add(p, 'rect', { x: -w / 2 + (i + .5) * w / n - 22, y: y - 18, width: 44, height: 22, rx: 8, fill }); }
+function frameBlock(p) { const b = g(p); studs(b, 300, -240, 3, '#a9b4c0');
+  add(b, 'path', { d: 'M-150,-240 h300 v480 h-300 Z M-120,-210 v420 h240 v-420 Z', fill: '#8d99a6', 'fill-rule': 'evenodd', stroke: '#5b6670', 'stroke-width': 6, 'stroke-linejoin': 'round' }); return b; }
+function glassBlock(p) { const b = g(p); add(b, 'rect', { x: -120, y: -210, width: 240, height: 420, rx: 8, fill: '#6cc4ff', stroke: '#2f8fd6', 'stroke-width': 6 });
+  add(b, 'path', { d: 'M-90,-160 L-20,-200 L-20,-170 L-90,-130 Z M-90,-90 L40,-170 L40,-150 L-90,-70 Z', fill: 'rgba(255,255,255,.6)' }); return b; }
+function hingeBlock(p) { const b = g(p); studs(b, 70, -55, 1, '#ffd36b'); add(b, 'rect', { x: -35, y: -55, width: 70, height: 110, rx: 12, fill: '#f5b915', stroke: '#c48c00', 'stroke-width': 6 });
+  add(b, 'circle', { cx: 0, cy: -22, r: 9, fill: '#c48c00' }); add(b, 'circle', { cx: 0, cy: 22, r: 9, fill: '#c48c00' }); return b; }
+function xMark(p) { const b = g(p); add(b, 'circle', { r: 54, fill: '#e03131' }); add(b, 'path', { d: 'M-22,-22 L22,22 M22,-22 L-22,22', stroke: '#fff', 'stroke-width': 11, 'stroke-linecap': 'round' }); return b; }
+
+/* ---------- the wall with its opening ---------- */
+const sc1 = g();
+add(sc1, 'rect', { x: 0, y: 380, width: 520, height: 1110, fill: '#e9dfcf' });
+for (let r = 0; r < 14; r++) for (let c = 0; c < 4; c++) add(sc1, 'rect', { x: (r % 2 ? -60 : 0) + c * 150, y: 380 + r * 80, width: 144, height: 74, rx: 6, fill: '#f1e8da' });
+add(sc1, 'rect', { x: 110, y: 560, width: 320, height: 930, fill: '#c9d9e8', stroke: '#5b6670', 'stroke-width': 6, 'stroke-dasharray': '22 14' });
+add(sc1, 'text', { x: 270, y: 530, 'text-anchor': 'middle', class: 'small' }, 'WARDROBE OPENING');
+const counter = g(sc1); add(counter, 'rect', { x: -130, y: -40, width: 260, height: 80, rx: 20, fill: '#fff', stroke: '#e03131', 'stroke-width': 5 });
+const cTxt = add(counter, 'text', { x: 0, y: 14, 'text-anchor': 'middle', style: 'font:900 36px Inter;fill:#e03131' }, '');
+// frames that keep getting cut
+const cut1 = g(sc1); frameBlock(cut1); const cut2 = g(sc1); frameBlock(cut2);
+const scis = [g(sc1), g(sc1)]; scis.forEach(s => add(s, 'text', { x: 0, y: 30, 'text-anchor': 'middle', style: 'font:90px "Noto Color Emoji"' }, '✂️'));
+const xm = xMark(sc1), dfP = pill(sc1, "DOESN'T FIT", '#e03131');
+const xm2 = xMark(sc1);
+SFX.push({ t: A(1.5), type: 'tick' }); SFX.push({ t: A(1.65), type: 'tick' }); SFX.push({ t: A(2.75), type: 'clunk' }); SFX.push({ t: A(4.9), type: 'tick' }); SFX.push({ t: A(5.05), type: 'tick' }); SFX.push({ t: A(5.6), type: 'clunk' });
+
+/* ---------- tape measure (one long winding path, revealed by a mask) ---------- */
+const CASE = [690, 1255];
+const WP = [CASE, [110, 1255], [110, 560], [430, 560], [430, 470], [900, 470], [1010, 640], [1010, 980],
+  ...Array.from({ length: 25 }, (_, i) => { const a = -Math.PI / 2 + i / 24 * Math.PI * 2.2; return [790 + Math.cos(a) * 200, 1170 + Math.sin(a) * 230]; }),
+  [580, 1040], [60, 360], [980, 330], [1040, 860], [40, 980], [40, 1450], [980, 1480]];
+const dPath = 'M' + WP.map(p => p.map(v => v.toFixed(1)).join(',')).join(' L');
+const defs = add(S, 'defs', {}); const mask = add(defs, 'mask', { id: 'tm', maskUnits: 'userSpaceOnUse', x: 0, y: 0, width: 1080, height: 1920 });
+const mp = add(mask, 'path', { d: dPath, fill: 'none', stroke: '#fff', 'stroke-width': 48, 'stroke-linejoin': 'round', 'stroke-linecap': 'butt' });
+const tape = g(); tape.setAttribute('mask', 'url(#tm)');
+add(tape, 'path', { d: dPath, fill: 'none', stroke: '#c48c00', 'stroke-width': 40, 'stroke-linejoin': 'round' });
+add(tape, 'path', { d: dPath, fill: 'none', stroke: '#ffd21f', 'stroke-width': 32, 'stroke-linejoin': 'round' });
+add(tape, 'path', { d: dPath, fill: 'none', stroke: '#1d2b3a', 'stroke-width': 14, 'stroke-dasharray': '3 21', 'stroke-linejoin': 'round' });
+const LEN = mp.getTotalLength(); mp.style.strokeDasharray = `${LEN} ${LEN}`;
+const segLen = (n) => { let L = 0; for (let i = 1; i <= n; i++) L += Math.hypot(WP[i][0] - WP[i - 1][0], WP[i][1] - WP[i - 1][1]); return L; };
+const L1 = segLen(1), L2 = segLen(3), L3 = segLen(7);
+const tapeCase = g(); add(tapeCase, 'rect', { x: -60, y: -60, width: 120, height: 120, rx: 28, fill: '#ffd21f', stroke: '#1d2b3a', 'stroke-width': 7 });
+add(tapeCase, 'circle', { r: 26, fill: '#1d2b3a' }); add(tapeCase, 'circle', { r: 11, fill: '#ffd21f' });
+const readout = pill(S, '2400?', '#1d2b3a');
+SFX.push({ t: A(.1), type: 'whoosh' }); SFX.push({ t: A(3.9), type: 'whoosh' }); SFX.push({ t: A(4.4), type: 'whoosh' });
+
+/* ---------- stick figure ---------- */
+const man = g(); const mouth = add(man, 'path', { stroke: '#1d2b3a', 'stroke-width': 7, fill: 'none', 'stroke-linecap': 'round' });
+add(man, 'circle', { cx: 0, cy: -150, r: 46, fill: '#fff', stroke: '#1d2b3a', 'stroke-width': 8 }); man.appendChild(mouth);
+add(man, 'circle', { cx: -16, cy: -158, r: 6, fill: '#1d2b3a' }); add(man, 'circle', { cx: 16, cy: -158, r: 6, fill: '#1d2b3a' });
+const sweat = add(man, 'path', { d: 'M52,-180 q10,18 0,26 q-10,-8 0,-26', fill: '#6cc4ff' });
+add(man, 'path', { d: 'M0,-104 V40 M0,40 L-40,140 M0,40 L40,140', stroke: '#1d2b3a', 'stroke-width': 9, fill: 'none', 'stroke-linecap': 'round' });
+const armL = add(man, 'path', { stroke: '#1d2b3a', 'stroke-width': 9, fill: 'none', 'stroke-linecap': 'round' });
+const armR = add(man, 'path', { stroke: '#1d2b3a', 'stroke-width': 9, fill: 'none', 'stroke-linecap': 'round' });
+S.appendChild(tapeCase);                                    // case sits above the figure's hand
+
+/* ---------- Razan part ---------- */
+const sc2 = g();
+const logoBlock = g(sc2); add(logoBlock, 'rect', { x: -230, y: -100, width: 460, height: 200, rx: 28, fill: '#fff', stroke: '#00203f', 'stroke-width': 6 });
+add(logoBlock, 'image', { href: '../assets/logo.png', x: -235, y: -92, width: 470, height: 184, preserveAspectRatio: 'xMidYMid meet' }); studs(logoBlock, 460, -100, 4, '#e6ecf2');
+const paper = g(sc2); add(paper, 'rect', { x: -70, y: -90, width: 140, height: 180, rx: 10, fill: '#fff', stroke: '#1d2b3a', 'stroke-width': 5 });
+[0, 1, 2, 3].forEach(i => add(paper, 'rect', { x: -45, y: -60 + i * 34, width: i % 2 ? 60 : 90, height: 10, rx: 5, fill: '#9bb8d3' }));
+const onceP = pill(sc2, 'SENT ONCE', '#1fae5b');
+const PARTS = [[frameBlock, 230, '2580.0 mm', 'D1 · L1'], [glassBlock, 560, '746 × 2536', 'D1 · G'], [hingeBlock, 860, '×3', 'D1 · H']].map(([fn, x, dim, lab], i) => {
+  const w = g(sc2); fn(w); const dimP = pill(sc2, dim, '#2f6fd6'); const tag = g(sc2);
+  add(tag, 'rect', { x: -78, y: -26, width: 156, height: 52, rx: 10, fill: '#DBAB88', stroke: '#b9845f', 'stroke-width': 4 });
+  add(tag, 'text', { x: 0, y: 11, 'text-anchor': 'middle', style: 'font:900 28px Inter;fill:#00203f' }, lab);
+  SFX.push({ t: A(8.8 + i * .45), type: 'pop' }); SFX.push({ t: A(10.65 + i * .25), type: 'tick' });
+  return { w, dimP, tag, x, at: A(8.8 + i * .45), tagAt: A(10.65 + i * .25), s: fn === hingeBlock ? 1.1 : .7 }; });
+const neverP = pill(sc2, '✓ NO MORE RE-MEASURING', '#1fae5b');
+SFX.push({ t: A(6.4), type: 'whoosh' }); SFX.push({ t: A(7.3), type: 'whoosh' }); SFX.push({ t: A(12.15), type: 'click' }); SFX.push({ t: A(12.3), type: 'ding' });
+
+/* ---------- captions ---------- */
+const LINES = [
+  [[[0.05, 0.94], [1.43, 2.11]], 'Measure the wall. Cut the frame.', { 0: 'k', 3: 'k' }],
+  [[[2.64, 3.46]], "Doesn't fit.", { 0: 'k', 1: 'k' }],
+  [[[3.83, 4.47], [4.84, 5.41]], 'Measure again. Cut again.', { 1: 'k', 3: 'k' }],
+  [[[6.36, 8.47]], 'With Razan, you send the drawing once —', { 1: 'b', 6: 'g' }],
+  [[[8.76, 10.46], [10.63, 11.41]], 'we cut it to the millimetre and label every piece.', { 5: 'g', 7: 'g', 8: 'g', 9: 'g' }],
+  [[[11.71, 13.43]], 'You never measure on site again.', { 1: 'g', 2: 'g' }],
+];
+const caps = LINES.map(([segs, text, hl]) => { const box = document.createElement('div');
+  box.style.cssText = 'position:absolute;left:0;right:0;top:0;display:flex;flex-wrap:wrap;justify-content:center;gap:4px 16px;font:900 64px/1.15 "Inter Display",Inter;color:#1d2b3a';
+  const words = text.split(' '), spans = [], times = []; let wi = 0;
+  // split words across segments in proportion to segment length
+  const tot = segs.reduce((s, [a, b]) => s + b - a, 0); let assigned = 0;
+  segs.forEach(([a, b], si) => { const n = si === segs.length - 1 ? words.length - assigned : Math.round(words.length * (b - a) / tot); const ws = words.slice(assigned, assigned + n); assigned += n;
+    const L = ws.reduce((s, w) => s + w.length + 2, 0); let acc = 0;
+    ws.forEach(w => { const sp = document.createElement('span'); sp.className = 'w' + (hl[wi] ? ' ' + hl[wi] : ''); sp.textContent = w; box.appendChild(sp); spans.push(sp); times.push(A(a + (b - a) * acc / L) - .05); acc += w.length + 2; wi++; }); });
+  $('caps').appendChild(box); return { box, spans, times, a: A(segs[0][0]) - .1 }; });
+
+/* ---------- timeline ---------- */
+window.render = t => {
+  const razan = easeInOut(prog(t, A(6.2), .5));
+  // wall scene dims away when Razan arrives
+  T(sc1, 0, 0, 1, 1 - .88 * razan);
+  // tape length: measure 1, then "measure again" keeps stretching and wraps the figure; snaps back at the end
+  let vis = 0;
+  vis = lerp(0, L1, easeOut(prog(t, A(.05), .8)));
+  vis = lerp(vis, L2, easeInOut(prog(t, A(3.83), .55)));
+  vis = lerp(vis, LEN, easeInOut(prog(t, A(4.4), 1.8)));
+  const snap = easeIn(prog(t, A(11.75), .4));
+  vis = lerp(vis, 0, snap);
+  mp.style.strokeDashoffset = (LEN - vis).toFixed(1);
+  tape.style.opacity = (1 - .65 * razan * (1 - snap)).toFixed(3);
+  const tip = mp.getPointAtLength(Math.max(1, vis));
+  T(readout, tip.x, tip.y - 60, 1, clamp(prog(t, A(.6), .2)) * (1 - prog(t, A(3.7), .2)) + clamp(prog(t, A(4.2), .2)) * (1 - prog(t, A(5.9), .3)));
+  readout.querySelector('text').textContent = t < A(3.7) ? '2400?' : '2398? 2402?';
+  readout.querySelector('rect').setAttribute('width', t < A(3.7) ? 175 : 315); readout.querySelector('rect').setAttribute('x', t < A(3.7) ? -87 : -157);
+  T(tapeCase, CASE[0], CASE[1], 1, 1, snap > 0 && snap < 1 ? 0 : (prog(t, A(12.15), .25) > 0 && prog(t, A(12.15), .25) < 1 ? Math.sin(prog(t, A(12.15), .25) * 20) * 8 : 0));
+  // counter
+  const tries = t < A(1.43) ? 0 : t < A(4.84) ? 1 : 2;
+  cTxt.textContent = `CUT #${tries}  ✕`; T(counter, 860, 300, 1, tries ? 1 : 0);
+  // cut 1 -> doesn't fit ; cut 2 -> doesn't fit
+  const c1 = prog(t, A(1.43), .4), fit1 = easeInOut(prog(t, A(2.55), .3)), bounce1 = prog(t, A(2.85), .5);
+  T(cut1, lerp(840, 270, fit1) + lerp(0, 60, easeOut(bounce1)) + (bounce1 > 0 && bounce1 < 1 ? Math.sin(bounce1 * 30) * 10 * (1 - bounce1) : 0), lerp(820, 1020, fit1), lerp(.5, .82, fit1), clamp(c1 * 2) * (1 - prog(t, A(3.8), .3)));
+  T(scis[0], 840, 820, easeBack(prog(t, A(1.43), .3)), clamp(prog(t, A(1.43), .15)) * (1 - prog(t, A(2.4), .2)));
+  T(xm, 270, 1020, easeBack(prog(t, A(2.8), .35)), clamp(prog(t, A(2.8), .15)) * (1 - prog(t, A(3.8), .3)));
+  T(dfP, 270, 1150, 1, clamp(prog(t, A(2.9), .2)) * (1 - prog(t, A(3.8), .3)));
+  const c2 = prog(t, A(4.84), .4), fit2 = easeInOut(prog(t, A(5.25), .3)), b2 = prog(t, A(5.55), .5);
+  T(cut2, lerp(840, 270, fit2) - lerp(0, 50, easeOut(b2)), lerp(820, 1020, fit2), lerp(.5, .9, fit2), clamp(c2 * 2));
+  T(scis[1], 840, 820, easeBack(prog(t, A(4.84), .3)), clamp(prog(t, A(4.84), .15)) * (1 - prog(t, A(5.3), .2)));
+  T(xm2, 270, 1020, easeBack(prog(t, A(5.6), .35)), clamp(prog(t, A(5.6), .15)));
+  // figure
+  const happy = t > A(12.0);
+  T(man, 790, 1400, 1, 1);
+  mouth.setAttribute('d', happy ? 'M-20,-136 Q0,-112 20,-136' : 'M-20,-120 Q0,-138 20,-120');
+  sweat.style.opacity = !happy && t > A(2.6) ? 1 : 0;
+  armL.setAttribute('d', happy ? 'M0,-70 L-60,-150' : 'M0,-70 L-50,-30');
+  armR.setAttribute('d', 'M0,-70 L-90,-140');                // holds the tape case
+  // Razan
+  T(sc2, 0, 0, 1, razan);
+  T(logoBlock, lerp(-400, 540, easeOut(prog(t, A(6.36), .7))), 330, .8, 1);                  // slides straight in — no roll
+  const fly = easeInOut(prog(t, A(7.3), .8)); T(paper, lerp(700, 540, fly), lerp(1180, 360, fly), lerp(1, .35, fly), clamp(prog(t, A(7.2), .2)) * (1 - prog(t, A(8.05), .2)), lerp(-10, 0, fly));
+  T(onceP, 540, 500, easeBack(prog(t, A(8.0), .35)), clamp(prog(t, A(8.0), .15)));
+  PARTS.forEach(p => { const q = prog(t, p.at, .45); T(p.w, p.x, lerp(1100, 860, easeBack(q)), p.s, clamp(q * 2));
+    T(p.dimP, p.x, 1080, easeBack(prog(t, p.at + .25, .35)), clamp(prog(t, p.at + .25, .15)));
+    T(p.tag, p.x, 700, easeBack(prog(t, p.tagAt, .35)), clamp(prog(t, p.tagAt, .15))); });
+  T(neverP, 540, 1530, easeBack(prog(t, A(12.3), .4)), clamp(prog(t, A(12.3), .2)));
+  // captions
+  caps.forEach((c, i) => { const nxt = i + 1 < caps.length ? caps[i + 1].a : END - .1; c.box.style.display = t >= c.a && t < nxt ? 'flex' : 'none';
+    c.spans.forEach((w, j) => { const p = prog(t, c.times[j], .25); w.style.opacity = clamp(p * 3); w.style.transform = `translateY(${lerp(18, 0, easeOut(p))}px)`; }); });
+  // end card
+  $('end').style.opacity = easeInOut(prog(t, END, .5));
+  $('elogo').style.opacity = easeOut(prog(t, END + .15, .5));                     // logo: fade only
+  $('end').querySelectorAll('.l1,.l2,.btn,.url').forEach((n, i) => { const q = prog(t, END + .3 + i * .35, .4); n.style.opacity = q;
+    n.style.transform = (n.classList.contains('btn') ? 'translateX(-50%) ' : '') + `translateY(${lerp(30, 0, easeOut(q))}px)`; });
+};
+window.SFX = SFX.sort((a, b) => a.t - b.t); window.CFG = { duration: DUR, voiceAt: OFF };
+window.DURATION = DUR; window.AUDIO_OFFSET = 0; window.AUDIO = 'sb-x10-04-tape.mp3';
+const q = new URLSearchParams(location.search); window.render(q.has('t') ? +q.get('t') : 1); window.READY = true;
+</script>
+</body>
+</html>
