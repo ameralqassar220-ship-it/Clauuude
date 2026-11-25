@@ -189,7 +189,7 @@ window.render = function (t) {
   set($('glow'), { x: Math.sin(t * .35) * 120, y: Math.cos(t * .25) * 90, s: 1 + Math.sin(t * .5) * .05 });
   set($('glow2'), { x: Math.cos(t * .3) * 100, y: Math.sin(t * .4) * 60 });
   set($('kicker'), { o: clamp(prog(t, .1, .6)) * (1 - prog(t, SC.s7[0] - .3, .4)), y: lerp(-20, 0, easeOut(prog(t, .1, .6))) });
-  set($('mark'), { o: prog(t, .2, .5), s: easeBack(prog(t, .2, .6)), r: t * 12 });
+  set($('mark'), { o: prog(t, .2, .5) });  // brand rule: the logo never rolls, spins or scales
 
   // S1 — two closet photos, tilted, drifting
   let d = Math.sin(t * 1.2) * 8;
@@ -234,7 +234,7 @@ window.render = function (t) {
 
   // S7 — CTA
   const S7 = [SC.s7[0], DURATION + 1];
-  set($('logoCard'), pop(t, S7, 0, { y: Math.sin(t * 1.4) * 6 }));
+  set($('logoCard'), { o: easeOut(prog(t, S7[0], .5)) });  // logo: simple fade, no motion
   set($('url'), pop(t, S7, .4));
   set($('wa'), pop(t, S7, .7, { tx: 'translateX(-50%)', s: 1 + .03 * Math.max(0, Math.sin((t - S7[0] - 1.6) * 4)) * (t > S7[0] + 1.6) }));
   set($('ship'), pop(t, S7, 1.0));
