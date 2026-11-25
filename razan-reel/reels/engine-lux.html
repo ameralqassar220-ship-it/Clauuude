@@ -71,8 +71,8 @@ function boot(R) {
       set(f, { o }); const k = prog(t, S, E - S + XF), z = sc.zoom || [1.0, 1.1];
       media.style.transform = `scale(${lerp(z[0], z[1], k).toFixed(4)})`;
       hl.forEach((h, j) => { const p = easeOut(prog(t, S + .4 + j * .15, 1.2)); if (h.dataset.w === '100%') { h.style.width = p * 100 + '%'; h.style.height = '2px'; } else { h.style.height = p * 100 + '%'; h.style.width = '2px'; } });
-      if (head) { const D = E - S, hd = Math.min(.5, D * .2), hf = Math.min(.9, D * .3);
-        set(head, { o: ease(prog(t, S + hd, hf)) * (1 - ease(prog(t, E + Math.min(.2, D * .1), Math.min(.6, D * .3)))), y: lerp(20, 0, easeOut(prog(t, S + hd, 1.2))) }); }
+      if (head) { const D = E - S, hd = Math.max(.25, Math.min(.5, D * .2)), hf = Math.min(.9, D * .3);
+        set(head, { o: ease(prog(t, S + hd, hf)) * (1 - ease(prog(t, E - Math.min(.45, D * .25), Math.min(.4, D * .22)))), y: lerp(20, 0, easeOut(prog(t, S + hd, 1.2))) }); }
       if (sc.clip && o > 0) { const fr = Math.min(sc.frames, Math.max(1, 1 + Math.floor((t - S + (sc.from || 0)) * 30 * (sc.speed || .6))));   // slowed footage
         if (fr !== last) { last = fr; media.src = `../.cache/clips/${sc.clip}/f_${String(fr).padStart(4, '0')}.jpg`; return media.decode().catch(() => {}); } }
     };
