@@ -127,7 +127,7 @@ const TYPES = {
     const rows = sc.items.map((it, i) => el(`<div class="abs stat" style="top:${380 + i * 270}px"><div class="num"><span>0</span><small>${it.suffix || ''}</small></div><div class="txt">${it.txt}</div></div>`));
     return t => { const w = sc.win;
       rows.forEach((r, i) => { set(r, pop(t, w, i * .25)); const it = sc.items[i];
-        const v = it.n * easeOut(prog(t, w[0] + .3 + i * .25, 1.2)); r.querySelector('span').textContent = it.dec ? v.toFixed(it.dec) : Math.round(v); });
+        const v = it.n * easeOut(prog(t, w[0] + .3 + i * .25, 1.2)); r.querySelector('span').textContent = it.dec ? v.toFixed(it.dec) : Math.ceil(v); });
     };
   },
   cta(sc) {
