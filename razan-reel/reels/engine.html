@@ -114,10 +114,10 @@ const TYPES = {
   hook2(sc) {
     const a = card(70, 330, 560, 720, sc.imgs[0]), b = card(450, 470, 560, 720, sc.imgs[1]);
     const tag = sc.tag && el(`<div class="abs tag sand" style="left:50%;top:1240px;font-size:44px;padding:20px 36px">${sc.tag}</div>`);
-    const tag2 = sc.tag2 && el(`<div class="abs tag" style="left:50%;top:180px;font-size:44px;padding:20px 36px;z-index:5">${sc.tag2}</div>`);
+    const tag2 = sc.tag2 && el(`<div class="abs tag" style="left:50%;top:1240px;font-size:44px;padding:20px 36px">${sc.tag2}</div>`);
     return t => { const d = Math.sin(t * 1.2) * 8, w = sc.win;
-      if (tag) set(tag, pop(t, w, sc.tagAt ?? .15, { tx: 'translateX(-50%)' }));
-      if (tag2) set(tag2, pop(t, w, sc.tag2At ?? .6, { tx: 'translateX(-50%)' }));
+      if (tag) set(tag, pop(t, w, sc.tagAt ?? .15, { tx: tag2 ? 'translateX(calc(-100% - 14px))' : 'translateX(-50%)' }));
+      if (tag2) set(tag2, pop(t, w, sc.tag2At ?? .6, { tx: 'translateX(14px)' }));
       set(a, pop(t, w, 0, { r: -6, y: d })); set(b, pop(t, w, .25, { r: 5, y: -d }));
       kb(a, t, w, 1, 1.1); kb(b, t, w, 1.1, 1); shine(a, t, w[0] + .9); shine(b, t, w[0] + 1.2); };
   },
