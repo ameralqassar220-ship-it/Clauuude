@@ -119,8 +119,8 @@ const TYPES = {
     const ks = sc.checks.map((txt, i) => el(`<div class="abs tag ${i === sc.checks.length - 1 ? 'sand' : ''}" style="left:540px;top:${560 + i * 130}px">✓ ${txt}</div>`));
     return t => { const w = sc.win;
       set(c, pop(t, w, 0, { r: -2 })); kb(c, t, w, 1.12, 1); shine(c, t, w[0] + .6);
-      const step = Math.min(.45, (w[1] - w[0] - 1.6) / ks.length);
-      ks.forEach((k, i) => set(k, pop(t, w, .6 + i * step, { x: lerp(60, 0, easeOut(prog(t, w[0] + .6 + i * step, .5))) })));
+      const step = Math.max(.22, Math.min(.45, (w[1] - w[0] - 1.6) / ks.length));
+      ks.forEach((k, i) => set(k, pop(t, w, Math.min(.6, (w[1] - w[0]) * .2) + i * step, { x: lerp(60, 0, easeOut(prog(t, w[0] + Math.min(.6, (w[1] - w[0]) * .2) + i * step, .5))) })));
     };
   },
   stats(sc) {
