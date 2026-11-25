@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Razan reel engine</title>
+<!-- Reusable Razan UAE reel template. Load a reel with ?reel=<id> (reads reels/<id>.js).
+     Brand rule: the Razan logo never rolls, spins, bounces or scales — it only fades. -->
+<style>
+  :root { --navy:#00203f; --sand:#DBAB88; --sand-d:#b9845f; --mist:#f0f3f5; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; }
+  body { font-family: "Inter Display", Inter, sans-serif; color: var(--navy); }
+  #stage { position: relative; width: 1080px; height: 1920px; overflow: hidden;
+    background: linear-gradient(180deg, #f7f2ed 0%, #f1e4d8 55%, #ead3c0 100%); }
+  #glow { position: absolute; width: 1400px; height: 1400px; left: -160px; top: 300px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(219,171,136,.55) 0%, rgba(219,171,136,0) 65%); }
+  #glow2 { position: absolute; width: 1100px; height: 1100px; left: 300px; top: -300px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(0,32,63,.10) 0%, rgba(0,32,63,0) 65%); }
+  .abs { position: absolute; will-change: transform, opacity; visibility: hidden; }
+  #kicker { left: 0; right: 0; top: 170px; text-align: center; font: 700 26px/1 Inter, sans-serif;
+    letter-spacing: .32em; color: var(--sand-d); text-transform: uppercase; }
+  #mark { right: 70px; top: 140px; width: 84px; height: 84px; border-radius: 50%;
+    box-shadow: 0 10px 30px rgba(0,32,63,.25); background: url(../assets/logo-mark.png) center/cover; }
+  .card { border-radius: 40px; overflow: hidden; background: #fff; border: 10px solid #fff;
+    box-shadow: 0 40px 90px rgba(0,32,63,.28), 0 8px 20px rgba(0,32,63,.12); }
+  .card .img { position: absolute; inset: 0; background-size: cover; background-position: center; border-radius: 30px; }
+  .card .shine { position: absolute; inset: 0; border-radius: 30px;
+    background: linear-gradient(105deg, rgba(255,255,255,0) 35%, rgba(255,255,255,.55) 50%, rgba(255,255,255,0) 65%);
+    background-size: 300% 100%; mix-blend-mode: screen; }
+  .tag { padding: 16px 28px; border-radius: 999px; background: var(--navy); color: #fff;
+    font: 700 34px/1 Inter, sans-serif; white-space: nowrap; box-shadow: 0 14px 30px rgba(0,32,63,.3); }
+  .tag.sand { background: var(--sand); color: var(--navy); }
+  .label { font: 800 44px/1 "Inter Display", sans-serif; color: var(--navy); text-align: center; }
+  .stat { left: 110px; width: 860px; height: 230px; border-radius: 40px; background: #fff;
+    box-shadow: 0 30px 70px rgba(0,32,63,.18); display: flex; align-items: center; padding: 0 56px; gap: 44px; }
+  .stat .num { font: 900 120px/1 "Inter Display", sans-serif; color: var(--navy); min-width: 300px; letter-spacing: -.03em; white-space: nowrap; }
+  .stat .num small { font-size: 60px; color: var(--sand-d); }
+  .stat .txt { font: 700 40px/1.2 Inter, sans-serif; color: #4a5a6a; }
+  .logoCard { left: 130px; top: 430px; width: 820px; height: 340px; border-radius: 44px; background: #fff url(../assets/logo.png) center/112% auto no-repeat;
+    box-shadow: 0 40px 90px rgba(0,32,63,.22); }
+  .url { left: 0; right: 0; top: 850px; text-align: center; font: 900 104px/1 "Inter Display", sans-serif; letter-spacing: -.03em; }
+  .wa { left: 50%; top: 1010px; padding: 24px 44px; border-radius: 999px; background: #25D366; color: #fff;
+    font: 800 46px/1 Inter, sans-serif; white-space: nowrap; box-shadow: 0 20px 40px rgba(37,211,102,.35); }
+  .ship { left: 0; right: 0; top: 1130px; text-align: center; font: 700 36px/1.3 Inter, sans-serif; color: #5b6b7a; }
+  #caps { left: 70px; right: 70px; top: 1390px; text-align: center; visibility: visible; }
+  .cap { position: absolute; left: 0; right: 0; top: 0; display: flex; flex-wrap: wrap; justify-content: center;
+    gap: 6px 20px; font: 900 76px/1.12 "Inter Display", sans-serif; letter-spacing: -.02em; color: var(--navy); }
+  .w { display: inline-block; padding: 2px 0; }
+  .w.hl { background: var(--navy); color: #fff; padding: 2px 18px 8px; border-radius: 14px; }
+  .w.hs { background: var(--sand); color: var(--navy); padding: 2px 18px 8px; border-radius: 14px; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="glow" class="abs" style="visibility:visible"></div>
+  <div id="glow2" class="abs" style="visibility:visible"></div>
+  <div id="kicker" class="abs"></div>
+  <div id="mark" class="abs"></div>
+  <div id="scenes"></div>
+  <div id="caps" class="abs"></div>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, p) => a + (b - a) * p;
+const easeOut = p => 1 - Math.pow(1 - p, 3);
+const easeInOut = p => p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
+const easeBack = p => { const c = 1.6; return 1 + (c + 1) * Math.pow(p - 1, 3) + c * Math.pow(p - 1, 2); };
+const prog = (t, a, d) => clamp((t - a) / d);
+const IMG = name => `../assets/${name}`;
+
+function el(html) { const d = document.createElement('div'); d.innerHTML = html.trim(); const n = d.firstChild; $('scenes').appendChild(n); return n; }
+const card = (x, y, w, h, img) => el(`<div class="abs card" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px"><div class="img" style="background-image:url(${IMG(img)})"></div><div class="shine"></div></div>`);
+function set(e, { x = 0, y = 0, s = 1, r = 0, o = 1, tx = '' } = {}) {
+  e.style.opacity = o.toFixed(4);
+  e.style.transform = `${tx} translate(${x.toFixed(2)}px, ${y.toFixed(2)}px) rotate(${r.toFixed(3)}deg) scale(${s.toFixed(4)})`;
+  e.style.visibility = o <= 0.001 ? 'hidden' : 'visible';
+}
+function pop(t, [S, E], delay, extra = {}) {
+  const pi = prog(t, S + delay, .6), po = prog(t, E - .4, .4);
+  const e = easeBack(pi), x = easeInOut(po);
+  return { o: clamp(pi * 2) * (1 - x), y: lerp(140, 0, e) - 90 * x + (extra.y || 0), s: lerp(.86, 1, e) * lerp(1, .96, x), r: extra.r || 0, x: extra.x || 0, tx: extra.tx || '' };
+}
+const fade = (t, [S, E], delay = 0) => ({ o: easeOut(prog(t, S + delay, .5)) * (1 - easeInOut(prog(t, E - .4, .4))) });
+function shine(c, t, at) { c.querySelector('.shine').style.backgroundPosition = `${lerp(130, -30, easeInOut(prog(t, at, 1.1)))}% 0`; }
+function kb(c, t, [S, E], from, to) { c.querySelector('.img').style.transform = `scale(${lerp(from, to, prog(t, S, E - S))})`; }
+
+// ---- scene types: build(scene) -> update(t) ----
+const TYPES = {
+  hook2(sc) {
+    const a = card(70, 330, 560, 720, sc.imgs[0]), b = card(450, 470, 560, 720, sc.imgs[1]);
+    return t => { const d = Math.sin(t * 1.2) * 8, w = sc.win;
+      set(a, pop(t, w, 0, { r: -6, y: d })); set(b, pop(t, w, .25, { r: 5, y: -d }));
+      kb(a, t, w, 1, 1.1); kb(b, t, w, 1.1, 1); shine(a, t, w[0] + .9); shine(b, t, w[0] + 1.2); };
+  },
+  hero(sc) {
+    const c = card(120, 330, 840, 740, sc.img);
+    const tag = sc.tag && el(`<div class="abs tag sand" style="left:170px;top:380px">${sc.tag}</div>`);
+    const chips = (sc.chips || []).map((txt, i) => el(`<div class="abs tag" style="left:50%;top:1140px">${txt}</div>`));
+    return t => { const w = sc.win;
+      set(c, pop(t, w, 0)); kb(c, t, w, 1, 1.15); shine(c, t, w[0] + .7);
+      if (tag) set(tag, pop(t, w, .5));
+      let x = 540 - (chips.reduce((s, ch) => s + ch.offsetWidth, 0) + 24 * (chips.length - 1)) / 2;
+      chips.forEach((ch, i) => { ch.style.left = x + 'px'; x += ch.offsetWidth + 24; set(ch, pop(t, w, 1.0 + i * .28)); });
+    };
+  },
+  fan3(sc) {
+    const cs = sc.imgs.map(img => card(350, 430, 380, 490, img)); cs[1].style.zIndex = 3;
+    const ls = sc.labels.map((l, i) => el(`<div class="abs label" style="left:${40 + i * 330}px;top:1030px;width:340px">${l}</div>`));
+    const tag = sc.tag && el(`<div class="abs tag sand" style="left:50%;top:1130px">${sc.tag}</div>`);
+    return t => { const w = sc.win, f = easeBack(prog(t, w[0] + .5, .8));
+      cs.forEach((c, i) => { const k = i - 1, p = pop(t, w, i * .12); p.x = k * 300 * f; p.r = k * 7 * f; p.y += Math.abs(k) * 40 * f; set(c, p); shine(c, t, w[0] + 1.4 + i * .2); });
+      ls.forEach((l, i) => set(l, pop(t, w, 1.0 + i * .2)));
+      if (tag) set(tag, pop(t, w, 1.6, { tx: 'translateX(-50%)' }));
+    };
+  },
+  checks(sc) {
+    const c = card(90, 320, 640, 860, sc.img);
+    const ks = sc.checks.map((txt, i) => el(`<div class="abs tag ${i === sc.checks.length - 1 ? 'sand' : ''}" style="left:540px;top:${560 + i * 130}px">✓ ${txt}</div>`));
+    return t => { const w = sc.win;
+      set(c, pop(t, w, 0, { r: -2 })); kb(c, t, w, 1.12, 1); shine(c, t, w[0] + .6);
+      const step = Math.min(.45, (w[1] - w[0] - 1.6) / ks.length);
+      ks.forEach((k, i) => set(k, pop(t, w, .6 + i * step, { x: lerp(60, 0, easeOut(prog(t, w[0] + .6 + i * step, .5))) })));
+    };
+  },
+  stats(sc) {
+    const rows = sc.items.map((it, i) => el(`<div class="abs stat" style="top:${380 + i * 270}px"><div class="num"><span>0</span><small>${it.suffix || ''}</small></div><div class="txt">${it.txt}</div></div>`));
+    return t => { const w = sc.win;
+      rows.forEach((r, i) => { set(r, pop(t, w, i * .25)); const it = sc.items[i];
+        const v = it.n * easeOut(prog(t, w[0] + .3 + i * .25, 1.2)); r.querySelector('span').textContent = it.dec ? v.toFixed(it.dec) : Math.round(v); });
+    };
+  },
+  cta(sc) {
+    const logo = el(`<div class="abs logoCard"></div>`);
+    const url = el(`<div class="abs url">razanuae.com</div>`);
+    const wa = el(`<div class="abs wa"><svg viewBox="0 0 32 32" fill="#fff" style="width:46px;height:46px;vertical-align:-9px;margin-right:14px"><path d="M16 3C9 3 3.3 8.6 3.3 15.6c0 2.4.7 4.7 1.9 6.7L3 29l6.9-2.1c1.9 1 4 1.6 6.1 1.6 7 0 12.7-5.7 12.7-12.7S23 3 16 3zm0 23.2c-2 0-3.9-.6-5.5-1.6l-.4-.2-4.1 1.2 1.3-4-.3-.4c-1.1-1.7-1.7-3.6-1.7-5.6C5.3 9.8 10.1 5 16 5s10.7 4.8 10.7 10.7S21.9 26.2 16 26.2zm5.9-8c-.3-.2-1.9-.9-2.2-1-.3-.1-.5-.2-.7.2-.2.3-.8 1-1 1.2-.2.2-.4.2-.7.1-.3-.2-1.4-.5-2.6-1.6-1-.9-1.6-1.9-1.8-2.3-.2-.3 0-.5.1-.7l.5-.6c.2-.2.2-.3.3-.6.1-.2 0-.4 0-.6l-1-2.4c-.3-.6-.5-.5-.7-.5h-.6c-.2 0-.6.1-.9.4-.3.3-1.2 1.2-1.2 2.9s1.2 3.4 1.4 3.6c.2.2 2.4 3.7 5.9 5.1 2.9 1.1 3.5.9 4.1.9.6-.1 1.9-.8 2.2-1.5.3-.8.3-1.4.2-1.5-.1-.2-.3-.3-.6-.4z"/></svg>+971 50 201 9281</div>`);
+    const ship = el(`<div class="abs ship">${sc.ship || 'RAK showroom · Delivery across the UAE &amp; GCC'}</div>`);
+    return t => { const w = [sc.win[0], 1e9];
+      set(logo, { o: easeOut(prog(t, w[0], .5)) });          // logo: fade only, never moves
+      set(url, pop(t, w, .4)); set(wa, pop(t, w, .7, { tx: 'translateX(-50%)' })); set(ship, pop(t, w, 1.0));
+    };
+  },
+};
+
+function boot(R) {
+  const A = x => x + R.offset;
+  $('kicker').textContent = R.kicker;
+  // scene windows come from the voiceover: each scene starts where its first line starts
+  R.scenes.forEach((sc, i) => { const s = i === 0 ? 0 : A(sc.at) - .15, e = i + 1 < R.scenes.length ? A(R.scenes[i + 1].at) - .15 : R.duration + 1; sc.win = [s, e]; });
+  const updates = R.scenes.map(sc => TYPES[sc.type](sc));
+  const SP = R.spoken || {};
+  const caps = R.caps.map((g, gi) => {
+    const box = document.createElement('div'); box.className = 'cap';
+    const words = [], times = [];
+    g.segs.forEach(([sa, sb, text]) => {
+      const ws = text.split(' '), wt = ws.map(w => (SP[w] || w.replace(/[^\w]/g, '').length) + 2);
+      const tot = wt.reduce((x, y) => x + y, 0); let acc = 0;
+      ws.forEach((w, i) => { times.push(A(sa + (sb - sa) * acc / tot) - .04); acc += wt[i]; words.push(w); });
+    });
+    const spans = words.map((w, i) => { const s = document.createElement('span'); s.className = 'w' + (g.hl && g.hl[i] ? ' ' + g.hl[i] : ''); s.textContent = w; box.appendChild(s); return s; });
+    $('caps').appendChild(box);
+    const b = gi + 1 < R.caps.length ? A(R.caps[gi + 1].segs[0][0]) - .06 : R.duration + 1;
+    return { a: times[0], b, box, spans, times };
+  });
+  const ctaStart = R.scenes[R.scenes.length - 1].win[0];
+  window.render = t => {
+    set($('glow'), { x: Math.sin(t * .35) * 120, y: Math.cos(t * .25) * 90, s: 1 + Math.sin(t * .5) * .05 });
+    set($('glow2'), { x: Math.cos(t * .3) * 100, y: Math.sin(t * .4) * 60 });
+    set($('kicker'), { o: clamp(prog(t, .1, .6)) * (1 - prog(t, ctaStart - .3, .4)), y: lerp(-20, 0, easeOut(prog(t, .1, .6))) });
+    set($('mark'), { o: prog(t, .2, .5) });                 // logo mark: fade only, never rolls
+    updates.forEach(u => u(t));
+    caps.forEach(c => {
+      c.box.style.visibility = (t >= c.a - .01 && t < c.b) ? 'visible' : 'hidden';
+      c.box.style.opacity = 1 - easeInOut(prog(t, c.b - .25, .25));
+      c.spans.forEach((w, i) => { const p = prog(t, c.times[i], .28);
+        w.style.opacity = clamp(p * 2.5); w.style.transform = `translateY(${lerp(28, 0, easeOut(p))}px) scale(${lerp(.7, 1, easeBack(p))})`; });
+    });
+  };
+  window.DURATION = R.duration; window.AUDIO_OFFSET = R.offset; window.AUDIO = R.audio;
+  const q = new URLSearchParams(location.search);
+  window.render(q.has('t') ? +q.get('t') : 2.5);
+  window.READY = true;
+}
+const id = new URLSearchParams(location.search).get('reel');
+const s = document.createElement('script'); s.src = `${id}.js`; s.onload = () => boot(window.REEL); document.body.appendChild(s);
+</script>
+</body>
+</html>
