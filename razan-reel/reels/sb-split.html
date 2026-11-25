@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Razan — "Before / After the call" split-screen ad (9:16, 15 s)</title>
+<!-- Split-screen screen-recording style. Left: cluttered thread with three suppliers. Right: one clean Razan thread.
+     Pure UI animation. The final ~4 s is a complete frame that also works as a static ad (render.js --stills 14).
+     Brand rule: the Razan logo never rolls, spins, bounces or scales — fade only. -->
+<style>
+  :root { --navy:#00203f; --sand:#DBAB88; --wa:#008069; --red:#e03131; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; }
+  body { font-family: Inter, sans-serif; background: #0b0f14; }
+  #stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: #0b0f14; }
+  .top { position: absolute; top: 60px; width: 540px; text-align: center; }
+  .top .k { font: 800 30px/1 "JetBrains Mono", monospace; letter-spacing: .2em; }
+  .top .h { margin-top: 14px; font: 900 64px/1 "Inter Display", Inter; color: #fff; }
+  .top .s { margin-top: 12px; font: 600 28px/1.2 Inter; color: rgba(255,255,255,.65); }
+  #L .k { color: #ff8a80; } #R .k { color: var(--sand); }
+  .phone { position: absolute; top: 290px; width: 500px; height: 1330px; border-radius: 44px; overflow: hidden; background: #efeae2; box-shadow: 0 30px 70px rgba(0,0,0,.5); }
+  #pl { left: 20px; } #pr { right: 20px; }
+  .status { height: 52px; display: flex; justify-content: space-between; align-items: center; padding: 0 30px; font: 700 22px Inter; background: var(--wa); color: #fff; }
+  .head { height: 104px; background: var(--wa); color: #fff; display: flex; align-items: center; gap: 16px; padding: 0 22px; }
+  .head .av { width: 64px; height: 64px; border-radius: 50%; flex: none; display: grid; place-items: center; font: 700 26px Inter; background: #dfe5e7; color: #54656f; }
+  .head .av.logo { background: #fff url(../assets/logo-mark.png) center/cover; }
+  .head b { display: block; font: 600 30px/1.1 Inter; white-space: nowrap; } .head span { font: 400 21px/1.3 Inter; opacity: .85; white-space: nowrap; }
+  .head .ver { display: inline-block; width: 26px; height: 26px; border-radius: 50%; background: #25D366; color: #fff; font: 800 17px/26px Inter; text-align: center; margin-left: 6px; vertical-align: 3px; }
+  .thread { position: absolute; left: 0; right: 0; top: 156px; bottom: 96px; overflow: hidden; }
+  .inner { position: absolute; left: 0; right: 0; bottom: 0; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
+  .m { max-width: 86%; padding: 10px 14px 6px; border-radius: 14px; font: 400 25px/1.3 Inter; color: #111b21; box-shadow: 0 1px 1px rgba(0,0,0,.12); }
+  .m.in { align-self: flex-start; background: #fff; border-top-left-radius: 0; }
+  .m.out { align-self: flex-end; background: #d9fdd3; border-top-right-radius: 0; }
+  .m .who { font: 700 22px Inter; margin-bottom: 2px; }
+  .m .tm { display: block; text-align: right; font: 400 18px Inter; color: #667781; margin-top: 2px; }
+  .m .tm.read:after { content: ' ✓✓'; color: #53bdeb; } .m .tm.sent:after { content: ' ✓'; color: #8696a0; }
+  .m.sys { align-self: center; background: #fff7d6; color: #54656f; font: 500 21px Inter; padding: 8px 14px; border-radius: 10px; }
+  .m.bad { border-left: 6px solid var(--red); }
+  .img { width: 330px; height: 300px; border-radius: 10px; background-size: cover; background-position: center; }
+  .pdf { width: 340px; border-radius: 10px; overflow: hidden; background: #fff; }
+  .pdf .pv { height: 150px; background: #f6f7f9; padding: 16px; } .pdf .pv i { display: block; height: 10px; border-radius: 5px; background: #dde3ea; margin-bottom: 12px; }
+  .pdf .meta { display: flex; gap: 12px; align-items: center; padding: 12px; background: #f0f2f5; font: 600 21px Inter; }
+  .pdf .ic { width: 40px; height: 48px; border-radius: 6px; background: #e2483d; color: #fff; display: grid; place-items: center; font: 800 14px Inter; }
+  .bar { position: absolute; left: 0; right: 0; bottom: 0; height: 96px; background: #f0f2f5; display: flex; align-items: center; padding: 0 16px; gap: 12px; }
+  .bar .in { flex: 1; height: 60px; border-radius: 30px; background: #fff; font: 400 22px/60px Inter; color: #8696a0; padding: 0 22px; white-space: nowrap; overflow: hidden; }
+  .bar .mic { width: 60px; height: 60px; border-radius: 50%; background: var(--wa); }
+  .badge { position: absolute; top: 18px; right: 18px; min-width: 52px; height: 52px; border-radius: 26px; background: var(--red); color: #fff; font: 800 28px/52px Inter; text-align: center; padding: 0 12px; box-shadow: 0 6px 16px rgba(224,49,49,.5); }
+  #rec { position: absolute; left: 50%; top: 20px; transform: translateX(-50%); font: 700 22px "JetBrains Mono", monospace; color: #fff; display: flex; gap: 10px; align-items: center; }
+  #rec i { width: 16px; height: 16px; border-radius: 50%; background: var(--red); }
+  #divider { position: absolute; left: 539px; top: 40px; bottom: 260px; width: 2px; background: rgba(255,255,255,.18); }
+  #grey { position: absolute; inset: 0; background: rgba(60,60,60,.0); pointer-events: none; }
+  #foot { position: absolute; left: 0; right: 0; bottom: 0; height: 280px; display: flex; align-items: center; justify-content: center; gap: 34px; }
+  #foot .lg { width: 330px; height: 132px; border-radius: 22px; background: #fff url(../assets/logo.png) center/112% auto no-repeat; flex: none; }
+  #foot b { display: block; font: 900 50px/1.05 "Inter Display", Inter; color: #fff; }
+  #foot span { display: block; margin-top: 10px; font: 700 30px Inter; color: var(--sand); }
+  .tap { position: absolute; width: 70px; height: 70px; margin: -35px 0 0 -35px; border-radius: 50%; background: rgba(255,255,255,.55); border: 3px solid rgba(0,0,0,.25); }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="rec"><i></i>REC <span id="rt">00:00</span></div>
+  <div class="top" id="L" style="left:0"><div class="k">BEFORE THE CALL</div><div class="h">3 suppliers</div><div class="s">Chasing answers at midnight</div></div>
+  <div class="top" id="R" style="right:0"><div class="k">AFTER THE CALL</div><div class="h">1 Razan</div><div class="s">Drawing in · PDF out · delivered</div></div>
+  <div id="divider"></div>
+  <div class="phone" id="pl">
+    <div class="status"><span>11:48 PM</span><span>▮▮▮ 12%</span></div>
+    <div class="head"><div class="av">👥</div><div><b>Door project – suppliers</b><span>Glass, Profiles, Hardware, You</span></div></div>
+    <div class="thread"><div class="inner" id="tl"></div></div>
+    <div class="bar"><div class="in" id="typl">Message</div><div class="mic"></div></div>
+    <div class="badge" id="badge">0</div>
+    <div id="grey"></div>
+  </div>
+  <div class="phone" id="pr">
+    <div class="status"><span>8:10 AM</span><span>▮▮▮ 86%</span></div>
+    <div class="head"><div class="av logo" id="ravatar"></div><div><b>Razan UAE<span class="ver">✓</span></b><span>Business account</span></div></div>
+    <div class="thread"><div class="inner" id="tr"></div></div>
+    <div class="bar"><div class="in">Message</div><div class="mic"></div></div>
+    <div class="tap" id="tap"></div>
+  </div>
+  <div id="foot"><div class="lg" id="flogo"></div><div><b>One chat.<br>Every door.</b><span>razanuae.com · WhatsApp +971 50 201 9281</span></div></div>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, p) => a + (b - a) * p;
+const easeOut = p => 1 - Math.pow(1 - p, 3);
+const easeInOut = p => p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
+const prog = (t, a, d) => clamp((t - a) / d);
+const SFX = [];
+const WHO = { G: ['Glass supplier', '#e8710a'], P: ['Profile supplier', '#8e44ad'], H: ['Hardware supplier', '#0f9d8a'] };
+// LEFT: the mess (times speed up)
+const LEFT = [
+  [0.7, 'G', 'Your glass is delayed again 😕', '11:02 PM', 1],
+  [1.4, 'P', 'Slim 2×2 black is out of stock', '11:05 PM', 1],
+  [2.1, 'H', 'Send measurements again pls', '11:09 PM', 1],
+  [2.8, 'me', 'I sent them yesterday!!', '11:10 PM'],
+  [3.4, 'G', 'Which thickness? 6 or 8?', '11:14 PM'],
+  [4.0, 'sys', '📞 Missed voice call · Profile supplier'],
+  [4.5, 'P', 'Price changed from today', '11:20 PM', 1],
+  [5.0, 'H', 'Which hinge side?', '11:22 PM'],
+  [5.45, 'G', 'Delivery next week maybe', '11:31 PM', 1],
+  [5.9, 'P', 'Cut sizes wrong, need to redo', '11:36 PM', 1],
+  [6.3, 'sys', '📞 Missed voice call · Glass supplier'],
+  [6.7, 'H', 'Send measurements again', '11:41 PM', 1],
+  [7.1, 'me', 'Client is waiting 😩', '11:44 PM'],
+  [7.5, 'G', '??', '11:46 PM'],
+];
+// RIGHT: the clean thread
+const RIGHT = [
+  [1.0, 'out', `<div class="img" style="background-image:url(../assets/doc-draw-1.jpg);background-position:30% 22%"></div><div style="padding-top:6px">Wardrobe · 3 sliding doors</div>`, '8:10 AM', 'read'],
+  [4.2, 'in', `<div class="pdf"><div class="pv"><b style="font:800 18px Inter;color:#00203f">RAZAN · QUOTATION</b><br><br><i style="width:80%"></i><i style="width:60%"></i><i style="width:90%"></i></div><div class="meta"><div class="ic">PDF</div>Cut list + price</div></div>`, '9:40 AM'],
+  [5.4, 'out', 'Approved 👍', '9:41 AM', 'read'],
+  [7.6, 'in', `<div class="img" style="background-image:url(../assets/staff-bronze-fluted-door.jpg);background-position:center 30%"></div><div style="padding-top:6px;font-weight:700;color:#1f9d55">✓ Delivered — labelled per door</div>`, 'Next day'],
+];
+function msg(parent, html, cls) { const d = document.createElement('div'); d.className = 'm ' + cls; d.innerHTML = html; parent.appendChild(d); return d; }
+const lEls = LEFT.map(([t, who, text, tm, bad]) => {
+  let el;
+  if (who === 'sys') el = msg($('tl'), text, 'sys');
+  else if (who === 'me') el = msg($('tl'), `${text}<span class="tm sent">${tm}</span>`, 'out');
+  else el = msg($('tl'), `<div class="who" style="color:${WHO[who][1]}">${WHO[who][0]}</div>${text}<span class="tm">${tm}</span>`, 'in' + (bad ? ' bad' : ''));
+  SFX.push({ t, type: who === 'me' ? 'pop' : 'ping' }); return { el, t };
+});
+const rEls = RIGHT.map(([t, dir, html, tm, st]) => { const el = msg($('tr'), `${html}<span class="tm ${st || ''}">${tm}</span>`, dir); SFX.push({ t, type: 'pop' }); return { el, t }; });
+const TAPS = [[.95, 390, 1560], [5.35, 390, 1560]];     // fake touch indicator on the right phone (send taps)
+
+window.render = t => {
+  $('rt').textContent = `00:${String(Math.floor(t)).padStart(2, '0')}`;
+  ['L', 'R'].forEach((id, i) => { const p = easeOut(prog(t, .1 + i * .15, .5)); $(id).style.opacity = p; $(id).style.transform = `translateY(${lerp(-20, 0, p)}px)`; });
+  [['pl', 0], ['pr', .15]].forEach(([id, d]) => { const p = easeOut(prog(t, d, .55)); $(id).style.opacity = p; $(id).style.transform = `translateY(${lerp(60, 0, p)}px)`; });
+  // left: messages pile up; the thread is bottom-anchored so new ones push the old ones up (screen-recording scroll)
+  let unread = 0;
+  lEls.forEach(({ el, t: a }) => { const on = t >= a; el.style.display = on ? 'block' : 'none'; const p = prog(t, a, .22);
+    el.style.opacity = p; el.style.transform = `translateY(${lerp(30, 0, easeOut(p))}px) scale(${lerp(.96, 1, p)})`; if (on && !el.classList.contains('out') && !el.classList.contains('sys')) unread++; });
+  $('badge').textContent = unread; $('badge').style.opacity = unread ? 1 : 0;
+  $('badge').style.transform = `scale(${1 + .25 * Math.max(0, 1 - lEls.reduce((m, e) => Math.min(m, t >= e.t ? t - e.t : 9), 9) / .2)})`;
+  $('typl').textContent = t > 7.7 ? 'typing…' : 'Message';
+  $('grey').style.background = `rgba(40,20,20,${(.18 * prog(t, 8.0, 1.2)).toFixed(3)})`;          // the mess stays unresolved
+  // right: few, calm messages
+  rEls.forEach(({ el, t: a }) => { const on = t >= a; el.style.display = on ? 'block' : 'none'; const p = prog(t, a, .3);
+    el.style.opacity = p; el.style.transform = `translateY(${lerp(24, 0, easeOut(p))}px)`; });
+  const tap = $('tap'); const tp = TAPS.map(([a, x, y]) => [prog(t, a - .25, .45), x, y]).find(([p]) => p > 0 && p < 1);
+  if (tp) { tap.style.left = tp[1] + 'px'; tap.style.top = tp[2] + 'px'; tap.style.opacity = Math.sin(Math.PI * tp[0]); tap.style.transform = `scale(${lerp(1.3, .8, tp[0])})`; } else tap.style.opacity = 0;
+  $('ravatar').style.opacity = 1;                                                                     // logo avatar: static
+  // footer: logo fades in (never moves), line rises
+  const f = prog(t, 8.6, .7); $('foot').style.opacity = easeOut(f); $('flogo').style.opacity = 1;
+};
+window.SFX = SFX.sort((a, b) => a.t - b.t); window.CFG = { duration: 15, voiceAt: null };
+window.DURATION = 15; window.AUDIO_OFFSET = 0; window.AUDIO = 'sb-split.mp3';
+const q = new URLSearchParams(location.search); window.render(q.has('t') ? +q.get('t') : 14);
+if (q.has('static')) $('rec').style.display = 'none';   // still version: no screen-recording marker
+window.READY = true;
+</script>
+</body>
+</html>

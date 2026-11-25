@@ -18,13 +18,20 @@ def whoosh():                    # soft air whoosh: noise through a sweeping one
         k = 1 - np.exp(-2 * np.pi * cut[i] / SR); a += k * (x[i] - a); y[i] = a
     env = np.sin(np.pi * t / t[-1]) ** 1.5
     return y * env * .45
-T, W = tick(), whoosh()
+def ping():                      # incoming-message ping: two quick soft tones
+    n = int(.16 * SR); t = np.arange(n) / SR
+    a = np.sin(2 * np.pi * 1320 * t) * np.exp(-t * 38) * (t < .07); b = np.sin(2 * np.pi * 1760 * (t - .07)) * np.exp(-(t - .07) * 34) * (t >= .07)
+    return (a + b) * .22
+def pop():                       # sent / calm message: one low soft pop
+    n = int(.12 * SR); t = np.arange(n) / SR
+    return np.sin(2 * np.pi * (520 + 300 * np.exp(-t * 60)) * t) * np.exp(-t * 32) * .3
+T, W, P, O = tick(), whoosh(), ping(), pop()
 for e in sfx:
-    s = int(e['t'] * SR); clip = T if e['type'] == 'tick' else W
+    s = int(e['t'] * SR); clip = {'tick': T, 'whoosh': W, 'ping': P, 'pop': O}[e['type']]
     e2 = min(N, s + len(clip)); track[s:e2] += clip[:e2 - s]
 # voice
-raw = subprocess.run(['ffmpeg', '-v', 'error', '-i', voice_in, '-af', 'loudnorm=I=-16:TP=-1.5', '-ac', '1', '-ar', str(SR), '-f', 'f32le', '-'], capture_output=True).stdout
-v = np.frombuffer(raw, dtype=np.float32).astype(float); s = int(cfg['voiceAt'] * SR); e2 = min(N, s + len(v)); track[s:e2] += v[:e2 - s]
+raw = b'' if voice_in == '-' else subprocess.run(['ffmpeg', '-v', 'error', '-i', voice_in, '-af', 'loudnorm=I=-16:TP=-1.5', '-ac', '1', '-ar', str(SR), '-f', 'f32le', '-'], capture_output=True).stdout
+v = np.frombuffer(raw, dtype=np.float32).astype(float); s = int((cfg.get('voiceAt') or 0) * SR); e2 = min(N, s + len(v)); track[s:e2] += v[:e2 - s]
 track /= max(1.0, np.abs(track).max() / .95)
 pcm = (track * 32767).astype('<i2').tobytes()
 subprocess.run(['ffmpeg', '-v', 'error', '-y', '-f', 's16le', '-ar', str(SR), '-ac', '1', '-i', '-', '-c:a', 'libmp3lame', '-q:a', '2', out], input=pcm, check=True)
