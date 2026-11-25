@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Razan cartoon reel — overlay layer</title>
+<!-- Transparent overlay rendered on top of the AI clips: notifications, captions, stress meter, end card.
+     Brand rule: the Razan logo never rolls, spins, bounces or scales — it only fades. -->
+<style>
+  :root { --navy:#00203f; --sand:#DBAB88; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; background: transparent; }
+  body { font-family: Inter, sans-serif; }
+  #bg { position: absolute; inset: 0; background: #444; display: none; } /* preview only: ?bg */
+  .abs { position: absolute; will-change: transform, opacity; }
+
+  /* phone notifications */
+  .notif { left: 60px; width: 960px; padding: 26px 30px; border-radius: 40px; background: rgba(245,245,247,.86);
+    backdrop-filter: blur(20px); box-shadow: 0 20px 50px rgba(0,0,0,.35); display: flex; gap: 24px; align-items: center; }
+  .notif .ic { width: 84px; height: 84px; border-radius: 20px; flex: none; display: grid; place-items: center; font-size: 46px; }
+  .notif .h { display: flex; justify-content: space-between; font: 700 30px/1.2 Inter; color: #1c1c1e; }
+  .notif .h span { font-weight: 500; color: #8e8e93; font-size: 26px; }
+  .notif .m { font: 500 32px/1.3 Inter; color: #3a3a3c; margin-top: 6px; }
+
+  /* captions — mono, like the reference */
+  #cap { left: 80px; right: 80px; top: 1420px; text-align: center; font: 600 46px/1.35 "JetBrains Mono", monospace;
+    color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,.9), 0 0 18px rgba(0,0,0,.6); white-space: pre-wrap; }
+
+  /* Razan chips */
+  .chip { padding: 20px 34px; border-radius: 999px; background: #fff; color: var(--navy); font: 800 38px/1 Inter;
+    box-shadow: 0 16px 40px rgba(0,0,0,.35); white-space: nowrap; }
+  .chip.navy { background: var(--navy); color: #fff; }
+  #brand { left: 50%; top: 170px; display: flex; align-items: center; gap: 18px; padding: 16px 34px 16px 16px; }
+  #brand i { width: 72px; height: 72px; border-radius: 50%; background: url(assets/logo-mark.png) center/cover; }
+
+  /* stress meter */
+  #meter { left: 140px; width: 800px; top: 190px; padding: 26px 34px; border-radius: 34px; background: rgba(255,255,255,.9);
+    box-shadow: 0 16px 40px rgba(0,0,0,.3); }
+  #meter .lbl { display: flex; justify-content: space-between; font: 800 34px/1 Inter; color: var(--navy); }
+  #meter .track { margin-top: 18px; height: 30px; border-radius: 99px; background: #e6e9ee; overflow: hidden; }
+  #meter .fill { height: 100%; border-radius: 99px; }
+
+  /* end card */
+  #end { inset: 0; background: linear-gradient(180deg, rgba(0,32,63,.55) 0%, rgba(0,32,63,.88) 45%, rgba(0,32,63,.96) 100%); }
+  #logoCard { left: 130px; top: 560px; width: 820px; height: 330px; border-radius: 44px; background: #fff url(assets/logo.png) center/112% auto no-repeat;
+    box-shadow: 0 40px 90px rgba(0,0,0,.4); }
+  .endtxt { left: 0; right: 0; text-align: center; color: #fff; }
+  #t1 { top: 960px; font: 800 60px/1.15 "Inter Display", Inter; }
+  #t2 { top: 1040px; font: 800 60px/1.15 "Inter Display", Inter; color: var(--sand); }
+  #url { top: 1170px; font: 900 92px/1 "Inter Display", Inter; letter-spacing: -.02em; }
+  #wa { left: 50%; top: 1300px; padding: 22px 42px; border-radius: 999px; background: #25D366; color: #fff; font: 800 44px/1 Inter; white-space: nowrap; }
+</style>
+</head>
+<body>
+<div id="bg"></div>
+
+<div id="n1" class="abs notif" style="top:150px"><div class="ic" style="background:#ff9f0a">📦</div><div style="flex:1"><div class="h">Glass Supplier <span>now</span></div><div class="m">Sorry, your order is delayed again. 2 more weeks.</div></div></div>
+<div id="n2" class="abs notif" style="top:360px"><div class="ic" style="background:#8e8e93">🔩</div><div style="flex:1"><div class="h">Aluminium Supplier <span>now</span></div><div class="m">Those profiles are out of stock 😕</div></div></div>
+<div id="n3" class="abs notif" style="top:570px"><div class="ic" style="background:#34c759">💬</div><div style="flex:1"><div class="h">Client · Villa Project <span>now</span></div><div class="m">Any update on my closet doors?? It's been a month!</div></div></div>
+
+<div id="brand" class="abs chip"><i></i>Razan · glass + aluminium</div>
+<div id="k1" class="abs chip navy" style="left:90px;top:1250px">✓ Pre-cut</div>
+<div id="k2" class="abs chip navy" style="left:370px;top:1250px">✓ Labelled</div>
+<div id="k3" class="abs chip" style="left:690px;top:1250px">✓ On time</div>
+
+<div id="meter" class="abs"><div class="lbl"><span>Stress level</span><span id="pct">95%</span></div><div class="track"><div id="fill" class="fill"></div></div></div>
+
+<div id="end" class="abs"></div>
+<div id="logoCard" class="abs"></div>
+<div id="t1" class="abs endtxt">We handle the glass &amp; aluminium.</div>
+<div id="t2" class="abs endtxt">You enjoy the project.</div>
+<div id="url" class="abs endtxt">razanuae.com</div>
+<div id="wa" class="abs">WhatsApp +971 50 201 9281</div>
+
+<div id="cap" class="abs"></div>
+
+<script>
+const $ = id => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, p) => a + (b - a) * p;
+const easeOut = p => 1 - Math.pow(1 - p, 3);
+const easeBack = p => { const c = 1.5; return 1 + (c + 1) * Math.pow(p - 1, 3) + c * Math.pow(p - 1, 2); };
+const prog = (t, a, d) => clamp((t - a) / d);
+
+const AUDIO_OFFSET = 0.5;            // narration starts here
+const A = x => x + AUDIO_OFFSET;
+// Clip cut points (video time). Each clip i plays from CUTS[i] to CUTS[i+1].
+const CUTS = [0, 5.0, 10.6, 17.6, 22.4, 31.5];
+const DURATION = 31.5;
+const END_AT = A(25.6);              // end card in, as "Razan." is spoken
+
+// Narration lines [audio start, audio end, text] — typed out at speaking pace.
+const LINES = [
+  [0.00, 1.77, "Another midnight…"],
+  [2.11, 4.35, "another supplier who never called back."],
+  [4.66, 7.40, "The glass came in the wrong size. Again."],
+  [7.70, 9.34, "And my client is still waiting."],
+  [10.40, 11.72, "Then I found Razan."],
+  [12.07, 14.53, "Glass and aluminium, from one supplier."],
+  [14.85, 17.00, "Pre-cut, labelled, and on time."],
+  [17.30, 19.43, "They took the whole headache off my shoulders."],
+  [19.76, 21.66, "Every door… just fits."],
+  [22.02, 23.75, "Now my projects finish on time…"],
+  [24.01, 25.31, "and I'm home for dinner."],
+];
+
+function set(el, { x = 0, y = 0, s = 1, o = 1, tx = '' } = {}) {
+  el.style.opacity = o.toFixed(4);
+  el.style.transform = `${tx} translate(${x.toFixed(2)}px, ${y.toFixed(2)}px) scale(${s.toFixed(4)})`;
+  el.style.visibility = o <= 0.001 ? 'hidden' : 'visible';
+}
+// slide-in + fade-out between [a, b]
+function inout(t, a, b, { dy = -60, dur = .45, out = .35, tx = '' } = {}) {
+  const pi = easeBack(prog(t, a, dur)), po = prog(t, b - out, out);
+  return { o: clamp(prog(t, a, dur) * 2) * (1 - po), y: lerp(dy, 0, pi), s: lerp(.92, 1, pi), tx };
+}
+
+window.render = function (t) {
+  // 1. notifications pile up over clip 1
+  [['n1', .6], ['n2', 1.7], ['n3', 2.9]].forEach(([id, a]) => set($(id), inout(t, a, CUTS[1] - .05)));
+
+  // 2. Razan brand chip + checklist over clip 3
+  set($('brand'), inout(t, A(10.4), CUTS[3], { tx: 'translateX(-50%)' }));
+  [['k1', A(14.85)], ['k2', A(15.5)], ['k3', A(16.2)]].forEach(([id, a]) => set($(id), inout(t, a, CUTS[3], { dy: 40 })));
+
+  // 3. stress meter drains from red to green over clips 4–5
+  const mp = easeOut(prog(t, CUTS[3] + .4, 6.5));
+  set($('meter'), inout(t, CUTS[3] + .1, END_AT, { dy: -40 }));
+  const pct = Math.round(lerp(95, 8, mp));
+  $('pct').textContent = pct + '%';
+  $('fill').style.width = pct + '%';
+  $('fill').style.background = `hsl(${lerp(2, 140, mp)}, 75%, 50%)`;
+
+  // 4. end card (logo: opacity fade only — never moves)
+  const e = easeOut(prog(t, END_AT, .6));
+  $('end').style.opacity = e;
+  $('logoCard').style.opacity = easeOut(prog(t, END_AT + .2, .6));
+  set($('t1'), inout(t, A(26.55), 99, { dy: 30 }));
+  set($('t2'), inout(t, A(28.7), 99, { dy: 30 }));
+  set($('url'), inout(t, A(29.3), 99, { dy: 30 }));
+  set($('wa'), inout(t, A(29.7), 99, { dy: 30, tx: 'translateX(-50%)' }));
+
+  // 5. captions: typewriter at speaking pace, hidden once the end card is up
+  let txt = '';
+  for (const [a, b, line] of LINES) {
+    const s = A(a), end = A(b) + .35;
+    if (t >= s && t < end) { const n = Math.ceil(line.length * clamp((t - s) / Math.max(.4, (b - a) * .9))); txt = line.slice(0, n); }
+  }
+  $('cap').textContent = txt;
+  $('cap').style.opacity = 1 - e;
+};
+window.DURATION = DURATION; window.CUTS = CUTS; window.AUDIO_OFFSET = AUDIO_OFFSET;
+const q = new URLSearchParams(location.search);
+if (q.has('bg')) $('bg').style.display = 'block';
+window.render(q.has('t') ? +q.get('t') : 2);
+</script>
+</body>
+</html>
