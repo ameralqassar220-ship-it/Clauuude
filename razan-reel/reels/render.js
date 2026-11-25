@@ -22,7 +22,7 @@ if (fs.existsSync(vidDir)) for (const f of fs.readdirSync(vidDir).filter(f => f.
 (async () => {
   const browser = await chromium.launch();
   const page = await browser.newPage({ viewport: { width: 1080, height: 1920 }, deviceScaleFactor: 1 });
-  await page.goto('file://' + path.join(__dirname, id.startsWith('cine-') ? 'engine-cine.html' : 'engine.html') + '?reel=' + id);
+  await page.goto('file://' + path.join(__dirname, id.startsWith('cine-') ? 'engine-cine.html' : id.startsWith('bp-') ? 'engine-bp.html' : 'engine.html') + '?reel=' + id);
   await page.waitForFunction(() => window.READY === true);
   await page.evaluate(() => document.fonts.ready);
   await page.waitForLoadState('networkidle');

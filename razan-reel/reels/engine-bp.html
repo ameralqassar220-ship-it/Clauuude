@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Razan reel engine — architectural blueprint theme</title>
+<!-- Blueprint theme: blue grid paper, white line drawings that draw themselves, dimension lines, pinned drawing sheets,
+     engineering stamps. Load with ?reel=<id> (reads <id>.js). Brand rule: the Razan logo never rolls, spins, bounces or scales — fade only. -->
+<style>
+  :root { --bp:#0c3a66; --bp2:#082a4c; --line:rgba(255,255,255,.92); --cyan:#8fd8ff; --sand:#DBAB88; --navy:#00203f; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; }
+  body { font-family: "Inter Display", Inter, sans-serif; color: #fff; }
+  #stage { position: relative; width: 1080px; height: 1920px; overflow: hidden;
+    background:
+      repeating-linear-gradient(0deg, rgba(255,255,255,.13) 0 2px, transparent 2px 180px),
+      repeating-linear-gradient(90deg, rgba(255,255,255,.13) 0 2px, transparent 2px 180px),
+      repeating-linear-gradient(0deg, rgba(255,255,255,.055) 0 1px, transparent 1px 36px),
+      repeating-linear-gradient(90deg, rgba(255,255,255,.055) 0 1px, transparent 1px 36px),
+      radial-gradient(ellipse at 50% 35%, #134a80 0%, var(--bp) 55%, var(--bp2) 100%); }
+  #frame { position: absolute; inset: 36px; border: 3px solid rgba(255,255,255,.55); }
+  #frame:after { content: ''; position: absolute; inset: 10px; border: 1px solid rgba(255,255,255,.3); }
+  .abs { position: absolute; will-change: transform, opacity; visibility: hidden; }
+  .mono { font-family: "JetBrains Mono", monospace; }
+  #head { left: 36px; right: 36px; top: 36px; height: 150px; border-bottom: 3px solid rgba(255,255,255,.55); display: flex; align-items: center; padding: 0 40px; gap: 26px; }
+  #head i { width: 84px; height: 84px; border-radius: 50%; background: url(../assets/logo-mark.png) center/cover; box-shadow: 0 0 0 4px rgba(255,255,255,.85); flex: none; }
+  #head .t { font: 800 34px/1.1 Inter, sans-serif; letter-spacing: .22em; }
+  #head .t span { display: block; font: 600 20px/1.3 "JetBrains Mono", monospace; letter-spacing: .12em; color: var(--cyan); margin-top: 6px; }
+  #head .r { margin-left: auto; text-align: right; font: 600 22px/1.5 "JetBrains Mono", monospace; color: rgba(255,255,255,.8); }
+  .h1 { left: 80px; right: 80px; top: 230px; font: 800 30px/1 "JetBrains Mono", monospace; letter-spacing: .14em; color: var(--cyan); }
+  .h1 b { display: block; margin-top: 14px; font: 900 78px/1 "Inter Display", sans-serif; letter-spacing: -.01em; color: #fff; text-transform: uppercase; }
+  svg.draw { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: visible; }
+  svg.draw * { vector-effect: non-scaling-stroke; }
+  .dimtxt { font: 700 30px "JetBrains Mono", monospace; fill: #fff; }
+  .sheet { background: #fff; box-shadow: 0 30px 70px rgba(0,0,0,.45); overflow: hidden; }
+  .sheet .page { position: absolute; left: 0; top: 0; background-size: 100% 100%; transform-origin: 0 0; }
+  .sheet .hi { position: absolute; border: 5px solid #1e88e5; border-radius: 10px; background: rgba(30,136,229,.08); }
+  .pin { position: absolute; width: 26px; height: 26px; border-radius: 50%; background: #e3e9f0; box-shadow: 0 4px 8px rgba(0,0,0,.4); }
+  .note { padding: 14px 24px; border: 3px solid #fff; background: rgba(8,42,76,.88); font: 700 34px/1 "JetBrains Mono", monospace; white-space: nowrap; }
+  .note.cy { border-color: var(--cyan); color: var(--cyan); }
+  .stamp { padding: 18px 34px; border: 8px double #ff6b5b; color: #ff6b5b; font: 900 54px/1.05 "JetBrains Mono", monospace; text-align: center;
+    letter-spacing: .06em; background: rgba(255,255,255,.9); white-space: nowrap; }
+  .stamp small { display: block; font-size: 26px; letter-spacing: .14em; margin-top: 6px; }
+  .stamp.ok { border-color: #1f9d55; color: #1f9d55; }
+  .photo { border: 4px solid #fff; overflow: hidden; background: #000; }
+  .photo img, .photo .m { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; background-size: cover; background-position: center; }
+  .tick { position: absolute; width: 60px; height: 60px; border-color: var(--cyan); border-style: solid; }
+  #caps { left: 70px; right: 70px; top: 1500px; visibility: visible; }
+  .cap { position: absolute; left: 0; right: 0; top: 0; display: flex; flex-wrap: wrap; gap: 6px 18px; justify-content: center;
+    font: 900 68px/1.14 "Inter Display", sans-serif; text-shadow: 0 4px 18px rgba(0,0,0,.35); }
+  .w { display: inline-block; }
+  .w.hc { background: var(--cyan); color: var(--navy); padding: 0 16px 6px; border-radius: 10px; text-shadow: none; }
+  .w.hs { background: var(--sand); color: var(--navy); padding: 0 16px 6px; border-radius: 10px; text-shadow: none; }
+  #tb { left: 130px; top: 430px; width: 820px; border: 4px solid #fff; background: rgba(8,42,76,.85); }
+  #tb .logo { height: 330px; margin: 22px; background: #fff url(../assets/logo.png) center/112% auto no-repeat; }
+  #tb .row { display: flex; border-top: 3px solid rgba(255,255,255,.7); }
+  #tb .row div { flex: 1; padding: 22px 26px; font: 600 24px/1.3 "JetBrains Mono", monospace; color: var(--cyan); }
+  #tb .row div + div { border-left: 3px solid rgba(255,255,255,.7); }
+  #tb .row b { display: block; color: #fff; font: 800 44px/1.1 "Inter Display", sans-serif; margin-top: 6px; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="frame"></div>
+  <div id="head" class="abs"><i></i><div class="t">RAZAN<span>GLASS &amp; ALUMINIUM · DOOR DETAIL</span></div><div class="r" id="sheetno"></div></div>
+  <div id="over"></div>
+  <div id="caps" class="abs"></div>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, p) => a + (b - a) * p;
+const easeOut = p => 1 - Math.pow(1 - p, 3);
+const easeInOut = p => p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
+const easeBack = p => { const c = 1.5; return 1 + (c + 1) * Math.pow(p - 1, 3) + c * Math.pow(p - 1, 2); };
+const prog = (t, a, d) => clamp((t - a) / d);
+const IMG = n => `../assets/${n}`;
+const NS = 'http://www.w3.org/2000/svg';
+function el(html) { const d = document.createElement('div'); d.innerHTML = html.trim(); const n = d.firstChild; $('over').appendChild(n); return n; }
+function set(e, { x = 0, y = 0, s = 1, r = 0, o = 1, tx = '' } = {}) {
+  e.style.opacity = o.toFixed(4); e.style.transform = `${tx} translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) rotate(${r}deg) scale(${s.toFixed(4)})`;
+  e.style.visibility = o <= 0.001 ? 'hidden' : 'visible';
+}
+function inout(t, [S, E], d = 0, dy = 50) { const p = easeOut(prog(t, S + d, .5)), q = easeInOut(prog(t, E - .3, .3)); return { o: clamp(prog(t, S + d, .3)) * (1 - q), y: lerp(dy, 0, p) - 20 * q }; }
+// draw-on for svg paths/lines: returns updater(p 0..1)
+function drawable(node) { const L = node.getTotalLength ? node.getTotalLength() : 1000; node.style.strokeDasharray = L; return p => { node.style.strokeDashoffset = L * (1 - p); }; }
+function svgEl(svg, tag, attrs) { const n = document.createElementNS(NS, tag); for (const k in attrs) n.setAttribute(k, attrs[k]); svg.appendChild(n); return n; }
+// dimension line from (x1,y1) to (x2,y2) with end ticks and a label
+function dim(svg, x1, y1, x2, y2, label, off = [0, 0]) {
+  const g = svgEl(svg, 'g', { stroke: '#8fd8ff', 'stroke-width': 3, fill: 'none' });
+  const l = svgEl(g, 'line', { x1, y1, x2, y2 });
+  const v = x1 === x2, tk = 18;
+  const t1 = svgEl(g, 'line', v ? { x1: x1 - tk, y1, x2: x1 + tk, y2: y1 } : { x1, y1: y1 - tk, x2: x1, y2: y1 + tk });
+  const t2 = svgEl(g, 'line', v ? { x1: x2 - tk, y1: y2, x2: x2 + tk, y2 } : { x1: x2, y1: y2 - tk, x2, y2: y2 + tk });
+  const tx = svgEl(svg, 'text', { x: (x1 + x2) / 2 + off[0], y: (y1 + y2) / 2 + off[1], class: 'dimtxt', 'text-anchor': 'middle', fill: '#8fd8ff' }); tx.textContent = label;
+  if (v) tx.setAttribute('transform', `rotate(-90 ${(x1 + x2) / 2 + off[0]} ${(y1 + y2) / 2 + off[1]})`);
+  const d = [l, t1, t2].map(drawable);
+  return p => { d.forEach(f => f(easeOut(p))); tx.style.opacity = clamp((p - .5) * 2); g.style.opacity = p > 0 ? 1 : 0; };
+}
+
+const TYPES = {
+  // Door elevation that draws itself, dimensions, then real footage fills the outline ("drawn" -> "made").
+  door(sc) {
+    const svg = document.createElementNS(NS, 'svg'); svg.setAttribute('class', 'draw'); svg.setAttribute('viewBox', '0 0 1080 1920'); $('over').appendChild(svg);
+    const X = 330, Y = 470, W = 400, H = 900;
+    const ph = el(`<div class="abs photo" style="left:${X}px;top:${Y}px;width:${W}px;height:${H}px;border:none"><img></div>`); const img = ph.querySelector('img');
+    const frame = svgEl(svg, 'rect', { x: X, y: Y, width: W, height: H, stroke: '#fff', 'stroke-width': 5, fill: 'none' });
+    const inner = svgEl(svg, 'rect', { x: X + 26, y: Y + 26, width: W - 52, height: H - 52, stroke: '#fff', 'stroke-width': 2.5, fill: 'none' });
+    const flutes = []; for (let i = 1; i < 12; i++) flutes.push(svgEl(svg, 'line', { x1: X + 26 + i * (W - 52) / 12, y1: Y + 26, x2: X + 26 + i * (W - 52) / 12, y2: Y + H - 26, stroke: 'rgba(255,255,255,.45)', 'stroke-width': 1.5 }));
+    const hinges = [0.11, 0.81].map(f => svgEl(svg, 'rect', { x: X - 16, y: Y + H * f - 30, width: 22, height: 60, stroke: '#fff', 'stroke-width': 3, fill: 'rgba(143,216,255,.25)' }));
+    const handle = svgEl(svg, 'line', { x1: X + W - 14, y1: Y + 40, x2: X + W - 14, y2: Y + H - 40, stroke: '#fff', 'stroke-width': 6 });
+    const dW = dim(svg, X, Y - 60, X + W, Y - 60, '472', [0, -18]);
+    const dH = dim(svg, X + W + 70, Y, X + W + 70, Y + H, '2095', [-22, 0]);
+    const dA = dim(svg, X - 70, Y, X - 70, Y + H * .11, '100', [-22, 0]);
+    const dB = dim(svg, X - 130, Y, X - 130, Y + H * .81, '732', [-22, 0]);
+    const draws = [frame, inner, handle, ...hinges].map(drawable), fl = flutes.map(drawable);
+    const h = el(`<div class="abs h1">${sc.kicker}<b>${sc.title}</b></div>`), h2 = el(`<div class="abs h1">${sc.kicker2}<b>${sc.title2}</b></div>`);
+    const tol = el(`<div class="abs note cy" style="left:330px;top:1400px">TOLERANCE ±1 mm</div>`);
+    let last = -1;
+    return t => { const [S, E] = sc.win, M = S + sc.madeAt, out = 1 - easeInOut(prog(t, E - .35, .35));
+      svg.style.opacity = out; svg.style.visibility = t >= S && t < E ? 'visible' : 'hidden';
+      draws.forEach((d, i) => d(easeInOut(prog(t, S + .1 + i * .12, 1.0)))); fl.forEach((d, i) => d(prog(t, S + .6 + i * .05, .5)));
+      dW(prog(t, S + .8, .6)); dH(prog(t, S + 1.0, .6)); dA(prog(t, S + 1.2, .5)); dB(prog(t, S + 1.35, .5));
+      set(h, { ...inout(t, [S, M + .1], .1), }); set(h2, inout(t, [M, E], 0)); set(tol, inout(t, [S, E], 1.4, 30));
+      // real door fills the outline from the bottom up
+      const r = easeInOut(prog(t, M, .7)); ph.style.clipPath = `inset(${(1 - r) * 100}% 0 0 0)`; set(ph, { o: (r > 0 ? 1 : 0) * out });
+      [inner, ...flutes].forEach(n => n.style.opacity = 1 - r * .85);
+      if (t >= M - .05 && t < E) { const f = Math.min(sc.frames, Math.max(1, 1 + Math.floor((t - M + (sc.from || 0)) * 30)));
+        if (f !== last) { last = f; img.src = `../.cache/clips/${sc.clip}/f_${String(f).padStart(4, '0')}.jpg`; return img.decode().catch(() => {}); } }
+    };
+  },
+  // A drawing sheet pinned to the board, panned/zoomed ({fx,fy,z}), with highlights, annotations and stamps.
+  sheet(sc) {
+    const CW = 900, CH = sc.h || 1000, AR = 1653 / 2339;
+    const c = el(`<div class="abs sheet" style="left:90px;top:${sc.top || 300}px;width:${CW}px;height:${CH}px"></div>`);
+    const page = document.createElement('div'); page.className = 'page'; page.style.backgroundImage = `url(${IMG(sc.img)})`; page.style.width = CW + 'px'; page.style.height = CW / AR + 'px'; c.appendChild(page);
+    [[18, 18], [CW - 44, 18]].forEach(([x, y]) => { const p = document.createElement('div'); p.className = 'pin'; p.style.left = x + 'px'; p.style.top = y + 'px'; c.appendChild(p); });
+    const his = (sc.highlights || []).map(([x0, y0, x1, y1]) => { const h = document.createElement('div'); h.className = 'hi'; Object.assign(h.style, { left: x0 * 100 + '%', top: y0 * 100 + '%', width: (x1 - x0) * 100 + '%', height: (y1 - y0) * 100 + '%' }); page.appendChild(h); return h; });
+    const notes = (sc.notes || []).map(n => el(`<div class="abs note ${n.cy ? 'cy' : ''}" style="left:${n.x}px;top:${n.y}px">${n.text}</div>`));
+    const stamps = (sc.stamps || []).map(s => el(`<div class="abs stamp ${s.ok ? 'ok' : ''}" style="left:${s.x}px;top:${s.y}px">${s.text}${s.small ? `<small>${s.small}</small>` : ''}</div>`));
+    return t => { const w = sc.win, p = easeInOut(prog(t, w[0] + .3, Math.max(1, (w[1] - w[0]) * .6)));
+      const pi = easeBack(prog(t, w[0], .55)), po = easeInOut(prog(t, w[1] - .35, .35));
+      set(c, { o: clamp(prog(t, w[0], .25)) * (1 - po), y: lerp(120, 0, pi) - 60 * po, r: lerp(-4, sc.rot || -1.2, pi) });
+      const fx = lerp(sc.from.fx, sc.to.fx, p), fy = lerp(sc.from.fy, sc.to.fy, p), z = lerp(sc.from.z, sc.to.z, p), pw = CW * z, ph = CW / AR * z;
+      page.style.transform = `translate(${(CW / 2 - fx * pw).toFixed(1)}px, ${(CH / 2 - fy * ph).toFixed(1)}px) scale(${z.toFixed(4)})`;
+      his.forEach((h, i) => { h.style.opacity = prog(t, w[0] + (sc.hiAt || .8) + i * .3, .4); h.style.borderWidth = (5 / z).toFixed(2) + 'px'; });
+      notes.forEach((n, i) => set(n, { ...inout(t, w, sc.notes[i].at, 0), x: lerp(-60, 0, easeOut(prog(t, w[0] + sc.notes[i].at, .45))) }));
+      stamps.forEach((s, i) => { const a = w[0] + sc.stamps[i].at, q = prog(t, a, .2), o = 1 - easeInOut(prog(t, w[1] - .35, .35));
+        s.style.visibility = q > 0 && o > 0 ? 'visible' : 'hidden'; s.style.opacity = clamp(q * 3) * o; s.style.transform = `rotate(${sc.stamps[i].r ?? -10}deg) scale(${lerp(2.1, 1, easeOut(q))})`; });
+    };
+  },
+  // Real footage/photo in a white frame with cyan corner ticks and annotations.
+  reveal(sc) {
+    const X = 140, Y = 300, W = 800, H = 1080;
+    const ph = el(`<div class="abs photo" style="left:${X}px;top:${Y}px;width:${W}px;height:${H}px">${sc.clip ? '<img>' : `<div class="m" style="background-image:url(${IMG(sc.img)})"></div>`}</div>`);
+    const ticks = [[X - 24, Y - 24, '6px 0 0 6px'], [X + W - 36, Y - 24, '6px 6px 0 0'], [X - 24, Y + H - 36, '0 0 6px 6px'], [X + W - 36, Y + H - 36, '0 6px 6px 0']]
+      .map(([x, y, bw]) => el(`<div class="abs tick" style="left:${x}px;top:${y}px;border-width:${bw}"></div>`));
+    const notes = (sc.notes || []).map(n => el(`<div class="abs note ${n.cy ? 'cy' : ''}" style="left:${n.x}px;top:${n.y}px">${n.text}</div>`));
+    const img = ph.querySelector('img'); let last = -1;
+    return t => { const w = sc.win, pi = easeOut(prog(t, w[0], .6)), po = easeInOut(prog(t, w[1] - .35, .35));
+      set(ph, { o: clamp(prog(t, w[0], .3)) * (1 - po) }); ph.style.clipPath = `inset(0 ${(1 - pi) * 100}% 0 0)`;
+      ticks.forEach((k, i) => set(k, { o: prog(t, w[0] + .3, .3) * (1 - po), s: lerp(1.6, 1, easeOut(prog(t, w[0] + .3, .4))) }));
+      notes.forEach((n, i) => set(n, { ...inout(t, w, sc.notes[i].at, 0), x: lerp(-60, 0, easeOut(prog(t, w[0] + sc.notes[i].at, .45))) }));
+      if (img && t >= w[0] - .05 && t < w[1] + .05) { const f = Math.min(sc.frames, Math.max(1, 1 + Math.floor((t - w[0] + (sc.from || 0)) * 30)));
+        if (f !== last) { last = f; img.src = `../.cache/clips/${sc.clip}/f_${String(f).padStart(4, '0')}.jpg`; return img.decode().catch(() => {}); } }
+    };
+  },
+  // Title block: logo (fade only), website, WhatsApp, tagline.
+  cta(sc) {
+    const tb = el(`<div class="abs" id="tb"><div class="logo"></div>
+      <div class="row"><div>WEB<b>razanuae.com</b></div></div>
+      <div class="row"><div>WHATSAPP<b>+971 50 201 9281</b></div></div>
+      <div class="row"><div>PROJECT<b style="font-size:34px">${sc.line || ''}</b></div><div style="flex:.55">REV<b>0</b></div></div></div>`);
+    return t => { const S = sc.win[0], p = easeOut(prog(t, S, .6));
+      set(tb, { o: p });                                              // whole title block (incl. logo) fades — no motion on the logo
+      tb.style.clipPath = `inset(0 0 ${(1 - easeOut(prog(t, S, .9))) * 100}% 0)`; };
+  },
+};
+
+function boot(R) {
+  const A = x => x + R.offset;
+  R.scenes.forEach((sc, i) => { sc.win = [i === 0 ? 0 : A(sc.at) - .15, i + 1 < R.scenes.length ? A(R.scenes[i + 1].at) - .15 : R.duration + 1]; });
+  const ups = R.scenes.map(sc => TYPES[sc.type](sc));
+  const SP = R.spoken || {};
+  const caps = R.caps.map((g, gi) => {
+    const box = document.createElement('div'); box.className = 'cap'; const words = [], times = [];
+    g.segs.forEach(([sa, sb, text]) => { const ws = text.split(' '), wt = ws.map(w => (SP[w] || w.replace(/[^\w]/g, '').length) + 2);
+      const tot = wt.reduce((a, b) => a + b, 0); let acc = 0; ws.forEach((w, i) => { times.push(A(sa + (sb - sa) * acc / tot) - .04); acc += wt[i]; words.push(w); }); });
+    const spans = words.map((w, i) => { const s = document.createElement('span'); s.className = 'w' + (g.hl && g.hl[i] ? ' ' + g.hl[i] : ''); s.textContent = w; box.appendChild(s); return s; });
+    $('caps').appendChild(box);
+    const b = gi + 1 < R.caps.length ? A(R.caps[gi + 1].segs[0][0]) - .06 : R.duration + 1;
+    return { a: times[0], b, box, spans, times };
+  });
+  const n = R.scenes.length;
+  window.render = t => {
+    const pend = ups.map(u => u(t)).filter(Boolean);
+    set($('head'), { o: prog(t, .1, .5) });                       // header incl. logo mark: fade only
+    const si = Math.max(0, R.scenes.findIndex(sc => t >= sc.win[0] && t < sc.win[1]));
+    $('sheetno').innerHTML = `SHEET ${String(si + 1).padStart(2, '0')} / ${String(n).padStart(2, '0')}<br>SCALE 1:10 · DIM. mm`;
+    caps.forEach(c => { c.box.style.visibility = (t >= c.a - .01 && t < c.b) ? 'visible' : 'hidden'; c.box.style.opacity = 1 - easeInOut(prog(t, c.b - .2, .2));
+      c.spans.forEach((w, i) => { const p = prog(t, c.times[i], .22); w.style.opacity = clamp(p * 3); w.style.transform = `translateY(${lerp(24, 0, easeOut(p))}px) scale(${lerp(.8, 1, easeBack(p))})`; }); });
+    return pend.length ? Promise.all(pend) : undefined;
+  };
+  window.DURATION = R.duration; window.AUDIO_OFFSET = R.offset; window.AUDIO = R.audio;
+  const q = new URLSearchParams(location.search); window.render(q.has('t') ? +q.get('t') : 1.5);
+  window.READY = true;
+}
+const id = new URLSearchParams(location.search).get('reel');
+const s = document.createElement('script'); s.src = `${id}.js`; s.onload = () => boot(window.REEL); document.body.appendChild(s);
+</script>
+</body>
+</html>

@@ -1,5 +1,5 @@
 // Cinematic theme — "Custom glass doors for closets & kitchens: who we are, our team, how we help".
-// Voiceover: ../audio/cine-doors.mp3, assembled from existing recordings by ../cine/assemble_audio.py (times below = that track).
+// Voiceover: ../audio/cine-doors.mp3, assembled from existing recordings by ../tools/assemble_audio.py cine-doors (times below = that track).
 window.REEL = {
   audio: 'cine-doors.mp3', offset: 0.3, duration: 31,
   spoken: { 'razanuae.com!': 17, 'UAE?': 6 },
