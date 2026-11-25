@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Razan — ad 9 "The Clock" (flat 2D, 9:16, ~10 s)</title>
+<!-- Flat 2D series (see sb-explainer.html). A drawing goes into a wall clock at 8:00, the hands spin twice, a quote pops out at 10:00. Logo only fades in on the end card. -->
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; }
+  body { font-family: "Inter Display", Inter, sans-serif; }
+  #stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: linear-gradient(180deg, #dff1ff 0%, #f3f9ff 62%, #fff7e6 62.1%, #fff2d6 100%); }
+  svg { position: absolute; left: 0; top: 0; }
+  .lbl { font: 900 40px "Inter Display", Inter; letter-spacing: .06em; fill: #fff; }
+  .small { font: 800 34px Inter; fill: #1d2b3a; }
+  #caps { position: absolute; left: 60px; right: 60px; top: 1600px; display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 16px;
+    font: 900 64px/1.15 "Inter Display", Inter; color: #1d2b3a; text-align: center; }
+  .w { display: inline-block; } .w.k { color: #fff; background: #ff6b4a; padding: 0 14px 6px; border-radius: 14px; } .w.g { color: #fff; background: #1fae5b; padding: 0 14px 6px; border-radius: 14px; }
+  .w.b { color: #fff; background: #00203f; padding: 0 14px 6px; border-radius: 14px; }
+  #end { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 30%, #0b3358 0%, #00203f 60%, #00142a 100%); color: #fff; opacity: 0; }
+  #end .logo { position: absolute; left: 190px; top: 420px; width: 700px; height: 280px; border-radius: 34px; background: #fff url(../assets/logo.png) center/112% auto no-repeat; }
+  #end .l1 { position: absolute; left: 0; right: 0; top: 820px; text-align: center; font: 900 100px/1.05 "Inter Display", Inter; }
+  #end .l2 { position: absolute; left: 0; right: 0; top: 950px; text-align: center; font: 800 70px/1.1 "Inter Display", Inter; color: #DBAB88; }
+  #end .btn { position: absolute; left: 50%; top: 1140px; padding: 34px 90px; border-radius: 999px; background: #25D366; font: 800 56px/1 Inter; white-space: nowrap; }
+  #end .url { position: absolute; left: 0; right: 0; top: 1300px; text-align: center; font: 600 36px Inter; color: rgba(255,255,255,.8); }
+</style>
+</head>
+<body>
+<div id="stage">
+  <svg id="s" width="1080" height="1920" viewBox="0 0 1080 1920"></svg>
+  <div id="caps"></div>
+  <div id="end"><div class="logo" id="elogo"></div><div class="l1">Send your drawing.</div><div class="l2">Price in 2 hours.</div><div class="btn">Get a quote</div><div class="url">razanuae.com · WhatsApp +971 50 201 9281</div></div>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, p) => a + (b - a) * p;
+const easeOut = p => 1 - Math.pow(1 - p, 3);
+const easeInOut = p => p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
+const easeBack = p => { const c = 1.7; return 1 + (c + 1) * Math.pow(p - 1, 3) + c * Math.pow(p - 1, 2); };
+const prog = (t, a, d) => clamp((t - a) / d);
+const OFF = 0.3, A = x => x + OFF;              // narration starts 0.3 s in; beat times below are narration times
+const NS = 'http://www.w3.org/2000/svg', S = $('s');
+const SFX = [];
+function g(parent = S) { const n = document.createElementNS(NS, 'g'); parent.appendChild(n); return n; }
+function add(parent, tag, at, txt) { const n = document.createElementNS(NS, tag); for (const k in at) n.setAttribute(k, at[k]); if (txt != null) n.textContent = txt; parent.appendChild(n); return n; }
+function T(n, x, y, s = 1, o = 1, r = 0) { n.setAttribute('transform', `translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${r.toFixed(2)}) scale(${s.toFixed(4)})`); n.style.opacity = o.toFixed(3); n.style.display = o <= .001 ? 'none' : ''; }
+function pill(p, text, color, y = 0) { const b = g(p); const w = text.length * 25 + 60;
+  add(b, 'rect', { x: -w / 2, y: y - 34, width: w, height: 68, rx: 34, fill: color }); add(b, 'text', { x: 0, y: y + 13, 'text-anchor': 'middle', class: 'lbl' }, text); return b; }
+// captions: [start, end, text, highlights, segments?] in narration time, word-by-word
+function buildCaps(LINES) { return LINES.map(([a, b, text, hl, segs]) => { const box = document.createElement('div'); box.style.cssText = 'position:absolute;left:0;right:0;top:0;display:flex;flex-wrap:wrap;justify-content:center;gap:4px 16px';
+  const words = text.split(' '); segs = segs || [[a, b]];
+  const per = segs.map(() => []); { const tot = words.reduce((s, w) => s + w.length, 0); let acc = 0, si = 0, segTot = segs.reduce((s, [x, y]) => s + (y - x), 0), segAcc = segs[0][1] - segs[0][0];
+    words.forEach(w => { if (acc / tot > segAcc / segTot + .02 && si < segs.length - 1) { si++; segAcc += segs[si][1] - segs[si][0]; } per[si].push(w); acc += w.length; }); }
+  const spans = [], times = []; let wi = 0;
+  per.forEach((ws, si) => { const [x, y] = segs[si], L = ws.reduce((s, w) => s + w.length + 2, 0); let acc = 0;
+    ws.forEach(w => { const sp = document.createElement('span'); sp.className = 'w' + (hl[wi] ? ' ' + hl[wi] : ''); sp.textContent = w; box.appendChild(sp); spans.push(sp); times.push(A(x + (y - x) * acc / L) - .05); acc += w.length + 2; wi++; }); });
+  $('caps').appendChild(box); return { box, spans, times, a: A(a) - .1 }; }); }
+function renderCaps(caps, t, endAt) { caps.forEach((c, i) => { const nxt = i + 1 < caps.length ? caps[i + 1].a : endAt; c.box.style.display = t >= c.a && t < nxt ? 'flex' : 'none';
+  c.spans.forEach((w, j) => { const p = prog(t, c.times[j], .25); w.style.opacity = clamp(p * 3); w.style.transform = `translateY(${lerp(18, 0, easeOut(p))}px)`; }); }); }
+function renderEnd(t, at) { const e = easeInOut(prog(t, at, .5)); $('end').style.opacity = e;
+  $('elogo').style.opacity = easeOut(prog(t, at + .15, .5));                                     // logo: fade only, never moves
+  $('end').querySelectorAll('.l1,.l2,.btn,.url').forEach((n, i) => { const q = prog(t, at + .25 + i * .35, .4); n.style.opacity = q;
+    n.style.transform = (n.classList.contains('btn') ? 'translateX(-50%) ' : '') + `translateY(${lerp(30, 0, easeOut(q))}px)`; }); }
+// stick figure (centred on hips); returns {root, mouth, armR}
+function stick(p, color = '#1d2b3a') { const root = g(p);
+  add(root, 'circle', { cx: 0, cy: -150, r: 46, fill: '#fff', stroke: color, 'stroke-width': 8 });
+  const mouth = add(root, 'path', { d: 'M-20,-136 Q0,-112 20,-136', stroke: color, 'stroke-width': 7, fill: 'none', 'stroke-linecap': 'round' });
+  add(root, 'circle', { cx: -16, cy: -158, r: 6, fill: color }); add(root, 'circle', { cx: 16, cy: -158, r: 6, fill: color });
+  add(root, 'path', { d: 'M0,-104 V40 M0,40 L-40,140 M0,40 L40,140 M0,-70 L-46,-30', stroke: color, 'stroke-width': 9, fill: 'none', 'stroke-linecap': 'round' });
+  const armR = add(root, 'path', { d: 'M0,-70 L46,-30', stroke: color, 'stroke-width': 9, fill: 'none', 'stroke-linecap': 'round' });
+  return { root, mouth, armR }; }
+/* Ad 9 "The Clock" — narration audio/x10/09-clock.mp3:
+   0.22–1.06 "Send a drawing." · 1.89–2.75 "Two hours later," · 2.99–4.05 "you have your price." · 4.57–5.23 "That's it." · (laugh) · 6.35–7.52 "That's the whole ad." */
+const CX = 540, CY = 820, R = 330;
+// slots
+const slotIn = g(); add(slotIn, 'rect', { x: -110, y: -22, width: 220, height: 44, rx: 12, fill: '#00203f' }); add(slotIn, 'text', { x: 0, y: -40, 'text-anchor': 'middle', class: 'small' }, 'IN');
+const slotOut = g(); add(slotOut, 'rect', { x: -110, y: -22, width: 220, height: 44, rx: 12, fill: '#00203f' }); add(slotOut, 'text', { x: 0, y: -40, 'text-anchor': 'middle', class: 'small' }, 'OUT');
+// drawing paper
+const paper = g(); add(paper, 'rect', { x: -90, y: -115, width: 180, height: 230, rx: 12, fill: '#fff', stroke: '#1d2b3a', 'stroke-width': 6 });
+[0, 1, 2, 3].forEach(i => add(paper, 'rect', { x: -60, y: -80 + i * 40, width: i % 2 ? 80 : 120, height: 12, rx: 6, fill: '#9bb8d3' }));
+add(paper, 'rect', { x: -50, y: 70, width: 100, height: 30, fill: 'none', stroke: '#2f8fd6', 'stroke-width': 5 });
+// clock
+const clock = g();
+add(clock, 'circle', { cx: 0, cy: 0, r: R + 26, fill: '#00203f' });
+add(clock, 'circle', { cx: 0, cy: 0, r: R, fill: '#fff' });
+for (let i = 0; i < 60; i++) { const a = i * 6 * Math.PI / 180, big = i % 5 === 0, r1 = R - (big ? 44 : 22);
+  add(clock, 'line', { x1: Math.sin(a) * r1, y1: -Math.cos(a) * r1, x2: Math.sin(a) * (R - 10), y2: -Math.cos(a) * (R - 10), stroke: big ? '#00203f' : '#c9d3dd', 'stroke-width': big ? 9 : 4, 'stroke-linecap': 'round' }); }
+const NUMS = {}; for (let h = 1; h <= 12; h++) { const a = h * 30 * Math.PI / 180, hot = h === 8 || h === 10;
+  NUMS[h] = add(clock, 'text', { x: Math.sin(a) * (R - 92), y: -Math.cos(a) * (R - 92) + 20, 'text-anchor': 'middle', style: `font:900 ${hot ? 64 : 52}px "Inter Display";fill:${hot ? '#1fae5b' : '#1d2b3a'}` }, h); }
+const arc = add(clock, 'path', { d: '', fill: 'rgba(31,174,91,.16)' });
+const hourH = add(clock, 'line', { x1: 0, y1: 20, x2: 0, y2: -170, stroke: '#00203f', 'stroke-width': 22, 'stroke-linecap': 'round' });
+const minH = add(clock, 'line', { x1: 0, y1: 30, x2: 0, y2: -260, stroke: '#ff6b4a', 'stroke-width': 12, 'stroke-linecap': 'round' });
+add(clock, 'circle', { cx: 0, cy: 0, r: 22, fill: '#DBAB88' });
+// wink face (for "That's the whole ad.")
+const face = g(clock); add(face, 'circle', { cx: -110, cy: -40, r: 18, fill: '#00203f' });
+const winkEye = add(face, 'path', { d: 'M90,-40 Q110,-58 130,-40', stroke: '#00203f', 'stroke-width': 10, fill: 'none', 'stroke-linecap': 'round' });
+add(face, 'path', { d: 'M-80,90 Q0,150 80,90', stroke: '#00203f', 'stroke-width': 12, fill: 'none', 'stroke-linecap': 'round' });
+// digital time chip
+const timeChip = g(); const timeBg = add(timeChip, 'rect', { x: -150, y: -50, width: 300, height: 100, rx: 50, fill: '#00203f' });
+const timeTxt = add(timeChip, 'text', { x: 0, y: 22, 'text-anchor': 'middle', style: 'font:900 64px "JetBrains Mono";fill:#fff' }, '8:00');
+// quote card
+const quote = g(); add(quote, 'rect', { x: -170, y: -150, width: 340, height: 300, rx: 24, fill: '#fff', stroke: '#1fae5b', 'stroke-width': 8 });
+add(quote, 'rect', { x: -170, y: -150, width: 340, height: 70, rx: 24, fill: '#1fae5b' }); add(quote, 'rect', { x: -170, y: -110, width: 340, height: 30, fill: '#1fae5b' });
+add(quote, 'text', { x: 0, y: -100, 'text-anchor': 'middle', class: 'lbl' }, 'QUOTE');
+add(quote, 'text', { x: 0, y: 0, 'text-anchor': 'middle', style: 'font:900 62px "Inter Display";fill:#00203f' }, 'PRICE');
+add(quote, 'text', { x: 0, y: 70, 'text-anchor': 'middle', style: 'font:800 38px Inter;fill:#1fae5b' }, '✓ Cut list');
+const twoH = pill(S, '2 HOURS', '#1fae5b');
+const done = g(); add(done, 'circle', { cx: 0, cy: 0, r: 70, fill: '#1fae5b' }); add(done, 'path', { d: 'M-30,0 L-8,24 L34,-24', stroke: '#fff', 'stroke-width': 14, fill: 'none', 'stroke-linecap': 'round', 'stroke-linejoin': 'round' });
+const bubble = g(); add(bubble, 'rect', { x: -60, y: -55, width: 120, height: 110, rx: 40, fill: '#fff', stroke: '#1d2b3a', 'stroke-width': 5 });
+add(bubble, 'text', { x: 0, y: 26, 'text-anchor': 'middle', style: 'font:64px "Noto Color Emoji"' }, '😉');
+
+// timings (narration time)
+const SPIN0 = 1.95, SPIN1 = 3.95;                 // minute hand: two full turns during "Two hours later, you have your…"
+SFX.push({ t: A(0.35), type: 'whoosh' }, { t: A(0.95), type: 'click' });
+for (let k = 0; k < 16; k++) SFX.push({ t: A(SPIN0 + (SPIN1 - SPIN0) * k / 16), type: 'tick' });
+SFX.push({ t: A(4.0), type: 'ding' }, { t: A(4.1), type: 'pop' }, { t: A(4.6), type: 'pop' }, { t: A(6.35), type: 'pop' });
+
+const caps = buildCaps([
+  [0.22, 1.06, 'Send a drawing.', { 2: 'b' }],
+  [1.89, 4.05, 'Two hours later, you have your price.', { 0: 'g', 1: 'g', 6: 'g' }, [[1.89, 2.75], [2.99, 4.05]]],
+  [4.57, 5.6, "That's it.", { 1: 'g' }],
+  [6.35, 7.52, "That's the whole ad.", { 2: 'b', 3: 'b' }],
+]);
+const END = A(7.52) + .25, DUR = 10.5;
+
+window.render = t => {
+  T(clock, CX, CY, lerp(.85, 1, easeBack(prog(t, .0, .5))), clamp(prog(t, 0, .25)));
+  T(slotIn, 130, 1260, 1, clamp(prog(t, .2, .3))); T(slotOut, 950, 1260, 1, clamp(prog(t, .2, .3)));
+  // paper slides in to the IN slot and disappears into it
+  const pin = easeInOut(prog(t, A(.45), .7)); T(paper, lerp(250, 130, pin), lerp(1400, 1260, pin), lerp(1.1, .5, pin), clamp(prog(t, A(.05), .2)) * (1 - prog(t, A(1.15), .2)), lerp(-14, 0, pin));
+  // hands: 8:00 -> 10:00 (minute hand two full turns, hour hand 8 -> 10)
+  const sp = easeInOut(prog(t, A(SPIN0), SPIN1 - SPIN0));
+  minH.setAttribute('transform', `rotate(${(720 * sp).toFixed(2)})`); hourH.setAttribute('transform', `rotate(${(240 + 60 * sp).toFixed(2)})`);
+  const a0 = 240 * Math.PI / 180, a1 = (240 + 60 * sp) * Math.PI / 180, rr = R - 30;
+  arc.setAttribute('d', sp > .001 ? `M0,0 L${(Math.sin(a0) * rr).toFixed(1)},${(-Math.cos(a0) * rr).toFixed(1)} A${rr},${rr} 0 0 1 ${(Math.sin(a1) * rr).toFixed(1)},${(-Math.cos(a1) * rr).toFixed(1)} Z` : '');
+  const mins = Math.floor(120 * sp), hh = 8 + Math.floor(mins / 60), mm = mins % 60; timeTxt.textContent = `${hh}:${String(mm).padStart(2, '0')}`;
+  timeBg.setAttribute('fill', sp >= 1 ? '#1fae5b' : '#00203f');
+  T(timeChip, CX, 330, 1, clamp(prog(t, .3, .3)));
+  T(twoH, CX, 1240, easeBack(prog(t, A(2.0), .35)), clamp(prog(t, A(2.0), .2)) * (1 - prog(t, A(3.9), .3)));
+  // quote pops out of the OUT slot at 10:00
+  const q = easeBack(prog(t, A(4.0), .55)); T(quote, 950 - lerp(0, 140, q), lerp(1260, 1220, q), lerp(.3, 1, q), clamp(prog(t, A(4.0), .15)));
+  T(done, 300, 1120, easeBack(prog(t, A(4.6), .4)), clamp(prog(t, A(4.6), .15)));
+  // wink on "That's the whole ad."
+  face.style.opacity = clamp(prog(t, A(5.3), .3)); minH.style.opacity = hourH.style.opacity = 1 - .85 * prog(t, A(5.3), .3);
+  const wk = prog(t, A(6.4), .5); winkEye.setAttribute('d', `M90,-40 Q110,${(-58 + 22 * Math.sin(Math.PI * wk)).toFixed(1)} 130,-40`);
+  T(bubble, CX + 300, CY - 330, easeBack(prog(t, A(6.35), .4)), clamp(prog(t, A(6.35), .15)));
+  renderCaps(caps, t, END);
+  renderEnd(t, END);
+};
+window.SFX = SFX.sort((a, b) => a.t - b.t); window.CFG = { duration: DUR, voiceAt: OFF };
+window.DURATION = DUR; window.AUDIO_OFFSET = 0; window.AUDIO = 'sb-x10-09-clock.mp3';
+const qs = new URLSearchParams(location.search); window.render(qs.has('t') ? +qs.get('t') : 3); window.READY = true;
+</script>
+</body>
+</html>
