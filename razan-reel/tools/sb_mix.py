@@ -25,9 +25,19 @@ def ping():                      # incoming-message ping: two quick soft tones
 def pop():                       # sent / calm message: one low soft pop
     n = int(.12 * SR); t = np.arange(n) / SR
     return np.sin(2 * np.pi * (520 + 300 * np.exp(-t * 60)) * t) * np.exp(-t * 32) * .3
-T, W, P, O = tick(), whoosh(), ping(), pop()
+def clunk():                     # parts that don't fit: dull low knock
+    n = int(.22 * SR); t = np.arange(n) / SR
+    return (np.sin(2 * np.pi * 110 * t) * .8 + np.sin(2 * np.pi * 173 * t) * .4 + rng.standard_normal(n) * .15) * np.exp(-t * 22) * .55
+def click():                     # satisfying snap: sharp click + short bright tail
+    n = int(.15 * SR); t = np.arange(n) / SR
+    c = rng.standard_normal(n) * np.exp(-t * 700); c = np.diff(c, prepend=0)
+    return (c * 1.2 + np.sin(2 * np.pi * 1900 * t) * np.exp(-t * 60) * .35) * .6
+def ding():                      # success chime: two bell partials
+    n = int(.9 * SR); t = np.arange(n) / SR
+    return (np.sin(2 * np.pi * 1318 * t) + .5 * np.sin(2 * np.pi * 1976 * t)) * np.exp(-t * 5) * .22
+T, W, P, O, K, C, D = tick(), whoosh(), ping(), pop(), clunk(), click(), ding()
 for e in sfx:
-    s = int(e['t'] * SR); clip = {'tick': T, 'whoosh': W, 'ping': P, 'pop': O}[e['type']]
+    s = int(e['t'] * SR); clip = {'tick': T, 'whoosh': W, 'ping': P, 'pop': O, 'clunk': K, 'click': C, 'ding': D}[e['type']]
     e2 = min(N, s + len(clip)); track[s:e2] += clip[:e2 - s]
 # voice
 raw = b'' if voice_in == '-' else subprocess.run(['ffmpeg', '-v', 'error', '-i', voice_in, '-af', 'loudnorm=I=-16:TP=-1.5', '-ac', '1', '-ar', str(SR), '-f', 'f32le', '-'], capture_output=True).stdout

@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Razan — flat 2D explainer "One drawing. One box. Done." (9:16)</title>
+<!-- Flat, bright 2D explainer. Lego-style blocks (FRAME / GLASS / HINGES), three shops and vans, a stick-figure customer,
+     the Razan factory. Every beat is timed to Douglas's narration (audio/explainer.mp3; times below = that file).
+     Brand rule: the Razan logo never rolls or spins (the logo block only slides straight in, as briefed). -->
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; }
+  body { font-family: "Inter Display", Inter, sans-serif; }
+  #stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: linear-gradient(180deg, #dff1ff 0%, #f3f9ff 62%, #fff7e6 62.1%, #fff2d6 100%); }
+  svg { position: absolute; left: 0; top: 0; }
+  .lbl { font: 900 40px "Inter Display", Inter; letter-spacing: .06em; fill: #fff; }
+  .shop { font: 900 30px Inter; fill: #fff; letter-spacing: .08em; }
+  .tagt { font: 900 34px Inter; fill: #fff; letter-spacing: .04em; }
+  .small { font: 800 34px Inter; fill: #1d2b3a; }
+  #caps { position: absolute; left: 60px; right: 60px; top: 1600px; display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 16px;
+    font: 900 64px/1.15 "Inter Display", Inter; color: #1d2b3a; text-align: center; }
+  .w { display: inline-block; } .w.k { color: #fff; background: #ff6b4a; padding: 0 14px 6px; border-radius: 14px; } .w.g { color: #fff; background: #1fae5b; padding: 0 14px 6px; border-radius: 14px; }
+  .w.b { color: #fff; background: #00203f; padding: 0 14px 6px; border-radius: 14px; }
+  #end { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 30%, #0b3358 0%, #00203f 60%, #00142a 100%); color: #fff; opacity: 0; }
+  #end .logo { position: absolute; left: 190px; top: 420px; width: 700px; height: 280px; border-radius: 34px; background: #fff url(../assets/logo.png) center/112% auto no-repeat; }
+  #end .l1 { position: absolute; left: 0; right: 0; top: 820px; text-align: center; font: 900 100px/1.05 "Inter Display", Inter; }
+  #end .l2 { position: absolute; left: 0; right: 0; top: 950px; text-align: center; font: 800 70px/1.1 "Inter Display", Inter; color: #DBAB88; }
+  #end .btn { position: absolute; left: 50%; top: 1140px; padding: 34px 90px; border-radius: 999px; background: #25D366; font: 800 56px/1 Inter; white-space: nowrap; }
+  #end .url { position: absolute; left: 0; right: 0; top: 1300px; text-align: center; font: 600 36px Inter; color: rgba(255,255,255,.8); }
+</style>
+</head>
+<body>
+<div id="stage">
+  <svg id="s" width="1080" height="1920" viewBox="0 0 1080 1920"></svg>
+  <div id="caps"></div>
+  <div id="end"><div class="logo" id="elogo"></div><div class="l1">Send your drawing.</div><div class="l2">Price in 2 hours.</div><div class="btn">Get a quote</div><div class="url">razanuae.com · WhatsApp +971 50 201 9281</div></div>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, p) => a + (b - a) * p;
+const easeOut = p => 1 - Math.pow(1 - p, 3);
+const easeInOut = p => p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
+const easeBack = p => { const c = 1.7; return 1 + (c + 1) * Math.pow(p - 1, 3) + c * Math.pow(p - 1, 2); };
+const prog = (t, a, d) => clamp((t - a) / d);
+const OFF = 0.3, A = x => x + OFF;              // narration starts 0.3 s in; all beat times below are narration times
+const NS = 'http://www.w3.org/2000/svg', S = $('s');
+const SFX = [];
+function g(parent = S) { const n = document.createElementNS(NS, 'g'); parent.appendChild(n); return n; }
+function add(parent, tag, at, txt) { const n = document.createElementNS(NS, tag); for (const k in at) n.setAttribute(k, at[k]); if (txt != null) n.textContent = txt; parent.appendChild(n); return n; }
+function T(n, x, y, s = 1, o = 1, r = 0) { n.setAttribute('transform', `translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${r.toFixed(2)}) scale(${s.toFixed(4)})`); n.style.opacity = o.toFixed(3); n.style.display = o <= .001 ? 'none' : ''; }
+
+/* ---------- parts (drawn around their centre) ---------- */
+function studs(p, w, y, n, fill) { for (let i = 0; i < n; i++) add(p, 'rect', { x: -w / 2 + (i + .5) * w / n - 22, y: y - 18, width: 44, height: 22, rx: 8, fill }); }
+function frameBlock(p) { const b = g(p); studs(b, 300, -240, 3, '#a9b4c0');
+  add(b, 'path', { d: 'M-150,-240 h300 v480 h-300 Z M-120,-210 v420 h240 v-420 Z', fill: '#8d99a6', 'fill-rule': 'evenodd', stroke: '#5b6670', 'stroke-width': 6, 'stroke-linejoin': 'round' });
+  add(b, 'rect', { x: -150, y: -240, width: 300, height: 26, fill: 'rgba(255,255,255,.18)' }); return b; }
+function glassBlock(p) { const b = g(p);
+  add(b, 'rect', { x: -120, y: -210, width: 240, height: 420, rx: 8, fill: '#6cc4ff', stroke: '#2f8fd6', 'stroke-width': 6 });
+  add(b, 'path', { d: 'M-90,-160 L-20,-200 L-20,-170 L-90,-130 Z M-90,-90 L40,-170 L40,-150 L-90,-70 Z', fill: 'rgba(255,255,255,.6)' }); return b; }
+function hingeBlock(p) { const b = g(p); studs(b, 70, -55, 1, '#ffd36b');
+  add(b, 'rect', { x: -35, y: -55, width: 70, height: 110, rx: 12, fill: '#f5b915', stroke: '#c48c00', 'stroke-width': 6 });
+  add(b, 'circle', { cx: 0, cy: -22, r: 9, fill: '#c48c00' }); add(b, 'circle', { cx: 0, cy: 22, r: 9, fill: '#c48c00' }); return b; }
+function pill(p, text, color, y = 0) { const b = g(p); const w = text.length * 25 + 60;
+  add(b, 'rect', { x: -w / 2, y: y - 34, width: w, height: 68, rx: 34, fill: color }); add(b, 'text', { x: 0, y: y + 13, 'text-anchor': 'middle', class: 'lbl' }, text); return b; }
+function sticker(p, x, y) { const b = g(p); add(b, 'circle', { cx: x, cy: y, r: 34, fill: '#fff', stroke: '#00203f', 'stroke-width': 4 });
+  add(b, 'image', { href: '../assets/logo-mark.png', x: x - 26, y: y - 26, width: 52, height: 52 }); return b; }
+
+/* ---------- scene A: the three parts ---------- */
+const sceneA = g();
+const outline = add(sceneA, 'rect', { x: 330, y: 520, width: 420, height: 640, rx: 16, fill: 'none', stroke: '#9bb8d3', 'stroke-width': 6, 'stroke-dasharray': '22 16' });
+const aWardLbl = add(sceneA, 'text', { x: 540, y: 470, 'text-anchor': 'middle', class: 'small' }, 'Your wardrobe');
+const A_PARTS = [[frameBlock, 230, 1000, 'FRAME', '#5b6670', 4.25], [glassBlock, 560, 1000, 'GLASS', '#2f8fd6', 5.17], [hingeBlock, 860, 1000, 'HINGES', '#d99a00', 6.03]]
+  .map(([fn, x, y, l, c, at]) => { const w = g(sceneA); fn(w); const lb = pill(sceneA, l, c); SFX.push({ t: A(at), type: 'pop' }); return { w, lb, x, y, at: A(at) }; });
+
+/* ---------- scene B: three shops, three problems ---------- */
+const sceneB = g();
+add(sceneB, 'rect', { x: 0, y: 470, width: 1080, height: 100, fill: '#c9d3dd' });
+for (let i = 0; i < 12; i++) add(sceneB, 'rect', { x: 20 + i * 95, y: 515, width: 50, height: 10, rx: 5, fill: '#fff' });
+const SHOPS = [[200, '#ff6b4a', 'SHOP 1'], [540, '#ff9f1c', 'SHOP 2'], [880, '#9b5de5', 'SHOP 3']].map(([x, c, n]) => { const s = g(sceneB);
+  add(s, 'rect', { x: -130, y: -110, width: 260, height: 220, rx: 12, fill: '#fff', stroke: '#1d2b3a', 'stroke-width': 5 });
+  for (let k = 0; k < 5; k++) add(s, 'rect', { x: -140 + k * 56, y: -130, width: 56, height: 54, fill: k % 2 ? '#fff' : c, stroke: '#1d2b3a', 'stroke-width': 4 });
+  add(s, 'rect', { x: -40, y: 10, width: 80, height: 100, fill: c, stroke: '#1d2b3a', 'stroke-width': 4 });
+  add(s, 'rect', { x: -110, y: -60, width: 230, height: 50, rx: 8, fill: c }); add(s, 'text', { x: 5, y: -24, 'text-anchor': 'middle', class: 'shop' }, n);
+  return { s, x, c }; });
+function van(p, c) { const v = g(p);
+  add(v, 'rect', { x: -120, y: -80, width: 170, height: 110, rx: 12, fill: c, stroke: '#1d2b3a', 'stroke-width': 5 });
+  add(v, 'path', { d: 'M50,-50 h50 l30,40 v40 h-80 Z', fill: c, stroke: '#1d2b3a', 'stroke-width': 5, 'stroke-linejoin': 'round' });
+  add(v, 'rect', { x: 62, y: -42, width: 34, height: 26, rx: 4, fill: '#dff1ff' });
+  [-70, 85].forEach(x => { add(v, 'circle', { cx: x, cy: 34, r: 24, fill: '#1d2b3a' }); add(v, 'circle', { cx: x, cy: 34, r: 9, fill: '#c9d3dd' }); }); return v; }
+const VANS = SHOPS.map((sh, i) => ({ v: van(sceneB, sh.c), x: sh.x, at: A([10.48, 12.04, 14.02][i]) }));
+VANS.forEach(v => SFX.push({ t: v.at, type: 'whoosh' }));
+// problem badges
+const late = g(sceneB); add(late, 'circle', { cx: 0, cy: 0, r: 52, fill: '#e03131' }); add(late, 'circle', { cx: 0, cy: 0, r: 38, fill: '#fff' });
+add(late, 'path', { d: 'M0,-26 V0 L18,12', stroke: '#e03131', 'stroke-width': 8, fill: 'none', 'stroke-linecap': 'round' }); const lateP = pill(sceneB, 'LATE', '#e03131');
+const bigGlass = g(sceneB); glassBlock(bigGlass); const wrongP = pill(sceneB, 'WRONG SIZE', '#e03131');
+const empty = g(sceneB); add(empty, 'rect', { x: -60, y: -70, width: 120, height: 140, rx: 14, fill: 'none', stroke: '#e03131', 'stroke-width': 6, 'stroke-dasharray': '16 12' });
+add(empty, 'text', { x: 0, y: 26, 'text-anchor': 'middle', style: 'font:900 80px Inter;fill:#e03131' }, '?'); const noHP = pill(sceneB, 'NO HINGES', '#e03131');
+// assembly attempt
+const bFrame = g(sceneB); frameBlock(bFrame);
+const cross = g(sceneB); add(cross, 'circle', { cx: 0, cy: 0, r: 60, fill: '#e03131' }); add(cross, 'path', { d: 'M-24,-24 L24,24 M24,-24 L-24,24', stroke: '#fff', 'stroke-width': 12, 'stroke-linecap': 'round' });
+SFX.push({ t: A(16.2), type: 'clunk' }); SFX.push({ t: A(16.75), type: 'clunk' });
+
+/* ---------- stick-figure customer ---------- */
+const cust = g();
+add(cust, 'circle', { cx: 0, cy: -150, r: 46, fill: '#fff', stroke: '#1d2b3a', 'stroke-width': 8 });
+const mouth = add(cust, 'path', { d: '', stroke: '#1d2b3a', 'stroke-width': 7, fill: 'none', 'stroke-linecap': 'round' });
+add(cust, 'circle', { cx: -16, cy: -158, r: 6, fill: '#1d2b3a' }); add(cust, 'circle', { cx: 16, cy: -158, r: 6, fill: '#1d2b3a' });
+add(cust, 'path', { d: 'M0,-104 V40 M0,40 L-40,140 M0,40 L40,140', stroke: '#1d2b3a', 'stroke-width': 9, fill: 'none', 'stroke-linecap': 'round' });
+const armL = add(cust, 'path', { d: '', stroke: '#1d2b3a', 'stroke-width': 9, fill: 'none', 'stroke-linecap': 'round' });
+const armR = add(cust, 'path', { d: '', stroke: '#1d2b3a', 'stroke-width': 9, fill: 'none', 'stroke-linecap': 'round' });
+add(cust, 'rect', { x: -58, y: -46, width: 24, height: 18, rx: 4, fill: '#ff6b4a' });   // watch on the left wrist
+const bubbleTxt = g(cust); add(bubbleTxt, 'rect', { x: -170, y: -330, width: 150, height: 90, rx: 30, fill: '#fff', stroke: '#1d2b3a', 'stroke-width': 5 });
+add(bubbleTxt, 'text', { x: -95, y: -268, 'text-anchor': 'middle', style: 'font:900 48px Inter;fill:#1d2b3a' }, '?!');
+
+/* ---------- scene C: Razan ---------- */
+const sceneC = g();
+const factory = g(sceneC);
+add(factory, 'path', { d: 'M-330,200 V-80 L-220,-170 V-80 L-110,-170 V-80 L0,-170 V-80 L110,-170 V-80 L220,-170 V-80 L330,-80 V200 Z', fill: '#00203f' });
+const door = add(factory, 'rect', { x: -110, y: 20, width: 220, height: 180, fill: '#DBAB88' });
+add(factory, 'rect', { x: -110, y: 20, width: 220, height: 180, fill: 'none', stroke: '#b9845f', 'stroke-width': 6 });
+add(factory, 'text', { x: 0, y: -10, 'text-anchor': 'middle', style: 'font:800 30px Inter;fill:#DBAB88;letter-spacing:.14em' }, 'OUR FACTORY');
+const logoBlock = g(sceneC);
+add(logoBlock, 'rect', { x: -230, y: -100, width: 460, height: 200, rx: 28, fill: '#fff', stroke: '#00203f', 'stroke-width': 6 });
+add(logoBlock, 'image', { href: '../assets/logo.png', x: -235, y: -92, width: 470, height: 184, preserveAspectRatio: 'xMidYMid meet' });
+studs(logoBlock, 460, -100, 4, '#e6ecf2');
+const paper = g(sceneC); add(paper, 'rect', { x: -70, y: -90, width: 140, height: 180, rx: 10, fill: '#fff', stroke: '#1d2b3a', 'stroke-width': 5 });
+[0, 1, 2, 3].forEach(i => add(paper, 'rect', { x: -45, y: -60 + i * 34, width: i % 2 ? 60 : 90, height: 10, rx: 5, fill: '#9bb8d3' }));
+add(paper, 'rect', { x: -40, y: 50, width: 80, height: 26, fill: 'none', stroke: '#2f8fd6', 'stroke-width': 4 });
+SFX.push({ t: A(19.66), type: 'whoosh' }); SFX.push({ t: A(21.7), type: 'whoosh' });
+const C_PARTS = [[frameBlock, 230, 1060, 24.0], [glassBlock, 560, 1060, 24.6], [hingeBlock, 860, 1060, 25.2]].map(([fn, x, y, at]) => {
+  const w = g(sceneC); fn(w); const st = sticker(w, fn === hingeBlock ? 0 : 70, fn === hingeBlock ? 80 : -140); SFX.push({ t: A(at), type: 'pop' }); return { w, x, y, at: A(at) }; });
+const CHIPS = [['CUT', '#00203f', 300, 26.19], ['DRILLED', '#00203f', 540, 26.79], ['LABELLED', '#00203f', 800, 27.3]].map(([t, c, x, at]) => { const p = pill(sceneC, t, c); SFX.push({ t: A(at), type: 'tick' }); return { p, x, at: A(at) }; });
+const togetherP = pill(sceneC, 'DELIVERED TOGETHER', '#1fae5b');
+SFX.push({ t: A(30.3), type: 'click' });
+const tick = g(sceneC); add(tick, 'circle', { cx: 0, cy: 0, r: 70, fill: '#1fae5b' }); add(tick, 'path', { d: 'M-30,0 L-8,24 L34,-24', stroke: '#fff', 'stroke-width': 14, fill: 'none', 'stroke-linecap': 'round', 'stroke-linejoin': 'round' });
+SFX.push({ t: A(30.9), type: 'ding' });
+const ICONS = [['📄', 'One drawing', 200, 32.24], ['📦', 'One box', 540, 33.21], ['✅', 'Done', 880, 34.31]].map(([e, l, x, at]) => { const b = g(sceneC);
+  add(b, 'circle', { cx: 0, cy: 0, r: 70, fill: '#fff', stroke: '#00203f', 'stroke-width': 5 }); add(b, 'text', { x: 0, y: 24, 'text-anchor': 'middle', style: 'font:70px "Noto Color Emoji"' }, e);
+  add(b, 'text', { x: 0, y: 125, 'text-anchor': 'middle', class: 'small' }, l); SFX.push({ t: A(at), type: 'pop' }); return { b, x, at: A(at) }; });
+
+/* ---------- captions (each narration line, word by word) ---------- */
+const LINES = [
+  [0.0, 2.10, 'Imagine you want to build a wardrobe.', { 6: 'b' }],
+  [2.69, 6.83, 'You need three things: the frame, the glass, and the hinges.', { 5: 'b', 7: 'b', 10: 'b' }, [[2.69, 3.89], [4.25, 4.87], [5.17, 5.85], [6.03, 6.83]]],
+  [7.43, 9.95, 'Most people buy them from three different shops.', { 5: 'k', 6: 'k', 7: 'k' }],
+  [10.48, 15.50, 'One shop is late. One sends the wrong size. One forgot the hinges.', { 3: 'k', 8: 'k', 9: 'k', 11: 'k' }, [[10.48, 11.67], [12.04, 13.66], [14.02, 15.50]]],
+  [15.95, 19.04, 'So nothing fits — and the customer is waiting.', { 1: 'k', 2: 'k', 8: 'k' }, [[15.95, 17.27], [17.56, 19.04]]],
+  [19.66, 21.11, 'Razan does it differently.', { 0: 'b' }],
+  [21.59, 23.00, 'You send us one drawing.', { 3: 'b', 4: 'b' }],
+  [23.41, 29.43, 'We make all three parts in our own factory — cut, drilled, and labelled — and deliver them together.', { 6: 'b', 7: 'b', 8: 'b', 10: 'g', 11: 'g', 13: 'g', 18: 'g' }, [[23.41, 25.86], [26.19, 26.49], [26.79, 27.91], [28.19, 29.43]]],
+  [29.91, 31.73, 'Everything fits the first time.', { 1: 'g', 3: 'g', 4: 'g' }],
+  [32.24, 34.61, 'One drawing. One box. Done.', { 5: 'g' }, [[32.24, 32.99], [33.21, 33.95], [34.31, 34.61]]],
+];
+const caps = LINES.map(([a, b, text, hl, segs]) => { const box = document.createElement('div'); box.style.cssText = 'position:absolute;left:0;right:0;top:0;display:flex;flex-wrap:wrap;justify-content:center;gap:4px 16px';
+  const words = text.split(' '); segs = segs || [[a, b]];
+  // assign words to segments in order, proportional to letters
+  const per = segs.map(() => []); { const tot = words.reduce((s, w) => s + w.length, 0); let acc = 0, si = 0, segTot = segs.reduce((s, [x, y]) => s + (y - x), 0), segAcc = segs[0][1] - segs[0][0];
+    words.forEach(w => { if (acc / tot > segAcc / segTot + .02 && si < segs.length - 1) { si++; segAcc += segs[si][1] - segs[si][0]; } per[si].push(w); acc += w.length; }); }
+  const spans = [], times = []; let wi = 0;
+  per.forEach((ws, si) => { const [x, y] = segs[si], L = ws.reduce((s, w) => s + w.length + 2, 0); let acc = 0;
+    ws.forEach(w => { const sp = document.createElement('span'); sp.className = 'w' + (hl[wi] ? ' ' + hl[wi] : ''); sp.textContent = w; box.appendChild(sp); spans.push(sp); times.push(A(x + (y - x) * acc / L) - .05); acc += w.length + 2; wi++; }); });
+  $('caps').appendChild(box); return { box, spans, times, a: A(a) - .1 }; });
+
+/* ---------- timeline ---------- */
+window.render = t => {
+  // SCENE A 0 – 7.4
+  const aOut = 1 - easeInOut(prog(t, A(7.2), .5));
+  T(sceneA, 0, 0, 1, aOut);
+  outline.style.opacity = easeOut(prog(t, .3, .6)); aWardLbl.style.opacity = easeOut(prog(t, .5, .6));
+  A_PARTS.forEach((p, i) => { const q = prog(t, p.at - .15, .5), bob = Math.sin(t * 2.2 + i) * 10;
+    T(p.w, p.x, lerp(p.y + 220, p.y, easeBack(q)) + bob, lerp(.6, 1, easeOut(q)) * (i === 2 ? 1.25 : .82), clamp(q * 2));
+    T(p.lb, p.x, p.y + 330 + bob * .3, 1, clamp(prog(t, p.at, .3))); });
+  // SCENE B 7.4 – 19.6
+  const bOn = easeInOut(prog(t, A(7.43), .5)) * (1 - easeInOut(prog(t, A(19.5), .5)));
+  T(sceneB, 0, 0, 1, bOn);
+  SHOPS.forEach((s, i) => T(s.s, s.x, lerp(200, 300, easeBack(prog(t, A(7.6) + i * .3, .5))), 1, clamp(prog(t, A(7.6) + i * .3, .25))));
+  VANS.forEach((v, i) => { const q = easeOut(prog(t, v.at, .9)); T(v.v, lerp(1250, v.x, q), 520 + (q < 1 ? Math.sin(t * 40) * 2 : 0), .9, t >= v.at ? 1 : 0); });
+  T(late, VANS[0].x, 680, easeBack(prog(t, VANS[0].at + .8, .4)), clamp(prog(t, VANS[0].at + .8, .2))); T(lateP, VANS[0].x, 790, 1, clamp(prog(t, VANS[0].at + .9, .2)));
+  // wrong-size glass: drops from van 2 into the assembly zone, then tries the frame and bounces off
+  const drop = easeBack(prog(t, VANS[1].at + .8, .6)), tryP = prog(t, A(15.95), .3), back = prog(t, A(16.25), .5);
+  const gx = lerp(VANS[1].x, 330, drop) + lerp(0, 120, easeInOut(tryP)) - lerp(0, 160, easeOut(back)) + (back > 0 && back < 1 ? Math.sin(back * 30) * 8 * (1 - back) : 0);
+  T(bigGlass, gx, lerp(560, 1080, drop), 1.32, clamp(prog(t, VANS[1].at + .8, .15)), lerp(0, -8, easeOut(back)));
+  T(wrongP, 540, 800, 1, clamp(prog(t, VANS[1].at + 1.4, .2)) * (1 - prog(t, A(15.8), .3)));
+  T(empty, VANS[2].x, 720, easeBack(prog(t, VANS[2].at + .8, .4)), clamp(prog(t, VANS[2].at + .8, .2))); T(noHP, VANS[2].x, 840, 1, clamp(prog(t, VANS[2].at + .9, .2)));
+  const shake = prog(t, A(16.2), .6); T(bFrame, 560 + (shake > 0 && shake < 1 ? Math.sin(shake * 40) * 14 * (1 - shake) : 0), 1080, 1, clamp(prog(t, A(10.3), .4)));
+  T(cross, 560, 1080, easeBack(prog(t, A(16.4), .35)), clamp(prog(t, A(16.4), .2)));
+  // CUSTOMER: waiting (B) then happy (C/D)
+  const custOn = clamp(prog(t, A(17.3), .4)) * (1 - prog(t, A(19.4), .4)) + clamp(prog(t, A(30.0), .4)) * (1 - prog(t, A(35.0), .3));
+  const happy = t > A(25);
+  T(cust, happy ? 930 : 900, happy ? 1340 : 1330, .95, custOn);
+  mouth.setAttribute('d', happy ? 'M-20,-136 Q0,-112 20,-136' : 'M-20,-120 Q0,-138 20,-120');
+  const tap = happy ? 0 : Math.max(0, Math.sin((t - A(17.56)) * 12));
+  armL.setAttribute('d', 'M0,-70 L-46,-36');
+  armR.setAttribute('d', happy ? 'M0,-70 L60,-150' : `M0,-70 L${lerp(-10, -30, tap).toFixed(1)},${lerp(-20, -40, tap).toFixed(1)}`);
+  bubbleTxt.style.opacity = happy ? 0 : clamp(prog(t, A(17.8), .3));
+  // SCENE C 19.6 – 35.2
+  const cOn = easeInOut(prog(t, A(19.6), .4)) * (1 - easeInOut(prog(t, A(35.1), .4)));
+  T(sceneC, 0, 0, 1, cOn);
+  const slide = easeOut(prog(t, A(19.66), .7)), up = easeInOut(prog(t, A(23.1), .6));
+  T(logoBlock, lerp(-400, 540, slide), lerp(760, 300, up), lerp(1, .62, up), 1);                       // slides straight in — no roll
+  const fly = easeInOut(prog(t, A(21.7), .9)); T(paper, lerp(160, 540, fly), lerp(1300, 760, fly), lerp(1, .3, fly), (1 - prog(t, A(22.5), .2)) * clamp(prog(t, A(21.59), .2)), lerp(-12, 0, fly));
+  T(factory, 540, lerp(820, 640, up), 1, clamp(prog(t, A(23.1), .4)) * (1 - prog(t, A(29.6), .4)));
+  door.setAttribute('height', (180 * (1 - easeInOut(prog(t, A(23.6), .4)))).toFixed(1));
+  const together = easeInOut(prog(t, A(28.19), .9)), snap = easeBack(prog(t, A(29.91), .45));
+  C_PARTS.forEach((p, i) => { const q = easeOut(prog(t, p.at, .6));
+    let x = lerp(540, p.x, q), y = lerp(760, p.y, q);
+    x = lerp(x, [430, 560, 690][i], together);
+    // snap into one wardrobe: glass into frame, hinge onto the frame's left side
+    const tx = [540, 540, 390][i], ty = [1060, 1060, 900][i];
+    x = lerp(x, tx, snap); y = lerp(y, ty, snap);
+    T(p.w, x, y, (i === 2 ? 1.1 : .82) * lerp(1, i === 2 ? .8 : 1, snap), clamp(prog(t, p.at, .2))); });
+  CHIPS.forEach(c => T(c.p, c.x, 1390, easeBack(prog(t, c.at, .35)), clamp(prog(t, c.at, .15)) * (1 - prog(t, A(28.25), .3))));
+  T(togetherP, 540, 1390, easeBack(prog(t, A(28.6), .35)), clamp(prog(t, A(28.6), .15)) * (1 - prog(t, A(29.9), .3)));
+  T(tick, 760, 800, easeBack(prog(t, A(30.6), .4)), clamp(prog(t, A(30.6), .15)));
+  ICONS.forEach(ic => T(ic.b, ic.x, 1380, easeBack(prog(t, ic.at, .4)), clamp(prog(t, ic.at, .15))));
+  // captions
+  const endA = A(35.0);
+  caps.forEach((c, i) => { const nxt = i + 1 < caps.length ? caps[i + 1].a : endA; c.box.style.display = t >= c.a && t < nxt ? 'flex' : 'none';
+    c.spans.forEach((w, j) => { const p = prog(t, c.times[j], .25); w.style.opacity = clamp(p * 3); w.style.transform = `translateY(${lerp(18, 0, easeOut(p))}px)`; }); });
+  // END CARD (Douglas: "Send your drawing. Price in two hours.")
+  const e = easeInOut(prog(t, A(34.95), .5)); $('end').style.opacity = e;
+  $('elogo').style.opacity = easeOut(prog(t, A(35.1), .5));                                           // logo: fade only on the end card
+  $('end').querySelectorAll('.l1,.l2,.btn,.url').forEach((n, i) => { const q = prog(t, A(35.19) + i * .45, .4); n.style.opacity = q;
+    n.style.transform = (n.classList.contains('btn') ? 'translateX(-50%) ' : '') + `translateY(${lerp(30, 0, easeOut(q))}px)`; });
+};
+window.SFX = SFX.sort((a, b) => a.t - b.t); window.CFG = { duration: 39.6, voiceAt: OFF };
+window.DURATION = 39.6; window.AUDIO_OFFSET = 0; window.AUDIO = 'sb-explainer.mp3';
+const q = new URLSearchParams(location.search); window.render(q.has('t') ? +q.get('t') : 1); window.READY = true;
+</script>
+</body>
+</html>
