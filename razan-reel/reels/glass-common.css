@@ -1,0 +1,60 @@
+/* Shared styles for the 5 glass-sheet creatives (sb-glass1..5.html). */
+:root { --navy:#00203f; --sand:#DBAB88; --green:#1fae5b; --red:#e03131; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 1080px; height: 1920px; overflow: hidden; }
+body { font-family: "Inter Display", Inter, sans-serif; }
+#stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: #f4efe9; }
+#stage > div { position: absolute; }
+.photo { inset: 0; background-size: cover; background-position: center 40%; }
+.shade { inset: 0; background: linear-gradient(180deg, rgba(0,20,42,.82) 0%, rgba(0,20,42,.25) 32%, rgba(0,20,42,.15) 50%, rgba(0,20,42,.85) 100%); }
+.shade.strong { background: linear-gradient(180deg, rgba(0,20,42,.85) 0%, rgba(0,20,42,.45) 35%, rgba(0,20,42,.55) 60%, rgba(0,20,42,.9) 100%); }
+.mark { left: 60px; top: 60px; display: flex; align-items: center; gap: 16px; font: 800 30px Inter; letter-spacing: .26em; color: #fff; mix-blend-mode: normal; text-shadow: 0 2px 10px rgba(0,0,0,.3); }
+.mark i { width: 60px; height: 60px; border-radius: 50%; background: #fff url(../assets/logo-mark.png) center/cover; }
+.hook { left: 60px; right: 60px; color: var(--navy); }
+.hook .k { display: inline-block; padding: 14px 26px; border-radius: 14px; background: var(--sand); color: var(--navy); font: 900 44px/1 "Inter Display", Inter; letter-spacing: .04em; transform-origin: left center; }
+.hook .l { margin-top: 26px; font: 900 96px/1.02 "Inter Display", Inter; letter-spacing: -.02em; }
+.hook .l span { color: var(--green); }
+.hook.light, #stage[style*="00203f"] .hook, #stage[style*="0c3a66"] .hook { color: #fff; }
+.hook.light .l span { color: #7ff0ad; }
+.sale { border-radius: 50%; background: var(--red); color: #fff; display: grid; place-items: center; text-align: center; font: 900 54px/1 "Inter Display", Inter; letter-spacing: .02em;
+  box-shadow: 0 16px 40px rgba(224,49,49,.45); border: 8px dashed rgba(255,255,255,.6); }
+.chip { left: 60px; padding: 18px 30px 18px 18px; border-radius: 999px; background: rgba(255,255,255,.95); color: var(--navy); font: 800 46px/1 Inter; display: flex; align-items: center; gap: 20px; box-shadow: 0 14px 30px rgba(0,0,0,.25); }
+.chip b, .line b, .types b { display: inline-block; width: 64px; height: 64px; border-radius: 12px; border: 3px solid rgba(255,255,255,.8); box-shadow: inset 0 0 0 1px rgba(0,0,0,.15); }
+.sheet { position: relative; border-radius: 6px; box-shadow: 0 30px 60px rgba(0,0,0,.35), inset 0 0 0 3px rgba(255,255,255,.25); overflow: hidden; }
+.sheet i, .bigsheet i { position: absolute; inset: 0; background: linear-gradient(115deg, rgba(255,255,255,0) 30%, rgba(255,255,255,.28) 42%, rgba(255,255,255,0) 52%); }
+.fan { transform-origin: 50% 100%; }
+.fan .cap { margin-top: 18px; text-align: center; font: 800 34px Inter; color: #fff; }
+.tag { padding: 18px 32px; border-radius: 999px; background: rgba(255,255,255,.12); border: 2px solid rgba(255,255,255,.4); color: #fff; font: 700 36px Inter; white-space: nowrap; }
+.ptag { left: 170px; top: 520px; width: 740px; padding: 60px 40px 46px; border-radius: 30px; background: #ffd43b; color: var(--navy); text-align: center; box-shadow: 0 30px 60px rgba(0,0,0,.4); transform-origin: 50% 0; }
+.ptag .hole { width: 54px; height: 54px; border-radius: 50%; background: #0b1a2a; margin: -20px auto 20px; box-shadow: inset 0 4px 8px rgba(0,0,0,.4); }
+.ptag .t1 { font: 900 210px/.9 "Inter Display", Inter; letter-spacing: -.03em; color: var(--red); }
+.ptag .t2 { margin-top: 16px; font: 900 56px/1.1 "Inter Display", Inter; }
+.ptag .t3 { margin-top: 12px; font: 700 34px "JetBrains Mono", monospace; }
+.line { left: 90px; right: 90px; display: flex; align-items: center; gap: 22px; padding: 14px 24px; border-radius: 18px; background: rgba(255,255,255,.94); color: var(--navy); font: 800 44px Inter; }
+.line em { margin-left: auto; font: 800 28px Inter; font-style: normal; color: var(--green); }
+.gauge { left: 60px; right: 60px; height: 180px; padding: 10px 26px 10px 170px; border-radius: 26px; background: #fff; box-shadow: 0 16px 34px rgba(0,32,63,.12); }
+.gauge .sw { position: absolute; left: 18px; top: 10px; }
+.gauge .gname { margin-top: 18px; font: 900 46px "Inter Display", Inter; color: var(--navy); }
+.gauge .track { margin-top: 16px; height: 34px; border-radius: 17px; background: #eef1f4; overflow: hidden; }
+.gauge .fill { height: 100%; border-radius: 17px; }
+.gauge .gl { position: absolute; right: 30px; top: 30px; font: 800 28px "JetBrains Mono", monospace; }
+.bigsheet { left: 110px; top: 560px; width: 860px; height: 603px; border-radius: 6px; overflow: hidden; box-shadow: 0 40px 80px rgba(0,0,0,.45); }
+.bigsheet .layer { position: absolute; inset: 0; }
+.dim { color: #8fd8ff; font: 700 36px "JetBrains Mono", monospace; }
+.dim.w { left: 110px; width: 860px; top: 500px; text-align: center; border-bottom: 3px solid #8fd8ff; padding-bottom: 8px; }
+.dim.h { left: 990px; top: 560px; height: 603px; writing-mode: vertical-rl; text-align: center; border-left: 3px solid #8fd8ff; padding-left: 8px; }
+.tname { left: 0; right: 0; top: 1220px; text-align: center; font: 900 78px "Inter Display", Inter; color: #fff; }
+.end { inset: 0; background: radial-gradient(ellipse at 50% 30%, #0b3358 0%, var(--navy) 60%, #00142a 100%); color: #fff; opacity: 0; }
+.end .logo { position: absolute; left: 240px; top: 230px; width: 600px; height: 240px; border-radius: 30px; background: #fff url(../assets/logo.png) center/112% auto no-repeat; }
+.end .e1 { position: absolute; left: 60px; right: 60px; top: 560px; text-align: center; font: 900 84px/1.05 "Inter Display", Inter; }
+.end .e2 { position: absolute; left: 60px; right: 60px; top: 760px; text-align: center; font: 800 56px/1.15 "Inter Display", Inter; color: var(--sand); }
+.end .types { position: absolute; left: 90px; right: 90px; top: 950px; display: grid; grid-template-columns: 1fr 1fr; gap: 22px 30px; font: 700 38px Inter; }
+.end .types span { display: flex; align-items: center; gap: 18px; }
+.end .types b { width: 70px; height: 70px; }
+.end .btn { position: absolute; left: 50%; top: 1420px; padding: 34px 70px; border-radius: 999px; background: #25D366; font: 800 52px/1 Inter; white-space: nowrap; }
+.end .url { position: absolute; left: 0; right: 0; top: 1570px; text-align: center; font: 600 36px Inter; color: rgba(255,255,255,.8); }
+.mark.dark { color: var(--navy); text-shadow: none; }
+.mark.dark i { box-shadow: 0 0 0 3px var(--navy); }
+.names { left: 90px; right: 90px; top: 1395px; display: grid; grid-template-columns: 1fr 1fr; gap: 18px 30px; color: #fff; font: 800 40px Inter; }
+.names span { display: flex; align-items: center; gap: 16px; }
+.names b { display: inline-block; width: 56px; height: 56px; border-radius: 10px; border: 3px solid rgba(255,255,255,.8); }
