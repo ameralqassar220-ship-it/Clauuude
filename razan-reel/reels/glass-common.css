@@ -58,3 +58,6 @@ body { font-family: "Inter Display", Inter, sans-serif; }
 .names { left: 90px; right: 90px; top: 1395px; display: grid; grid-template-columns: 1fr 1fr; gap: 18px 30px; color: #fff; font: 800 40px Inter; }
 .names span { display: flex; align-items: center; gap: 16px; }
 .names b { display: inline-block; width: 56px; height: 56px; border-radius: 10px; border: 3px solid rgba(255,255,255,.8); }
+.vcap { left: 60px; right: 60px; top: 1640px; }
+.vg { flex-wrap: wrap; justify-content: center; gap: 4px 14px; font: 900 60px/1.15 "Inter Display", Inter; color: #fff; text-shadow: 0 4px 16px rgba(0,0,0,.6); }
+.vg span { display: inline-block; } .vg .hl { background: var(--sand); color: var(--navy); padding: 0 14px 6px; border-radius: 12px; text-shadow: none; }

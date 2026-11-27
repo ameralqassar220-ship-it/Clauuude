@@ -120,12 +120,48 @@ if (V === 5) {
   U.push(saleBadge(770, 470, 6.8, 200));
   U.push(endCard(7.7, 'Full sheets. Every tint.', 'On sale now for glass factories.'));
 }
+/* ---------------- 6 / 7 / 8 · PRICE TAG + excited voiceover (James) — variations of creative 3 ---------------- */
+const VO = {
+  6: { file: 'vo-glass-owners.mp3', kicker: 'ATTENTION, GLASS FACTORY OWNERS', line: 'Full sheets now at <span>Razan.</span>', tag: ['#ffd43b', '#e03131', '#00203f'], pos: 'center 40%', zoom: [1.05, 1.2],
+       segs: [[0, 1.88, 'Attention, glass factory owners!'], [2.14, 4.87, 'Full glass sheets are now available at Razan!']], names: [5.53, 6.72, 7.92, 9.36], more: 10.23, sale: [11.56, 12.88, 'All on sale now!'], end: 13.04 },
+  7: { file: 'vo-glass-managers.mp3', kicker: 'GLASS FACTORY MANAGERS', line: 'Need full sheets? <span>Now at Razan.</span>', tag: ['#e03131', '#fff', '#fff'], pos: '35% 45%', zoom: [1.25, 1.08],
+       segs: [[0, 1.49, 'Glass factory managers!'], [1.68, 2.54, 'Need full sheets?'], [2.71, 4.25, "They're now available at Razan!"]], names: [4.97, 6.10, 7.21, 8.50], more: 9.29, sale: [10.66, 11.65, 'On sale now!'], end: 12.0 },
+  8: { file: 'vo-glass-factories.mp3', kicker: 'HEY, GLASS FACTORIES', line: 'Full sheets just <span>landed.</span>', tag: ['#DBAB88', '#00203f', '#00203f'], pos: '70% 40%', zoom: [1.3, 1.12],
+       segs: [[0, 1.64, 'Hey, glass factories!'], [1.84, 3.91, 'Full sheets just landed at Razan!']], names: [4.72, 5.91, 7.10, 8.54], more: 9.35, sale: [10.64, 11.98, "Grab them while they're on sale!"], end: 12.16 },
+}[V];
+if (VO) {
+  const OFF = .3, A = x => x + OFF, END = A(VO.end) + .25;
+  const ph = el(`<div class="photo" style="background-image:url(../assets/glass-rack.jpg);background-position:${VO.pos}"></div>`); el(`<div class="shade strong"></div>`);
+  U.push(t => { ph.style.transform = `scale(${lerp(VO.zoom[0], VO.zoom[1], prog(t, 0, END))})`; });
+  U.push(hook(150, VO.kicker, VO.line, A(0) - .05, true));
+  const lastSeg = VO.segs[VO.segs.length - 1], tagAt = A(lastSeg[0]);
+  const tag = el(`<div class="ptag" style="background:${VO.tag[0]}"><div class="hole"></div><div class="t1" style="color:${VO.tag[1]}">SALE</div><div class="t2" style="color:${VO.tag[2]}">FULL GLASS SHEETS</div><div class="t3" style="color:${VO.tag[2]}">3.21 × 2.25 m · 3.66 × 2.14 m</div></div>`);
+  SFX.push({ t: tagAt, type: 'click' });
+  U.push(t => { const p = prog(t, tagAt, .6); set(tag, { o: clamp(p * 3) * (1 - prog(t, END - .4, .4)), y: lerp(-500, 0, easeBack(p)), r: lerp(-25, -6, easeOut(p)) + Math.sin(t * 2.2) * 1.5 * p }); });
+  const rows = [...FOUR.map((k, i) => ({ k, at: A(VO.names[i]) })), { k: 'more', at: A(VO.more) }].map(({ k, at }, i) => ({ at,
+    n: el(`<div class="line" style="top:${1150 + i * 92}px">${k === 'more' ? `<b style="background:${GLASS.grey.css}"></b>+ many more` : `<b style="background:${GLASS[k].css}"></b>${GLASS[k].name}<em>✓ IN STOCK</em>`}</div>`) }));
+  rows.forEach(r => SFX.push({ t: r.at, type: 'tick' }));
+  U.push(t => rows.forEach(r => { const q = rise(t, r.at - .05, .3, 30); set(r.n, { ...q, o: q.o * (1 - prog(t, END - .4, .4)) }); }));
+  U.push(saleBadge(780, 480, A(VO.sale[0]), 230));
+  // word-by-word captions of the voiceover (muted viewing)
+  const capBox = el(`<div class="vcap"></div>`);
+  const groups = [...VO.segs.map(s => [s]), [[VO.names[0], VO.more + 1.0, 'Black tinted. Brown tinted. Brown reflective. Fluted. And many more!']], [VO.sale]].map(segs => {
+    const box = document.createElement('div'); box.className = 'vg'; capBox.appendChild(box); const spans = [], times = [];
+    segs.forEach(([a, b, text]) => { const ws = text.split(' '), L = ws.reduce((x, w) => x + w.length + 2, 0); let acc = 0;
+      ws.forEach(w => { const sp = document.createElement('span'); sp.textContent = w; if (/Razan|sale|Brown|Black|Fluted|many/i.test(w)) sp.className = 'hl'; box.appendChild(sp); spans.push(sp); times.push(A(a + (b - a) * acc / L) - .04); acc += w.length + 2; }); });
+    return { box, spans, times, a: times[0] }; });
+  U.push(t => groups.forEach((g, i) => { const nxt = i + 1 < groups.length ? groups[i + 1].a : END; g.box.style.display = t >= g.a - .05 && t < nxt ? 'flex' : 'none';
+    g.spans.forEach((w, j) => { const q = prog(t, g.times[j], .2); w.style.opacity = clamp(q * 3); w.style.transform = `translateY(${lerp(16, 0, easeOut(q))}px)`; }); }));
+  U.push(endCard(END, 'Full glass sheets — now at Razan.', 'On sale now for glass factories.'));
+  window.__VOICE = { file: VO.file, at: OFF, dur: END + 2.6 };
+}
 // brand mark (top-left, fade only) on every creative
 const mark = el(`<div class="mark ${V === 4 ? 'dark' : ''}"><i></i>RAZAN</div>`);
-U.push(t => { mark.style.opacity = easeOut(prog(t, .2, .5)) * (1 - prog(t, 7.3, .3)); });
+U.push(t => { mark.style.opacity = easeOut(prog(t, .2, .5)) * (1 - prog(t, window.__VOICE ? window.__VOICE.dur - 2.9 : 7.3, .3)); });
 
 window.render = t => { U.forEach(u => u(t)); };
-window.SFX = SFX.sort((a, b) => a.t - b.t); window.CFG = { duration: DUR, voiceAt: null };
-window.DURATION = DUR; window.AUDIO_OFFSET = 0; window.AUDIO = `sb-glass${V}.mp3`;
-const q = new URLSearchParams(location.search); window.render(q.has('t') ? +q.get('t') : 9.5); window.READY = true;
+const D = window.__VOICE ? window.__VOICE.dur : DUR;
+window.SFX = SFX.sort((a, b) => a.t - b.t); window.CFG = { duration: D, voiceAt: window.__VOICE ? window.__VOICE.at : null };
+window.DURATION = D; window.AUDIO_OFFSET = 0; window.AUDIO = `sb-glass${V}.mp3`;
+const q = new URLSearchParams(location.search); window.render(q.has('t') ? +q.get('t') : D - .5); window.READY = true;
 })();
